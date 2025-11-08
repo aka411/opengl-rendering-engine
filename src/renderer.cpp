@@ -46,9 +46,12 @@ void Renderer::renderFrame(Engine::Model& engineModel)
 
 	glBindVertexArray(m_vertexFormatManager.getDefaultVAO());
 	
-	glBindBuffer(GL_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle);
 	//glBindBufferBase(GL_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle, 0); 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle);
+
+	//glBindBufferBase(GL_ARRAY_BUFFER, 0, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalIndexBufferInfo().bufferHandle);
 
 
 	glClearColor(0.2, 0.4, 0.5, 1.0);
@@ -83,34 +86,6 @@ void Renderer::renderFrame(Engine::Model& engineModel)
 		for (auto& primitive : engineModel.meshes[meshIndex].primitives)
 		{
 
-			glVertexAttribPointer(
-				0,       // Attribute index (0, 1, 2, etc.)
-				3,         // Component count (3 for vec3, 2 for vec2)
-				GL_FLOAT,          // Data type (GL_FLOAT, GL_UNSIGNED_SHORT, etc.)
-				GL_FALSE,                   // Normalized (GL_FALSE)
-				primitive.postionStride,                     // Dynamic Stride (0 or >0 for interleaved)
-				(const void*)primitive.positionOffsetInBuffer    // Dynamic Offset in bytes from VBO start
-			);
-
-
-			glVertexAttribPointer(
-				1,       // Attribute index (0, 1, 2, etc.)
-				3,         // Component count (3 for vec3, 2 for vec2)
-				GL_FLOAT,          // Data type (GL_FLOAT, GL_UNSIGNED_SHORT, etc.)
-				GL_FALSE,                   // Normalized (GL_FALSE)
-				primitive.normalStride,                     // Dynamic Stride (0 or >0 for interleaved)
-				(const void*)primitive.normalOffsetInBuffer    // Dynamic Offset in bytes from VBO start
-			);
-
-
-			glVertexAttribPointer(
-				2,       // Attribute index (0, 1, 2, etc.)
-				2,         // Component count (3 for vec3, 2 for vec2)
-				GL_FLOAT,          // Data type (GL_FLOAT, GL_UNSIGNED_SHORT, etc.)
-				GL_FALSE,                   // Normalized (GL_FALSE)
-				primitive.texCoordStride,                     // Dynamic Stride (0 or >0 for interleaved)
-				(const void*)primitive.texCoordOffsetInBuffer    // Dynamic Offset in bytes from VBO start
-			);
 			
 
 			glProgramUniformMatrix4fv
@@ -179,14 +154,15 @@ void Renderer::renderFrame(Engine::Model& engineModel)
 			{
 				
 
-				auto indexFormat = (primitive.indexFormat == Engine::IndexFormat::UNSIGNED_INT) ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT;
-				glDrawElements(GL_TRIANGLES, primitive.indexCount, indexFormat, (const void*)primitive.indexOffsetInBuffer);
+				auto indexFormat = (primitive.indexFormat == Engine::IndexFormat::UINT8) ?  GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 				
-
+				glBindVertexBuffer(0, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle, primitive.vertexOffsetInBuffer, 32);
+				//glDrawElementsBaseVertex(GL_TRIANGLES, primitive.indexCount, indexFormat, (const void*)primitive.indexOffsetInBuffer, 0);
+				glDrawElements(GL_TRIANGLES, primitive.indexCount, indexFormat, (const void*)primitive.indexOffsetInBuffer);
 			}
 			else
 			{
-				glDrawArrays(GL_TRIANGLES, 0, primitive.vertexCount);
+				glDrawArrays(GL_TRIANGLES, primitive.vertexOffsetInBuffer, primitive.vertexCount);
 			}
 		}
 

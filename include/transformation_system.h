@@ -1,6 +1,5 @@
 #pragma once
-//#include "gltf_parser.h"
-//#include "hierarchy_traverser.h"
+
 #include "hierarchy_traverser_flat.h"
 
 

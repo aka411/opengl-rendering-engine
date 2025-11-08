@@ -5,7 +5,7 @@ BufferManagementSystem::BufferManagementSystem()
 {
 	/*** VERTEX AND INDEX BUFFER AREA ***/
 	m_globalVertexBufferInfo = m_gpuBufferManager.createMappedVertexBuffer(1024 * 1024 * 100, nullptr);// 100 MiB
-	m_globalIndexBufferInfo = m_gpuBufferManager.createMappedIndexBuffer(1024 * 1024 * 10, nullptr);// 100 MiB
+	m_globalIndexBufferInfo = m_gpuBufferManager.createMappedIndexBuffer(1024 * 1024 * 10, nullptr);// 10 MiB
 
 
 
@@ -24,7 +24,7 @@ BufferManagementSystem::BufferManagementSystem()
 
 
 
-size_t BufferManagementSystem::uploadDataToVertexBuffer(void* data, size_t size/*in bytes*/)
+size_t BufferManagementSystem::uploadDataToVertexBuffer(const void* data, size_t size/*in bytes*/)
 {
 	if(m_currentOffsetOfVertexBuffer + size > m_globalVertexBufferInfo.totalSize)
 	{
@@ -53,7 +53,7 @@ size_t BufferManagementSystem::uploadDataToVertexBuffer(void* data, size_t size/
 
 }
 
-size_t BufferManagementSystem::uploadDataToIndexBuffer(void* data, size_t size)
+size_t BufferManagementSystem::uploadDataToIndexBuffer(const void* data, size_t size)
 {
 
 	if (m_currentOffsetOfIndexBuffer + size > m_globalIndexBufferInfo.totalSize)
@@ -87,6 +87,11 @@ size_t BufferManagementSystem::uploadDataToIndexBuffer(void* data, size_t size)
 BufferInfo BufferManagementSystem::getGlobalVertexBufferInfo()
 {
 	return m_globalVertexBufferInfo;
+}
+
+BufferInfo BufferManagementSystem::getGlobalIndexBufferInfo()
+{
+	return m_globalIndexBufferInfo;
 }
 
 BufferInfo BufferManagementSystem::getMaterialUBOInfo()

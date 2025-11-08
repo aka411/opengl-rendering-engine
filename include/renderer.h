@@ -3,7 +3,7 @@
 #include <string>
 #include "shader_manager.h"
 #include "camera.h"
-//#include "gltf_parser.h"
+
 #include "hierarchy_traverser_flat.h"
 #include "vertex_format_manager.h"
 

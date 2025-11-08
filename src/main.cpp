@@ -47,20 +47,20 @@ SDL_Window* init()
 	return window;
 }
 
-	using namespace tinygltf;
+	
 
 
-Model loadModel()
+tinygltf::Model loadModel()
 {
 
 tinygltf::Model model;
-TinyGLTF loader;
+tinygltf::TinyGLTF loader;
 std::string err;
 std::string warn;
-std::string filePath = "PATH TO GLTF FILE";/*ADD CORRECT PATH*/
+std::string filePath = ""/*ADD CORRECT PATH*/;
 
 
-bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, filePath, 0);
+bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, filePath);
 //bool ret = loader.LoadBinaryFromFile(&model, &err, &warn, filePath); // for binary glTF(.glb)
 
 if (!warn.empty())
@@ -99,7 +99,7 @@ int main(int argc, char* args[])
 
 
 
-	Model model = loadModel();
+	tinygltf::Model model = loadModel();
 
 	SDL_Window* window = init();
 
@@ -197,7 +197,7 @@ int main(int argc, char* args[])
 
 		 }
 
-		 animationSystem.animate(deltaTime, engineModel, "Take 001");
+		 animationSystem.animate(deltaTime, engineModel, "Animation Name");
 
 		 g_transfromationSystem.updateWorldTransforms(engineModel);
 		

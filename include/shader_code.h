@@ -50,7 +50,7 @@ std::string defaultFragmentShaderCode = R"(
 layout (std140, binding = 5) uniform material
 {
     vec4 baseColorFactor;
-    vec4 emmissiveFactor;
+    vec3 emmissiveFactor;
     float metallicFactor;
     float roughnessFactor;
 

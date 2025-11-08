@@ -87,7 +87,7 @@ BufferInfo GPUBufferManager::createMappedIndexBuffer(const size_t size, void* da
 
 	glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, size, data, flags);
 
-	void* mappedVBOData = glMapBufferRange(GL_ARRAY_BUFFER, 0, size, flags);
+	void* mappedVBOData = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, size, flags);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	m_allocatedBuffers.push_back(EBO);

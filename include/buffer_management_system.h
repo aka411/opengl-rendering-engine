@@ -23,10 +23,12 @@ private:
 public:
 	BufferManagementSystem();
 
-	size_t uploadDataToVertexBuffer(void* data, size_t size);
-	size_t uploadDataToIndexBuffer(void* data, size_t size);
+	size_t uploadDataToVertexBuffer(const void* data, size_t size);
+	size_t uploadDataToIndexBuffer(const void* data, size_t size);
 
 	BufferInfo getGlobalVertexBufferInfo();
+	BufferInfo getGlobalIndexBufferInfo();
+
 	BufferInfo getMaterialUBOInfo();
 
 	BufferInfo getCameraUBOInfo();
