@@ -42,13 +42,16 @@ void Renderer::renderFrame(Engine::Model& engineModel)
 
 	glViewport(0, 0, m_viewPort.width, m_viewPort.height);
 
-	glUseProgram(m_defaultShaderProgram);
 
-	glBindVertexArray(m_vertexFormatManager.getDefaultVAO());
+
+	//glBindVertexArray(m_vertexFormatManager.getDefaultVAO());
 	
-	glBindBuffer(GL_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle);
 	//glBindBufferBase(GL_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle, 0); 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle);
+
+	//glBindBufferBase(GL_ARRAY_BUFFER, 0, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle);
+
+	
 
 
 	glClearColor(0.2, 0.4, 0.5, 1.0);
@@ -83,34 +86,6 @@ void Renderer::renderFrame(Engine::Model& engineModel)
 		for (auto& primitive : engineModel.meshes[meshIndex].primitives)
 		{
 
-			glVertexAttribPointer(
-				0,       // Attribute index (0, 1, 2, etc.)
-				3,         // Component count (3 for vec3, 2 for vec2)
-				GL_FLOAT,          // Data type (GL_FLOAT, GL_UNSIGNED_SHORT, etc.)
-				GL_FALSE,                   // Normalized (GL_FALSE)
-				primitive.postionStride,                     // Dynamic Stride (0 or >0 for interleaved)
-				(const void*)primitive.positionOffsetInBuffer    // Dynamic Offset in bytes from VBO start
-			);
-
-
-			glVertexAttribPointer(
-				1,       // Attribute index (0, 1, 2, etc.)
-				3,         // Component count (3 for vec3, 2 for vec2)
-				GL_FLOAT,          // Data type (GL_FLOAT, GL_UNSIGNED_SHORT, etc.)
-				GL_FALSE,                   // Normalized (GL_FALSE)
-				primitive.normalStride,                     // Dynamic Stride (0 or >0 for interleaved)
-				(const void*)primitive.normalOffsetInBuffer    // Dynamic Offset in bytes from VBO start
-			);
-
-
-			glVertexAttribPointer(
-				2,       // Attribute index (0, 1, 2, etc.)
-				2,         // Component count (3 for vec3, 2 for vec2)
-				GL_FLOAT,          // Data type (GL_FLOAT, GL_UNSIGNED_SHORT, etc.)
-				GL_FALSE,                   // Normalized (GL_FALSE)
-				primitive.texCoordStride,                     // Dynamic Stride (0 or >0 for interleaved)
-				(const void*)primitive.texCoordOffsetInBuffer    // Dynamic Offset in bytes from VBO start
-			);
 			
 
 			glProgramUniformMatrix4fv
@@ -134,7 +109,7 @@ void Renderer::renderFrame(Engine::Model& engineModel)
 
 
 			memcpy(materialUBOInfo.mappedPtr, &material.materialPBRMetallicRoughnessConstValues, sizeof(material.materialPBRMetallicRoughnessConstValues));
-			GLuint bindingPoint = 5; // The desired binding point
+			GLuint bindingPoint = 5; 
 			glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, materialUBOInfo.bufferHandle);
 
 			Engine::MaterialPBRMetallicRoughnessConstValues materialPBRMetallicRoughnessConstValues = material.materialPBRMetallicRoughnessConstValues;
@@ -171,22 +146,39 @@ void Renderer::renderFrame(Engine::Model& engineModel)
 				glBindTextureUnit(10, material.materialPBRMetallicRoughnessTexture.emmissiveTexture);
 			}
 
+			if (primitive.isSkinned)
+			{
+				glUseProgram(m_bonedShaderProgram);
+				glBindVertexArray(m_vertexFormatManager.getBonedVAO());
+				//continue;
 
+				BufferInfo boneUBOInfo = m_bufferManagementSystem.getBoneUBOBufferInfo();
+				assert(boneUBOInfo.mappedPtr != nullptr);
 
+				memcpy(boneUBOInfo.mappedPtr, engineModel.jointMatrices.data(), sizeof(engineModel.jointMatrices[0]) * engineModel.jointMatrices.size());
+				GLuint boneUBOBindingPoint = 1; 
+				glBindBufferBase(GL_UNIFORM_BUFFER, boneUBOBindingPoint, boneUBOInfo.bufferHandle);
 
+			}
+			else
+			{
+				glUseProgram(m_defaultShaderProgram);
+				glBindVertexArray(m_vertexFormatManager.getDefaultVAO());
+			}
 
 			if (primitive.isIndexed)
 			{
 				
 
-				auto indexFormat = (primitive.indexFormat == Engine::IndexFormat::UNSIGNED_INT) ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT;
+				auto indexFormat = (primitive.indexFormat == Engine::IndexFormat::UINT8) ?  GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalIndexBufferInfo().bufferHandle);
+				glBindVertexBuffer(0, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle, primitive.vertexOffsetInBuffer, primitive.stride);
+				//glDrawElementsBaseVertex(GL_TRIANGLES, primitive.indexCount, indexFormat, (const void*)primitive.indexOffsetInBuffer, 0);
 				glDrawElements(GL_TRIANGLES, primitive.indexCount, indexFormat, (const void*)primitive.indexOffsetInBuffer);
-				
-
 			}
 			else
 			{
-				glDrawArrays(GL_TRIANGLES, 0, primitive.vertexCount);
+				glDrawArrays(GL_TRIANGLES, primitive.vertexOffsetInBuffer, primitive.vertexCount);
 			}
 		}
 

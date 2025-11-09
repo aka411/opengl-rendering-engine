@@ -8,16 +8,19 @@ VertexFormatManager::VertexFormatManager()
 	glCreateVertexArrays(1, &m_defaultVAO);
 	glBindVertexArray(m_defaultVAO);
 
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // postion attribute
+
+	glVertexAttribFormat(0, 3, GL_FLOAT, GL_FALSE, 0);
 	glVertexAttribBinding(0, 0);
 	glEnableVertexAttribArray(0);
 
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(3 * sizeof(float))); // normal attribute
+
+	glVertexAttribFormat(1, 3, GL_FLOAT, GL_FALSE, 12);
 	glVertexAttribBinding(1, 0);
 	glEnableVertexAttribArray(1);
+	
 
 
-	//glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0); // uv coords attribute
+	glVertexAttribFormat(2, 2, GL_FLOAT, GL_FALSE, 24);
 	glVertexAttribBinding(2, 0);
 	glEnableVertexAttribArray(2);
 
@@ -25,29 +28,36 @@ VertexFormatManager::VertexFormatManager()
 
 
 
-
+	
 	glCreateVertexArrays(1, &m_bonedVAO);
+
 	glBindVertexArray(m_bonedVAO);
 
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // postion attribute
+
+	glVertexAttribFormat(0, 3, GL_FLOAT, GL_FALSE, 0);//POSITION
 	glVertexAttribBinding(0, 0);
 	glEnableVertexAttribArray(0);
 
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(3 * sizeof(float))); // normal attribute
+
+	glVertexAttribFormat(1, 3, GL_FLOAT, GL_FALSE, 12);//NORMAL
 	glVertexAttribBinding(1, 0);
 	glEnableVertexAttribArray(1);
 
 
-	//glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0); // uv coords attribute
+
+	glVertexAttribFormat(2, 2, GL_FLOAT, GL_FALSE, 24);//TEXCOORD
 	glVertexAttribBinding(2, 0);
 	glEnableVertexAttribArray(2);
 
 
-	//glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0); // uv coords attribute
-	glVertexAttribBinding(3, 0);
-	glEnableVertexAttribArray(3);//weights
 
-	glVertexAttribBinding(4, 0);//jointIndex
+	glVertexAttribIFormat(3, 4, GL_INT, 32);//JOINT 16 bytes
+	glVertexAttribBinding(3, 0);
+	glEnableVertexAttribArray(3);
+
+
+	glVertexAttribFormat(4, 4, GL_FLOAT, GL_FALSE, 48);//WEIGHTS
+	glVertexAttribBinding(4, 0);
 	glEnableVertexAttribArray(4);
 
 	glBindVertexArray(0);

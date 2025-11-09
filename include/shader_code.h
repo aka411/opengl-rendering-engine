@@ -50,7 +50,7 @@ std::string defaultFragmentShaderCode = R"(
 layout (std140, binding = 5) uniform material
 {
     vec4 baseColorFactor;
-    vec4 emmissiveFactor;
+    vec3 emmissiveFactor;
     float metallicFactor;
     float roughnessFactor;
 
@@ -82,15 +82,6 @@ layout (binding = 10) uniform sampler2D u_EmissiveTexture;        // Texture Uni
 
 
 void main() {
-/*
-     // FragColor = vec4(vertexNormal, 1.0); 
-  
-    vec3 N = normalize(vertexNormal);
-    
-    // Visualize the normal vector by mapping its components (-1 to 1) to colors (0 to 1)
-    // This is a common debugging technique.
-    FragColor = vec4(N * 0.5 + 0.5, 1.0);
-*/
 
 
 
@@ -99,7 +90,7 @@ void main() {
     float roughness = roughnessFactor;
     
  
-    float ambientOcclusion = 1.0; 
+    float ambientOcclusion = 0.9; 
 
 
 
@@ -114,6 +105,7 @@ void main() {
     }
 
     // 3. Metallic-Roughness (Channel Packed)
+
     if (metallicRoughnessTexturePresent) {
         // glTF standard:
         // Metallic/Roughness is combined into one texture.
@@ -166,8 +158,8 @@ layout(location = 0 ) in vec3 inPosition;
 layout(location = 1 ) in vec3 inNormal;
 layout(location = 2 ) in vec2 inTexCoord;
 
-layout(location = 3 ) in vec4 inWeights;
-layout(location = 4 ) in vec4 inJoints;
+layout(location = 3 ) in ivec4 inJoints; 
+layout(location = 4 ) in vec4 inWeights;
 
 layout(std140,binding = 0 ) uniform Camera
 {
@@ -197,15 +189,29 @@ out vec2 texCoord;
 
 void main()
 {
-    vertexNormal = mat3(model) * inNormal;
-	texCoord = inTexCoord;
 
 
 
+    mat4 boneTransform = 
+        inWeights.x * joints[inJoints.x] +
+        inWeights.y * joints[inJoints.y] +
+        inWeights.z * joints[inJoints.z] +
+        inWeights.w * joints[inJoints.w];
 
-    gl_Position = projection * view * model * vec4( inPosition, 1.0); 
 
- 
+
+    vec4 finalPosition = model * boneTransform * vec4(inPosition, 1.0);
+    gl_Position = projection * view * model * finalPosition;
+
+
+    mat3 normalMatrix = mat3(model) * mat3(boneTransform);
+    vertexNormal = normalMatrix * inNormal;
+
+
+
+    texCoord = inTexCoord ;
+
+
 }
 
 

@@ -6,16 +6,35 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(FetchContent)
 
-add_executable(gltf-test-app
+add_executable(rendering-engine
 
 src/main.cpp
 src/gpu_texture_manager.cpp
 src/gpu_buffer_manager.cpp
- "glad/glad.c"      "src/buffer_management_system.cpp" "src/common_header_imp.cpp" "src/camera.cpp"   "src/skin_animation_system.cpp"
+ "glad/glad.c" 
+ "src/buffer_management_system.cpp" 
+ "src/common_header_imp.cpp" 
+ "src/camera.cpp"   
+ "src/skin_animation_system.cpp"
 
- "src/renderer.cpp"  "src/shader_manager.cpp"  "src/transformation_system.cpp"     "src/gltf_flat_parser.cpp"  "src/hierarchy_traverser_flat.cpp"    "src/bone_animation_system.cpp"  "src/vertex_format_manager.cpp")
+ "src/renderer.cpp" 
+ "src/shader_manager.cpp"  
+ "src/transformation_system.cpp"    
+ "src/gltf_flat_parser.cpp"  
+ "src/hierarchy_traverser_flat.cpp"   
+ "src/bone_animation_system.cpp"  
+ "src/vertex_format_manager.cpp" 
+ "src/data_convertor.cpp" 
+ "src/gltf_animation_extractor.cpp"
+ "src/vertex_attribute_repacker.cpp"
+ )
 
-target_include_directories(gltf-test-app PRIVATE
+#single header library headaches 
+#target_compile_definitions(rendering-engine PRIVATE 
+ #   TINYGLTF_NO_STB_IMAGE 
+#    TINYGLTF_NO_STB_IMAGE_WRITE
+#)
+target_include_directories(rendering-engine PRIVATE
 
 ${CMAKE_SOURCE_CURRENT_DIR}/include
 ${CMAKE_SOURCE_CURRENT_DIR}/glad
@@ -42,7 +61,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glm)
 
 
-target_link_libraries(gltf-test-app PRIVATE
+target_link_libraries(rendering-engine PRIVATE
 
   SDL3::SDL3
   glm::glm
@@ -50,9 +69,9 @@ target_link_libraries(gltf-test-app PRIVATE
 )
 
 
-  add_custom_command(TARGET gltf-test-app POST_BUILD
+  add_custom_command(TARGET rendering-engine POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     $<TARGET_FILE_DIR:SDL3::SDL3>
-    $<TARGET_FILE_DIR:gltf-test-app>
+    $<TARGET_FILE_DIR:rendering-engine>
     COMMENT "Copying SDL3 DLL to the executable directory"
   )
