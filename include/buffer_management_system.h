@@ -13,8 +13,9 @@ private:
 	BufferInfo m_globalIndexBufferInfo;
 
 	BufferInfo m_materialUBOInfo;
-
+	BufferInfo m_boneUBOInfo;
 	BufferInfo m_cameraUBOInfo;
+
 	BufferInfo m_lightUBOInfo;
 
 	size_t m_currentOffsetOfVertexBuffer = 0;
@@ -32,6 +33,7 @@ public:
 	BufferInfo getMaterialUBOInfo();
 
 	BufferInfo getCameraUBOInfo();
+	BufferInfo getBoneUBOBufferInfo();
 	BufferInfo getLightUBOInfo();
 
 };

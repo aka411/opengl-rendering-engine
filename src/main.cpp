@@ -12,6 +12,7 @@
 #include "../include/renderer.h"
 #include "../include/gltf_flat_parser.h"
 #include "../include/skin_animation_system.h"
+#include "../include/bone_animation_system.h"
 
 
 SDL_Window* init()
@@ -26,7 +27,7 @@ SDL_Window* init()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_Window* window = SDL_CreateWindow("Test Ground(openGL 4.6)",700, 700, SDL_WINDOW_OPENGL);
+	SDL_Window* window = SDL_CreateWindow("Opengl Rendering Engine(openGL 4.6)",700, 700, SDL_WINDOW_OPENGL);
 	assert(window != nullptr);
 	SDL_GLContext  gl_context = SDL_GL_CreateContext(window);
 	assert(gl_context != nullptr);
@@ -57,7 +58,8 @@ tinygltf::Model model;
 tinygltf::TinyGLTF loader;
 std::string err;
 std::string warn;
-std::string filePath = ""/*ADD CORRECT PATH*/;
+std::string filePath = "ADD PATH TO GLTF FILE";
+
 
 
 bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, filePath);
@@ -127,7 +129,7 @@ int main(int argc, char* args[])
 
 	 renderer.setPhysicalViewport(700, 700);
 	 SkinAnimationSystem animationSystem;
-
+	 BoneAnimationSystem boneAnimationSystem;
 	 std::cout << "Going to start Rendering" << std::endl;
 
 
@@ -197,10 +199,10 @@ int main(int argc, char* args[])
 
 		 }
 
-		 animationSystem.animate(deltaTime, engineModel, "Animation Name");
+		 animationSystem.animate(deltaTime, engineModel, "PUT ANIMATION NAME HERE");
 
 		 g_transfromationSystem.updateWorldTransforms(engineModel);
-		
+		 boneAnimationSystem.animate(engineModel);
 		 // per frame loop here
 
 

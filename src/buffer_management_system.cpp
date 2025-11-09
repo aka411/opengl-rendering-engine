@@ -17,6 +17,8 @@ BufferManagementSystem::BufferManagementSystem()
 
 	m_cameraUBOInfo = m_gpuBufferManager.createMappedUBOBuffer(65 * 2 , nullptr);// 130 bytes,2 extra bytes just for safety , actually only 128 bytes needed
 
+	m_boneUBOInfo = m_gpuBufferManager.createMappedUBOBuffer((100 * 64)+20, nullptr);// 6420 bytees, good for 100 mat4
+
 	m_lightUBOInfo = m_gpuBufferManager.createMappedUBOBuffer(100, nullptr); // 100 bytes currently
 
 
@@ -106,6 +108,11 @@ BufferInfo BufferManagementSystem::getMaterialUBOInfo()
 BufferInfo BufferManagementSystem::getCameraUBOInfo()
 {
 	return m_cameraUBOInfo;
+}
+
+BufferInfo BufferManagementSystem::getBoneUBOBufferInfo()
+{
+	return m_boneUBOInfo;
 }
 
 BufferInfo BufferManagementSystem::getLightUBOInfo()

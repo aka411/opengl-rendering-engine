@@ -42,16 +42,16 @@ void Renderer::renderFrame(Engine::Model& engineModel)
 
 	glViewport(0, 0, m_viewPort.width, m_viewPort.height);
 
-	glUseProgram(m_defaultShaderProgram);
 
-	glBindVertexArray(m_vertexFormatManager.getDefaultVAO());
+
+	//glBindVertexArray(m_vertexFormatManager.getDefaultVAO());
 	
 	//glBindBuffer(GL_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle);
 	//glBindBufferBase(GL_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle, 0); 
 
 	//glBindBufferBase(GL_ARRAY_BUFFER, 0, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalIndexBufferInfo().bufferHandle);
+	
 
 
 	glClearColor(0.2, 0.4, 0.5, 1.0);
@@ -109,7 +109,7 @@ void Renderer::renderFrame(Engine::Model& engineModel)
 
 
 			memcpy(materialUBOInfo.mappedPtr, &material.materialPBRMetallicRoughnessConstValues, sizeof(material.materialPBRMetallicRoughnessConstValues));
-			GLuint bindingPoint = 5; // The desired binding point
+			GLuint bindingPoint = 5; 
 			glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, materialUBOInfo.bufferHandle);
 
 			Engine::MaterialPBRMetallicRoughnessConstValues materialPBRMetallicRoughnessConstValues = material.materialPBRMetallicRoughnessConstValues;
@@ -146,17 +146,33 @@ void Renderer::renderFrame(Engine::Model& engineModel)
 				glBindTextureUnit(10, material.materialPBRMetallicRoughnessTexture.emmissiveTexture);
 			}
 
+			if (primitive.isSkinned)
+			{
+				glUseProgram(m_bonedShaderProgram);
+				glBindVertexArray(m_vertexFormatManager.getBonedVAO());
+				//continue;
 
+				BufferInfo boneUBOInfo = m_bufferManagementSystem.getBoneUBOBufferInfo();
+				assert(boneUBOInfo.mappedPtr != nullptr);
 
+				memcpy(boneUBOInfo.mappedPtr, engineModel.jointMatrices.data(), sizeof(engineModel.jointMatrices[0]) * engineModel.jointMatrices.size());
+				GLuint boneUBOBindingPoint = 1; 
+				glBindBufferBase(GL_UNIFORM_BUFFER, boneUBOBindingPoint, boneUBOInfo.bufferHandle);
 
+			}
+			else
+			{
+				glUseProgram(m_defaultShaderProgram);
+				glBindVertexArray(m_vertexFormatManager.getDefaultVAO());
+			}
 
 			if (primitive.isIndexed)
 			{
 				
 
 				auto indexFormat = (primitive.indexFormat == Engine::IndexFormat::UINT8) ?  GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
-				
-				glBindVertexBuffer(0, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle, primitive.vertexOffsetInBuffer, 32);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferManagementSystem.getGlobalIndexBufferInfo().bufferHandle);
+				glBindVertexBuffer(0, m_bufferManagementSystem.getGlobalVertexBufferInfo().bufferHandle, primitive.vertexOffsetInBuffer, primitive.stride);
 				//glDrawElementsBaseVertex(GL_TRIANGLES, primitive.indexCount, indexFormat, (const void*)primitive.indexOffsetInBuffer, 0);
 				glDrawElements(GL_TRIANGLES, primitive.indexCount, indexFormat, (const void*)primitive.indexOffsetInBuffer);
 			}

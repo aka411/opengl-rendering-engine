@@ -37,7 +37,12 @@
 	 //padding is an issue that currently is ignored if any problems occur might want to look here
 	 {Engine::VertexAttributes::POSITION, 0},
 	 {Engine::VertexAttributes::NORMAL, 12},
-	 {Engine::VertexAttributes::TEXCOORD_0, 24}
+	 {Engine::VertexAttributes::TEXCOORD_0, 24},
+
+	 {Engine::VertexAttributes::JOINT, 32},//  temp ivec4 4 * 4 bytes
+	 {Engine::VertexAttributes::WEIGHT, 48}
+	 //{Engine::VertexAttributes::WEIGHT, 36} //4 floats vec4
+
 
 
  };
@@ -48,12 +53,13 @@ BufferByteMetrics VertexAttributeRepacker::getBufferByteMetrics(tinygltf::Access
 	BufferByteMetrics bufferByteMetrics;
 
 	bufferByteMetrics.absoluteBufferOffset = accessor.byteOffset + bufferView.byteOffset;
-	bufferByteMetrics.numOfBytePerComponent = m_typeToNumOfComponentsMap.at(accessor.type) * m_componentTypeToByteSizeMap.at(accessor.componentType);
+	bufferByteMetrics.numOfBytesPerItem = m_typeToNumOfComponentsMap.at(accessor.type) * m_componentTypeToByteSizeMap.at(accessor.componentType);
 	
-	bufferByteMetrics.totalBytes = accessor.count * bufferByteMetrics.numOfBytePerComponent;
-	//bufferByteMetrics.byteStride = (bufferView.byteStride > 0 )? bufferView.byteStride : 0 ;
-
-	bufferByteMetrics.totalNumOfComponents = accessor.count;
+	bufferByteMetrics.numOfComponentsPerItem = m_typeToNumOfComponentsMap.at(accessor.type);
+	bufferByteMetrics.totalBytes = accessor.count * bufferByteMetrics.numOfBytesPerItem;
+	bufferByteMetrics.byteStride = (bufferView.byteStride > 0 )? bufferView.byteStride : 0 ;
+	bufferByteMetrics.numOfBytesOfOneComponentOfItem = m_componentTypeToByteSizeMap.at(accessor.componentType);
+	bufferByteMetrics.totalNumOfItems = accessor.count;
 	return bufferByteMetrics;
 }
 
@@ -63,14 +69,14 @@ ExtractedAttribute VertexAttributeRepacker::extractAttributeFromInterleaved(tiny
 	//const unsigned char* byteBufferPtr = reinterpret_cast<const unsigned char*>(buffer.data);
  
 	 ExtractedAttribute extractedAttribute;
-	 extractedAttribute.totalNumOfComponents = bufferByteMetrics.totalNumOfComponents;
-	 extractedAttribute.numOfBytePerComponent = bufferByteMetrics.numOfBytePerComponent;
-
+	 extractedAttribute.totalNumOfItems = bufferByteMetrics.totalNumOfItems;
+	 extractedAttribute.numOfBytesPerItem = bufferByteMetrics.numOfBytesPerItem;
+	 extractedAttribute.numOfBytesOfOneComponentOfItem = bufferByteMetrics.numOfBytesOfOneComponentOfItem;
 
 	 std::vector<std::byte> byteResult(bufferByteMetrics.totalBytes);
 
 	
-	 for (size_t i = 0; i < bufferByteMetrics.totalNumOfComponents; ++i)
+	 for (size_t i = 0; i < bufferByteMetrics.totalNumOfItems; ++i)
 	 {
 		 const size_t sourceIndex = bufferByteMetrics.absoluteBufferOffset + bufferByteMetrics.byteStride * i;
 		 //safety check needed
@@ -90,19 +96,41 @@ ExtractedAttribute VertexAttributeRepacker::extractAttributeFromNonInterleaved(t
 	//const unsigned char* byteBufferPtr = reinterpret_cast<const unsigned char*>(buffer.data);
 
 	ExtractedAttribute extractedAttribute;
-	extractedAttribute.totalNumOfComponents = bufferByteMetrics.totalNumOfComponents;
-	extractedAttribute.numOfBytePerComponent = bufferByteMetrics.numOfBytePerComponent;
+	extractedAttribute.totalNumOfItems = bufferByteMetrics.totalNumOfItems;
+	extractedAttribute.numOfBytesPerItem = bufferByteMetrics.numOfBytesPerItem;
+	extractedAttribute.numOfBytesOfOneComponentOfItem = bufferByteMetrics.numOfBytesOfOneComponentOfItem;
+
+	if (extractedAttribute.numOfBytesOfOneComponentOfItem <= 4)
+	{
+		extractedAttribute.numOfBytesOfOneComponentOfItem = 4;
+		extractedAttribute.numOfBytesPerItem = bufferByteMetrics.numOfComponentsPerItem * 4;
+	}
+	const size_t neededBufferSize = extractedAttribute.totalNumOfItems * extractedAttribute.numOfBytesPerItem;
+	std::vector<std::byte> byteResult(neededBufferSize, std::byte(0));
 
 
-	std::vector<std::byte> byteResult(bufferByteMetrics.totalBytes);
 
 
 
-
+	if (bufferByteMetrics.numOfBytesOfOneComponentOfItem >=4)
+	{
 		const size_t sourceIndex = bufferByteMetrics.absoluteBufferOffset;
-		
 		memcpy(&byteResult[0], &buffer.data[sourceIndex], bufferByteMetrics.totalBytes);//will it also copy padding?
-	
+	}
+	else
+	{
+		for(size_t i = 0 ;i < bufferByteMetrics.totalNumOfItems; i+= bufferByteMetrics.numOfBytesOfOneComponentOfItem)
+		{
+		
+			for (size_t j = 0; j < bufferByteMetrics.numOfComponentsPerItem; ++j)
+			{
+				const size_t sourceIndex = bufferByteMetrics.absoluteBufferOffset + (i * bufferByteMetrics.numOfBytesPerItem) + (j * bufferByteMetrics.numOfBytesOfOneComponentOfItem);
+				const size_t destIndex = (i * 4 * bufferByteMetrics.numOfComponentsPerItem) + (j*4);
+
+				memcpy(&byteResult[destIndex], &buffer.data[sourceIndex], bufferByteMetrics.numOfBytesOfOneComponentOfItem);
+			}
+		}
+	}
 	extractedAttribute.rawData = byteResult;
 	return extractedAttribute;
 
@@ -169,7 +197,7 @@ ExtractedVertexAttributeMap VertexAttributeRepacker::extractVertexAttributesFrom
 	return extractedVertexAttributeMap;
 }
 
-std::vector<std::byte> VertexAttributeRepacker::interleaveAttributes(ExtractedVertexAttributeMap& extractedVertexAttributeMap, std::vector<Engine::VertexAttributes> packingFormat)
+InterleavedData VertexAttributeRepacker::interleaveAttributes(ExtractedVertexAttributeMap& extractedVertexAttributeMap, std::vector<Engine::VertexAttributes> packingFormat)
 {
 
 
@@ -180,15 +208,18 @@ std::vector<std::byte> VertexAttributeRepacker::interleaveAttributes(ExtractedVe
 	for (auto& attributeName : packingFormat)
 	{
 		ExtractedAttribute& extractedAttribute = extractedVertexAttributeMap.vertexAttributeMap.at(attributeName);
-		totalSizeOfBuffer += extractedAttribute.numOfBytePerComponent * extractedAttribute.totalNumOfComponents;
+		const size_t numOfBytesPerItem = extractedAttribute.numOfBytesPerItem;
+		totalSizeOfBuffer += numOfBytesPerItem * extractedAttribute.totalNumOfItems;
 
-		stride += extractedAttribute.numOfBytePerComponent;
+		stride += extractedAttribute.numOfBytesPerItem;
 	}
 
-	std::vector<std::byte> resultBuffer(totalSizeOfBuffer);
+	InterleavedData interleavedData;
 
+	interleavedData.interleavedData.resize(totalSizeOfBuffer,std::byte(0b0000));
+	interleavedData.stride = stride;
 
-
+	std::vector<std::byte>& resultBuffer = interleavedData.interleavedData;
 
 	for (auto& attributeName : packingFormat)
 	{
@@ -198,8 +229,8 @@ std::vector<std::byte> VertexAttributeRepacker::interleaveAttributes(ExtractedVe
 
 		std::vector<std::byte>& attributeData = extractedAttribute.rawData;
 
-		const size_t numOfBytePerComponent = extractedAttribute.numOfBytePerComponent;
-		const size_t totalNumOfComponents = extractedAttribute.totalNumOfComponents;
+		const size_t numOfBytePerComponent = extractedAttribute.numOfBytesPerItem;
+		const size_t totalNumOfComponents = extractedAttribute.totalNumOfItems;
 
 		for (size_t i = 0 ; i < totalNumOfComponents; ++i)
 		{
@@ -214,5 +245,5 @@ std::vector<std::byte> VertexAttributeRepacker::interleaveAttributes(ExtractedVe
 
 
 
-	return resultBuffer;
+	return interleavedData;
 }

@@ -10,7 +10,15 @@ namespace Engine
 {
 
 
+	struct BoneAnimationData
+	{
+		std::vector<glm::mat4> inverseBindMatrices;
+		std::vector<int> jointIndices; // 
 
+		std::vector<glm::mat4> jointMatrices;//important prereserve size 
+
+		bool isSkinned = false;
+	};
 
 	class GLTFFlatParser
 	{
@@ -49,7 +57,7 @@ namespace Engine
 
 
 
-		
+		BoneAnimationData getBoneAnimationData(tinygltf::Model& tinygltfModel);
 
 
 

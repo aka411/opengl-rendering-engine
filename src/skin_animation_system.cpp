@@ -201,7 +201,7 @@ void SkinAnimationSystem::animate(float deltaTime, Engine::Model& model, std::st
 	float totalDuration = animation.maxTime ;
 
 	if (totalDuration <= 0.0f) return; // No animation to process
-
+	model.currentlyAnimated = true;
 	float animationDuration = 0.0f;
 	Engine::Model::AnimationState* state = nullptr;
 	if (model.playingAnimations.find(animationName) != model.playingAnimations.end())

@@ -50,11 +50,11 @@ void TransformationSystem::buildLocalMatrix(Engine::Transformation& transform)
 
 	
 
-
 	glm::mat4 S = glm::scale(glm::mat4(1.0f), transform.scale);
 	glm::mat4 R = glm::mat4_cast(transform.rotation);
 	glm::mat4 T = glm::translate(glm::mat4(1.0f), transform.position);
 
 	transform.localTransformMatrix = T * R * S ;
+
 
 }

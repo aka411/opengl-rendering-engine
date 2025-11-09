@@ -184,6 +184,7 @@ namespace Engine
 
 		size_t vertexOffsetInBuffer;
 		size_t vertexCount;
+		size_t stride = 0;
 
 		size_t indexOffsetInBuffer;
 		size_t indexCount;//shouldnt it also be an offset?
@@ -192,7 +193,7 @@ namespace Engine
 
 		int materialIndex;
 		
-
+		bool isSkinned = false;
 	};
 
 

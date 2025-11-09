@@ -6,8 +6,9 @@
 
 struct ExtractedAttribute
 {
-	size_t numOfBytePerComponent = 0;
-	size_t totalNumOfComponents = 0;
+	size_t numOfBytesOfOneComponentOfItem = 0;
+	size_t numOfBytesPerItem = 0;
+	size_t totalNumOfItems = 0;
 	std::vector<std::byte> rawData;
 };
 
@@ -32,9 +33,15 @@ struct BufferByteMetrics
 {
 	 size_t absoluteBufferOffset = 0;
 	 size_t byteStride = 0;
-	 size_t numOfBytePerComponent = 0;
+
+	 size_t numOfComponentsPerItem = 0;
+	 size_t numOfBytesOfOneComponentOfItem = 0;// vec3(float) has 3 components and this means one component is 4 bytes 
+
+	 size_t numOfBytesPerItem = 0; // f(vec3) = 3 * 4 = 12 bytes , size of one item
+	 size_t totalNumOfItems = 0; // vec3 * n, n is the value noted here
+
 	 size_t totalBytes = 0;
-	 size_t totalNumOfComponents = 0;//component here means a single attribute and not a component of the attribute
+	
 };
 
 struct VertexAttributeInfo
@@ -43,6 +50,12 @@ struct VertexAttributeInfo
 };
 
 
+
+struct InterleavedData
+{
+	std::vector<std::byte> interleavedData;
+	size_t stride; //in byte
+};
 class VertexAttributeRepacker
 {
 private:
@@ -65,7 +78,7 @@ public:
 
 	static ExtractedVertexAttributeMap extractVertexAttributesFromInterleaved(VertexAttributeGltfLocationMap vertexAttributeGltfLocationMap, tinygltf::Model& tinygltfModel);
 	static ExtractedVertexAttributeMap extractVertexAttributesFromNonInterleaved(VertexAttributeGltfLocationMap vertexAttributeGltfLocationMap, tinygltf::Model& tinygltfModel);
-	static std::vector<std::byte> interleaveAttributes(ExtractedVertexAttributeMap& extractedVertexAttributeMap, std::vector<Engine::VertexAttributes> packingFormat);
+	static InterleavedData interleaveAttributes(ExtractedVertexAttributeMap& extractedVertexAttributeMap, std::vector<Engine::VertexAttributes> packingFormat);
 	
 
 };

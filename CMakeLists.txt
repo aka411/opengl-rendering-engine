@@ -27,7 +27,7 @@ src/gpu_buffer_manager.cpp
  "src/data_convertor.cpp" 
  "src/gltf_animation_extractor.cpp"
  "src/vertex_attribute_repacker.cpp"
-)
+ )
 
 #single header library headaches 
 #target_compile_definitions(rendering-engine PRIVATE 

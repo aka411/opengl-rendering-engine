@@ -156,7 +156,7 @@ namespace Engine
 		{
 			Transformation transformation;
 			glm::mat4 matrix = DataConvertor::narrowToMatrix4(node.matrix);
-
+			
 			// **Decomposition**
 			glm::vec3 scale{ 1.0f,1.0f,1.0f };
 			glm::quat rotation{ 1.0f,0.0f,0.0f, 0.0f };
@@ -182,8 +182,9 @@ namespace Engine
 			transformation.position = translation;
 			transformation.scale = scale;
 			transformation.rotation = rotation;
-
-			return transformation;
+			
+			transformation.localTransformMatrix = matrix;
+			return  transformation;
 		}
 
 		Transformation transformation;
@@ -247,8 +248,8 @@ namespace Engine
 			{"POSITION", Engine::VertexAttributes::POSITION},
 			{"NORMAL", Engine::VertexAttributes::NORMAL},
 			{"TEXCOORD_0", Engine::VertexAttributes::TEXCOORD_0}, // First UV set
-			//{"JOINTS_0", Engine::VertexAttributes::JOINT},        // Skinning Joint/Bone Indices
-			//{"WEIGHTS_0", Engine::VertexAttributes::WEIGHT},      // Skinning Weights
+			{"JOINTS_0", Engine::VertexAttributes::JOINT},        // Skinning Joint/Bone Indices
+			{"WEIGHTS_0", Engine::VertexAttributes::WEIGHT},      // Skinning Weights
 
 		
 			// {"TEXCOORD_1", Engine::VertexAttributes::TEXCOORD_1}, // Second UV set
@@ -290,12 +291,22 @@ namespace Engine
 		// glm::vec3 normal;   // 12 bytes
 		// glm::vec2 texCoord; // 8 bytes
 		//}
-		std::vector<Engine::VertexAttributes> engineFormat = {
+		std::vector<Engine::VertexAttributes> defualtEngineFormat = {
 
 			Engine::VertexAttributes::POSITION,
 			Engine::VertexAttributes::NORMAL,
 			Engine::VertexAttributes::TEXCOORD_0
 		};
+
+		std::vector<Engine::VertexAttributes> bonedEngineFormat = {
+
+		Engine::VertexAttributes::POSITION,
+		Engine::VertexAttributes::NORMAL,
+		Engine::VertexAttributes::TEXCOORD_0,
+		Engine::VertexAttributes::JOINT,
+		Engine::VertexAttributes::WEIGHT
+		};
+
 
 		std::vector<Primitive> primitivesList;
 		for (tinygltf::Primitive& gltfPrimitive : gltfMesh.primitives)
@@ -313,16 +324,29 @@ namespace Engine
 				extractedVertexAttributeMap = VertexAttributeRepacker::extractVertexAttributesFromNonInterleaved(vertexAttributeGltfLocationMap, tinygltfModel);
 			}
 
-			std::vector<std::byte> interleavedBuffer = VertexAttributeRepacker::interleaveAttributes(extractedVertexAttributeMap, engineFormat);
+
+			bool isSkinned =
+				gltfPrimitive.attributes.count("JOINTS_0") > 0 &&
+				gltfPrimitive.attributes.count("WEIGHTS_0") > 0;
+
+			// **2. Select the correct engine format**
+			const std::vector<Engine::VertexAttributes>& currentEngineFormat =
+				isSkinned ? bonedEngineFormat : defualtEngineFormat;
+
+
+
+			InterleavedData interleavedData = VertexAttributeRepacker::interleaveAttributes(extractedVertexAttributeMap, currentEngineFormat);
 
 			//upload to vertex buffer and update offsets correctly
 
 			Primitive ourPrimitive;
 
-			ourPrimitive.vertexOffsetInBuffer = m_bufferManagementSystem.uploadDataToVertexBuffer(interleavedBuffer.data(), interleavedBuffer.size());
-			ourPrimitive.vertexCount = extractedVertexAttributeMap.vertexAttributeMap.at(VertexAttributes::POSITION).totalNumOfComponents;
-			
+			ourPrimitive.isSkinned = isSkinned;
 
+			ourPrimitive.vertexOffsetInBuffer = m_bufferManagementSystem.uploadDataToVertexBuffer(interleavedData.interleavedData.data(), interleavedData.interleavedData.size());
+			ourPrimitive.vertexCount = extractedVertexAttributeMap.vertexAttributeMap.at(VertexAttributes::POSITION).totalNumOfItems;
+			
+			ourPrimitive.stride = interleavedData.stride;
 
 			//check if is indexed 
 			if (gltfPrimitive.indices >= 0)
@@ -386,11 +410,11 @@ namespace Engine
 	Model GLTFFlatParser::parse(tinygltf::Model& tinygltfModel)
 	{
 
-		 size_t rootNodeIndex = 0;
-		
-		for(auto scene : tinygltfModel.scenes)
+		size_t rootNodeIndex = 0;
+
+		for (auto scene : tinygltfModel.scenes)
 		{
-			for(auto nodeIndex : scene.nodes)
+			for (auto nodeIndex : scene.nodes)
 			{
 				if (nodeIndex >= 0)
 				{
@@ -399,7 +423,7 @@ namespace Engine
 				}
 			}
 		}
-		
+
 
 
 		//const tinygltf::Node rootNode = (tinygltfModel.nodes.size() > 1) ? tinygltfModel.nodes[1] : tinygltfModel.nodes[0];
@@ -411,7 +435,7 @@ namespace Engine
 
 		m_imageList = extractImages(tinygltfModel);
 		m_textureList = extractTextures(tinygltfModel);
-		
+
 
 		model.materials = extractMaterial(tinygltfModel);
 		model.meshes = getMeshList(tinygltfModel);
@@ -420,11 +444,21 @@ namespace Engine
 
 
 		ExtractedAnimationData extractedAnimationData = GltfAnimationExtractor::extractAnimation(tinygltfModel);
-		
+
 		model.animationData = extractedAnimationData.animationData;
 		model.animations = extractedAnimationData.animationsMap;
 
+		BoneAnimationData boneAnimationData;
 
+		boneAnimationData = getBoneAnimationData(tinygltfModel);
+		if (boneAnimationData.isSkinned)
+		{
+			model.inverseBindMatrices = boneAnimationData.inverseBindMatrices;
+			model.jointIndices = boneAnimationData.jointIndices;
+			model.jointMatrices = boneAnimationData.jointMatrices;
+
+			model.hasSkin = boneAnimationData.isSkinned;
+	    }
 		
 
 
@@ -436,6 +470,38 @@ namespace Engine
 
 
 
+
+	BoneAnimationData GLTFFlatParser::getBoneAnimationData(tinygltf::Model& tinygltfModel)
+	{
+		std::vector<tinygltf::Accessor>& accessors = tinygltfModel.accessors;
+		std::vector<tinygltf::BufferView>& bufferViews = tinygltfModel.bufferViews;
+
+		BoneAnimationData boneAnimationData;
+
+		if (tinygltfModel.skins.size() == 0 /**!(tinygltfModel.skins[0].inverseBindMatrices >= 0)*/)
+		{
+			boneAnimationData.isSkinned = false;
+			return boneAnimationData;
+		}
+		boneAnimationData.isSkinned = true;
+
+		boneAnimationData.jointIndices = tinygltfModel.skins[0].joints;
+
+		boneAnimationData.inverseBindMatrices.resize(boneAnimationData.jointIndices.size());
+
+		boneAnimationData.jointMatrices.resize(boneAnimationData.jointIndices.size(),glm::mat4(1.0f));
+
+	
+
+		const std::vector<unsigned char>& buffer = tinygltfModel.buffers[0].data;
+
+		const size_t srcIndex = accessors[tinygltfModel.skins[0].inverseBindMatrices].byteOffset + bufferViews[accessors[tinygltfModel.skins[0].inverseBindMatrices].bufferView].byteOffset;
+
+		memcpy(boneAnimationData.inverseBindMatrices.data(), &buffer[srcIndex], bufferViews[accessors[tinygltfModel.skins[0].inverseBindMatrices].bufferView].byteLength);
+
+
+		return boneAnimationData;
+	}
 
 	GLTFFlatParser::GLTFFlatParser(BufferManagementSystem& bufferManagementSystem, GPUTextureManager& gpuTextureManager) : m_bufferManagementSystem(bufferManagementSystem), m_gpuTextureManager(gpuTextureManager)
 	{
