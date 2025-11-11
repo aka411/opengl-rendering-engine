@@ -33,7 +33,7 @@ Open `src/main.cpp` and locate the line for `std::string filePath`.
 // Near line 61 in src/main.cpp
 std::string filePath = "YOUR/ACTUAL/PATH/TO/model.gltf";
 ```
-**Note:** For a `.glb` (binary glTF) file, you must comment out the LoadASCIIFromFile line (`bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, filePath);`) and uncomment the LoadBinaryFromFile line (`bool ret = loader.LoadBinaryFromFile(&model, &err, &warn, filePath); // for binary glTF(.glb)`).
+**Note:** For a `.glb` (binary glTF) file, you must comment out the *LoadASCIIFromFile line* (`bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, filePath);`) and uncomment the *LoadBinaryFromFile* line (`bool ret = loader.LoadBinaryFromFile(&model, &err, &warn, filePath); // for binary glTF(.glb)`).
 
 #### 3. Configure Animation (Optional)
 If your model has skeletal animation and you want it to play, find the animationSystem.animate line (around line 200 in main.cpp) and replace the third parameter with the exact name of the animation you want to play.
