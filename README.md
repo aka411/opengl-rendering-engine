@@ -11,9 +11,8 @@ I have added the build instructions to build and run it below, the build and run
 _If you have any issue or need help don't hesitate to contact me or raise an issue._
 ## Rendering Example
 
-<video src="./demos/rendering_output.webm" width="300" controls autoplay muted loop>
-    Your browser does not support the video tag.
-</video>
+
+[![Watch the video](https://raw.githubusercontent.com/aka411/opengl-rendering-engine/main/demos/rendering_output.jpg)](https://raw.githubusercontent.com/aka411/opengl-rendering-engine/main/demos/rendering_output.webm)
 
 ## Build And Run Instructions
 ### Prerequisites
