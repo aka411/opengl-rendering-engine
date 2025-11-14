@@ -26,19 +26,10 @@ To build and run this project, you will need the following tools and dependencie
 git clone https://github.com/aka411/opengl-rendering-engine.git
 cd opengl-rendering-engine
 ````
+  
 
-#### 2. Configure Model Path
-   
-Open `src/main.cpp` and locate the line for `std::string filePath`.
-
-- Replace `"ADD PATH TO GLTF FILE"` with the actual path to your model (e.g., `"C:/Models/mymodel.gltf"`).
-```cpp
-// Near line 61 in src/main.cpp
-std::string filePath = "YOUR/ACTUAL/PATH/TO/model.gltf";
-```
-**Note:** For a `.glb` (binary glTF) file, you must comment out the *LoadASCIIFromFile line* (`bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, filePath);`) and uncomment the *LoadBinaryFromFile* line (`bool ret = loader.LoadBinaryFromFile(&model, &err, &warn, filePath); // for binary glTF(.glb)`).
-
-#### 3. Configure Animation (Optional)
+#### 4. Configure Animation (Optional)
+I have made some changes in code so that we can enter the filepath of gltf model in the console window that comes with main window, but animation name is still hardcoded in the code so if if you know name of the animations in the gltf file you are going to load then you can follow the below instruction else you can skip this step.
 If your model has skeletal animation and you want it to play, find the animationSystem.animate line (around line 200 in main.cpp) and replace the third parameter with the exact name of the animation you want to play.
 
 ```cpp
