@@ -12,7 +12,7 @@ _If you have any issue or need help don't hesitate to contact me or raise an iss
 ## Rendering Example
 
 <video width="320" height="240" controls>
-  <source src="demos/rendering_output.webm" type="video/webm">
+  <source src="demos/rendering_output.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
