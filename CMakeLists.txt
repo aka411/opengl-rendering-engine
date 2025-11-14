@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(FetchContent)
 
-add_executable(rendering-engine
+add_executable(opengl-rendering-engine
 
 src/main.cpp
 src/gpu_texture_manager.cpp
@@ -28,11 +28,11 @@ src/gpu_buffer_manager.cpp
  "src/gltf_animation_extractor.cpp"
  "src/vertex_attribute_repacker.cpp"
  )
- set_target_properties(rendering-engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+ set_target_properties(opengl-rendering-engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 
 
-target_include_directories(rendering-engine PRIVATE
+target_include_directories(opengl-rendering-engine PRIVATE
 
 ${CMAKE_SOURCE_CURRENT_DIR}/include
 ${CMAKE_SOURCE_CURRENT_DIR}/glad
@@ -59,7 +59,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glm)
 
 
-target_link_libraries(rendering-engine PRIVATE
+target_link_libraries(opengl-rendering-engine PRIVATE
 
   SDL3::SDL3
   glm::glm
@@ -67,9 +67,9 @@ target_link_libraries(rendering-engine PRIVATE
 )
 
 
-  add_custom_command(TARGET rendering-engine POST_BUILD
+  add_custom_command(TARGET opengl-rendering-engine POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     $<TARGET_FILE_DIR:SDL3::SDL3>
-   $<TARGET_FILE_DIR:rendering-engine>
+   $<TARGET_FILE_DIR:opengl-rendering-engine>
     COMMENT "Copying SDL3 DLL to the executable directory"
   )
