@@ -1,0 +1,3 @@
+[submodule "external/the-engine"]
+	path = external/the-engine
+	url = https://github.com/aka411/the-engine.git
