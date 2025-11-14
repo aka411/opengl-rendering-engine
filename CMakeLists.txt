@@ -28,7 +28,7 @@ src/gpu_buffer_manager.cpp
  "src/gltf_animation_extractor.cpp"
  "src/vertex_attribute_repacker.cpp"
  )
-
+ set_target_properties(rendering-engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 
 
@@ -67,9 +67,9 @@ target_link_libraries(rendering-engine PRIVATE
 )
 
 
-  #add_custom_command(TARGET rendering-engine POST_BUILD
- #   COMMAND ${CMAKE_COMMAND} -E copy_directory
- #   $<TARGET_FILE_DIR:SDL3::SDL3>
- #   $<TARGET_FILE_DIR:rendering-engine>
-  #  COMMENT "Copying SDL3 DLL to the executable directory"
-  #)
+  add_custom_command(TARGET rendering-engine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    $<TARGET_FILE_DIR:SDL3::SDL3>
+   $<TARGET_FILE_DIR:rendering-engine>
+    COMMENT "Copying SDL3 DLL to the executable directory"
+  )
