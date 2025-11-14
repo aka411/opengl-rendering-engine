@@ -9,12 +9,9 @@ The Renderer as of now can :
 I have added the build instructions to build and run it below, the build and run instructions may seem a little verbose cause the project is **work in progress**, but if you follow it correctly it should work.
 
 _If you have any issue or need help don't hesitate to contact me or raise an issue._
-## Rendering Example
+## Rendering Demo
 
-<video width="320" height="240" controls>
-  <source src="demos/rendering_output.webm" type="video/webm">
-  Your browser does not support the video tag.
-</video>
+https://github.com/user-attachments/assets/585f3910-599b-4a91-a188-ea8b9d1bb905
 
 ## Build And Run Instructions
 ### Prerequisites
