@@ -12,7 +12,7 @@ _If you have any issue or need help don't hesitate to contact me or raise an iss
 ## Rendering Example
 
 
-[![Watch the video](https://raw.githubusercontent.com/aka411/opengl-rendering-engine/main/demos/rendering_output.jpg)](https://raw.githubusercontent.com/aka411/opengl-rendering-engine/main/demos/rendering_output.webm)
+[![demo video](https://raw.githubusercontent.com/aka411/opengl-rendering-engine/main/demos/rendering_output.jpg)](https://raw.githubusercontent.com/aka411/opengl-rendering-engine/main/demos/rendering_output.webm)
 
 ## Build And Run Instructions
 ### Prerequisites
