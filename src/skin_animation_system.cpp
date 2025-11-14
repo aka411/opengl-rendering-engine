@@ -1,7 +1,7 @@
 ﻿#include "../include/skin_animation_system.h"
 #include "../include/gltf_flat_parser.h"
 #include <glm/gtc/type_ptr.hpp>
-
+#include  <algorithm>
 
 
 SkinAnimationSystem::SkinAnimationSystem()
@@ -22,7 +22,7 @@ SkinAnimationSystem::~SkinAnimationSystem()
 
 int SkinAnimationSystem::step(const std::vector<float>& input, const float currentTime)
 {
-	auto& it = std::upper_bound(input.begin(), input.end(), currentTime);
+	const auto& it = std::upper_bound(input.begin(), input.end(), currentTime);
 
 
 	if (it == input.end())
@@ -47,7 +47,7 @@ int SkinAnimationSystem::step(const std::vector<float>& input, const float curre
 
 LinearData SkinAnimationSystem::linear(const std::vector<float>& input, const float currentTime)
 {
-	auto& it = std::upper_bound(input.begin(), input.end(), currentTime);
+	const auto& it = std::upper_bound(input.begin(), input.end(), currentTime);
 
 	if (it == input.end()) {
 

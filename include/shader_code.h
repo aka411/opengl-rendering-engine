@@ -83,14 +83,14 @@ layout (binding = 10) uniform sampler2D u_EmissiveTexture;        // Texture Uni
 
 void main() {
 
-
-
+vec3 sunlightDir = normalize(vec3(-0.7f, -0.7f, -0.2f));
+vec3 AMBIENT_LIGHT = vec3(0.15, 0.15, 0.15);
     vec4 baseColor = baseColorFactor;
     float metallic = metallicFactor;
     float roughness = roughnessFactor;
     
  
-    float ambientOcclusion = 0.9; 
+    float ambientOcclusion = 1.0; 
 
 
 
@@ -134,18 +134,29 @@ void main() {
     
 
 
+   
+    float NdotL = max(0.0, dot(N, -sunlightDir));
+    vec3 lightColor = vec3(1.0, 1.0, 1.0) * 0.9;
+
+   vec3 diffuseLight = lightColor * NdotL;
     
+    vec3 ambientTerm = baseColor.rgb * AMBIENT_LIGHT;
+
+   
+    
+    vec3 directLight = baseColor.rgb * diffuseLight;
+
+
+    vec3 final_color = ambientTerm + directLight;
+
 
     
-    vec3 final_color = baseColor.rgb;
-
     
-    final_color = final_color * ambientOcclusion; 
-    
+    final_color *= ambientOcclusion; // Apply Ao to the total light (not just ambient)
 
-    final_color += emissive; 
+    final_color += emissive;
 
-    FragColor = vec4(final_color,baseColor.a );
+    FragColor = vec4(final_color, baseColor.a);
 
 }
 )";

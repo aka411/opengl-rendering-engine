@@ -13,7 +13,8 @@
 #include "../include/gltf_flat_parser.h"
 #include "../include/skin_animation_system.h"
 #include "../include/bone_animation_system.h"
-
+#include <filesystem>
+#include <fstream>
 
 SDL_Window* init()
 {
@@ -58,12 +59,22 @@ tinygltf::Model model;
 tinygltf::TinyGLTF loader;
 std::string err;
 std::string warn;
-std::string filePath = "ADD PATH TO GLTF FILE";
 
+std::cout << "Enter File Path (supports both .glb and .gltf) : "<<std::endl<<"Example Format -> C:/documents/asset/block_island/prototype_scene_block_island.glb" << std::endl;
 
+std::string filePath;
 
-bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, filePath);
-//bool ret = loader.LoadBinaryFromFile(&model, &err, &warn, filePath); // for binary glTF(.glb)
+std::getline(std::cin, filePath);
+
+bool ret = false;
+if (filePath.substr(filePath.length() - 3) == "gltf")
+{
+	ret = loader.LoadASCIIFromFile(&model, &err, &warn, filePath);
+}
+else
+{
+	ret = loader.LoadBinaryFromFile(&model, &err, &warn, filePath); // for binary glTF(.glb)
+}
 
 if (!warn.empty())
 {
@@ -199,7 +210,7 @@ int main(int argc, char* args[])
 
 		 }
 
-		 animationSystem.animate(deltaTime, engineModel, "PUT ANIMATION NAME HERE");
+		 animationSystem.animate(deltaTime, engineModel, "Take 001");
 
 		 g_transfromationSystem.updateWorldTransforms(engineModel);
 		 boneAnimationSystem.animate(engineModel);

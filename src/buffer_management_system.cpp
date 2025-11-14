@@ -1,5 +1,7 @@
 #include "../include/buffer_management_system.h"
 #include <cassert>
+#include <cstdint>
+#include <cstring>
 
 BufferManagementSystem::BufferManagementSystem()
 {

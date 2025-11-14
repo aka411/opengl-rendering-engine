@@ -261,7 +261,7 @@ namespace Engine
 
 		for (auto& attribute : primitive.attributes)
 		{
-			auto& it =  gltfToEngineVertexAttributeMap.find(attribute.first);
+			const auto& it =  gltfToEngineVertexAttributeMap.find(attribute.first);
 			if (it == gltfToEngineVertexAttributeMap.end()) continue;
 
 			const Engine::VertexAttributes vertexAttribute = gltfToEngineVertexAttributeMap[it->first];

@@ -1,5 +1,6 @@
 #pragma once
 #include "gpu_buffer_manager.h"
+#include <cstdint>
 
 
 
