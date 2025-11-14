@@ -9,6 +9,11 @@ The Renderer as of now can :
 I have added the build instructions to build and run it below, the build and run instructions may seem a little verbose cause the project is **work in progress**, but if you follow it correctly it should work.
 
 _If you have any issue or need help don't hesitate to contact me or raise an issue._
+## Rendering Example
+
+<video src="./demos/rendering_output.webm" width="300" controls autoplay muted loop>
+    Your browser does not support the video tag.
+</video>
 
 ## Build And Run Instructions
 ### Prerequisites
