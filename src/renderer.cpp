@@ -3,6 +3,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include "../include/shader_code.h"
+#include "../include/low-level/rendering_system_data_types.h"
 
 Renderer::Renderer(BufferManagementSystem& bufferManagementSystem, GPUTextureManager& gpuTextureManager, Engine::Camera& camera) : m_bufferManagementSystem(bufferManagementSystem), m_gpuTextureManager(gpuTextureManager), m_camera(camera)
 {

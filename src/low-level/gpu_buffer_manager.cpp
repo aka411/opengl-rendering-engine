@@ -2,6 +2,7 @@
 #include <stdexcept>
 
 #include "../include/gpu_buffer_manager.h"
+#include "../include/low-level/rendering_system_data_types.h"
 
 
 

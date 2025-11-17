@@ -3,14 +3,7 @@
 #include <vector>
 #include "../glad/glad.h"
 
-struct BufferInfo
-{
-	GLuint bufferHandle;
-	size_t totalSize = 0;
 
-	void* mappedPtr = nullptr;
-
-};
 class GPUBufferManager
 {
 private:

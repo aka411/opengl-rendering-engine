@@ -9,25 +9,32 @@ include(FetchContent)
 add_executable(opengl-rendering-engine
 
 src/main.cpp
-src/gpu_texture_manager.cpp
-src/gpu_buffer_manager.cpp
+
  "glad/glad.c"
  "src/buffer_management_system.cpp"
  "src/common_header_imp.cpp"
  "src/camera.cpp"
- "src/skin_animation_system.cpp"
+ "src/animation/skin_animation_system.cpp"
 
  "src/renderer.cpp"
- "src/shader_manager.cpp"
+ "src/low-level/shader_manager.cpp"
  "src/transformation_system.cpp"
- "src/gltf_flat_parser.cpp"
+ "src/model-loading/gltf_flat_parser.cpp"
  "src/hierarchy_traverser_flat.cpp"
- "src/bone_animation_system.cpp"
- "src/vertex_format_manager.cpp"
- "src/data_convertor.cpp"
- "src/gltf_animation_extractor.cpp"
- "src/vertex_attribute_repacker.cpp"
- )
+ "src/animation/bone_animation_system.cpp"
+ "src/low-level/vertex_format_manager.cpp"
+ "src/model-loading/data_convertor.cpp"
+ "src/model-loading/gltf_animation_extractor.cpp"
+
+ "src/model-loading/vertex_attribute_repacker.cpp"
+ 
+ "src/low-level/vertex_format_manager.cpp"
+ "src/low-level/gpu_buffer_sub_bump_allocator.cpp"
+ "src/low-level/gpu_texture_manager.cpp"
+
+ "include/engine_data_structures.h" "include/model-loading/model_loading_data_structure.h")
+
+
  set_target_properties(opengl-rendering-engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 

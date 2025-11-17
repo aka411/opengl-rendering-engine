@@ -1,0 +1,57 @@
+# GLTF TO ECS IS PAIN
+
+There is a dilema on who gets entity id node or primitive ,after some painful 
+hours of though and research i have come to the conclusion to make two types of Renderable Component sacrificing some cache coherence.
+Its the mainatainable way i could come up with as hierarchy is a pain in ecs , so with this method.
+
+So design is Node gets entity Id , primitives are treated depending on how many primitives a 
+node (mesh , assuming node only references one mesh) has , if its one then its a simple RenderableComponent ,
+and if its two or more its a FATRenderableComponent.The FATRenderableComponent is a component that contains a vector containing Renderable components.
+
+
+Now for Rendering system to not lose cache advantage of ecs i propose using a two step method of preparing rendering data ,
+
+1) Get all entity that contains RenderableComponent and TransformComponent.
+2) Get all entites with FATRenderableComponent and TransformComponent.
+
+This two step process hopes to provide atleast some coherency,but 
+might not be enough casue a model might most have FATRenderableComponent more.
+
+
+I am hoping any other system can atleast make use of ecs fully.
+
+Struct HierarchyComponent
+{
+std::vector<EntityId> children;
+};
+
+struct RenderableComponent
+{
+ 
+}
+
+struct FATRenderableComponent
+{
+std::vector<RenderableComponent> renderableComponent;
+}
+
+
+
+
+
+# Using Intermediatery Engine Data structures 
+
+I have decided to use intermediatory engine data structures to decouple loading of model/scene data from core engine infrastructure , 
+an intermediatery format that is consumable by engine data uploaders like ecs , texture , material systems, vertex buffer systems.
+
+This will be more maintainable and can help me support other file formats also cause now i 
+have a target format to which other formats needs to be converted and this intermediatory format is 
+consumable by engine so only need to write convertors and no need to touch engine logic.
+
+1)Node ---> Mesh ---> Primitive(indexId, VertexId, MaterialId)
+
+# Animation Will be a bigger pain in ECS
+
+Animation system also need changes to map to ecs
+
+nodeIndex will map to EntityId
