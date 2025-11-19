@@ -55,3 +55,6 @@ consumable by engine so only need to write convertors and no need to touch engin
 Animation system also need changes to map to ecs
 
 nodeIndex will map to EntityId
+
+I come to a solution of storing a mapping from old node index to entityId per instance of model in engine.
+The animation data will be only one copy maybe in a animation manager and use id to get it,only state of animation will be stored per root entity.

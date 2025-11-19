@@ -2,6 +2,8 @@
 #include <vector>
 #include <glm/ext/matrix_float4x4.hpp>
 #include "gltf_flat_parser.h"
+
+
 struct LinearData
 {
 	int currentFrameIndex;

@@ -52,51 +52,7 @@ SDL_Window* init()
 	
 
 
-tinygltf::Model loadModel()
-{
 
-tinygltf::Model model;
-tinygltf::TinyGLTF loader;
-std::string err;
-std::string warn;
-
-std::cout << "Enter File Path (supports both .glb and .gltf) : "<<std::endl<<"Example Format -> C:/documents/asset/block_island/prototype_scene_block_island.glb" << std::endl;
-
-std::string filePath;
-
-std::getline(std::cin, filePath);
-
-bool ret = false;
-if (filePath.substr(filePath.length() - 3) == "gltf")
-{
-	ret = loader.LoadASCIIFromFile(&model, &err, &warn, filePath);
-}
-else
-{
-	ret = loader.LoadBinaryFromFile(&model, &err, &warn, filePath); // for binary glTF(.glb)
-}
-
-if (!warn.empty())
-{
-	printf("Warn: %s\n", warn.c_str());
-}
-
-if (!err.empty())
-{
-	printf("Err: %s\n", err.c_str());
-	assert(0);
-}
-
-if (!ret)
-{
-	printf("Failed to parse glTF\n");
-	assert(0);
-}
-
-std::cout << "Loaded GLTF successfully" << std::endl;
-return model;
-
-}
 
 
 
