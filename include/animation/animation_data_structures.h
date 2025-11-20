@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
-#include <glm/ext/quaternion_float.hpp>
+#include <glm/mat4x4.hpp>
+
 
 
 
@@ -8,14 +9,7 @@ namespace Engine
 {
 
 
-	/*ANIMATION*/
-	enum class AnimationInterpolationMode
-	{
-		LINEAR,
-		STEP,
-		CUBICSPLINE,
-		UNKNOWN
-	};
+
 
 	enum class AnimationPathType
 	{
@@ -25,7 +19,14 @@ namespace Engine
 		UNKNOWN
 	};
 
-
+	/*ANIMATION*/
+	enum class AnimationInterpolationMode
+	{
+		LINEAR,
+		STEP,
+		CUBICSPLINE,
+		UNKNOWN
+	};
 
 	/**
 struct AnimationTranslationSampler

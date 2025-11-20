@@ -1,6 +1,10 @@
 #pragma once
 #include <unordered_map>
 #include "tiny_gltf.h"
+#include "../animation/animation_data_structures.h"
+#include <string>
+
+
 
 namespace Engine
 {

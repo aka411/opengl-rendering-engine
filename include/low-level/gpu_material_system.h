@@ -2,6 +2,8 @@
 #include <glm/ext/vector_float4.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include "gpu_buffer_sub_bump_allocator.h"
+#include <unordered_map>
+#include "gpu_buffer_manager.h"
 
 enum class MaterialType
 {
@@ -36,15 +38,17 @@ class GPUMaterialSystem
 {
 
 private:
+	GPUBufferManager& m_gpuBufferManager;
 
-	std::unordered_map<MaterialType,GPUBufferSubBumpAllocator> m_materialTypeToSSBO;
-	
+
+	std::unordered_map<MaterialType, GPUBufferSubBumpAllocator> m_materialTypeToSSBO;
+
 	MaterialId m_currentMaterialId = 0;
 
 public:
-	GPUMaterialSystem();
+	GPUMaterialSystem(GPUBufferManager& gpuBufferManager);
 	MaterialId uploadMaterial(MaterialType materialType, std::byte* ptr, size_t size); //size in bytes
 
 	const GPUBufferInfo getGPUBufferInfo(MaterialType materialType);
 
-}
+};

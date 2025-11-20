@@ -2,7 +2,7 @@
 
 #include "tiny_gltf.h"
 #include "model_loading_data_structure.h"
-#include "../engine_data_structures.h"
+
 
 namespace Engine
 {
@@ -23,7 +23,7 @@ namespace Engine
 		EngineTransformationComponent getTransformationFromGltfNode(const tinygltf::Node& node); // helper function
 
 
-		std::vector<IntermediatePrimitive> getIntermediatePrimitive(tinygltf::Model& tinygltfModel, tinygltf::Mesh& gltfMesh);//helper
+		//std::vector<IntermediatePrimitive> getIntermediatePrimitive(tinygltf::Model& tinygltfModel, tinygltf::Mesh& gltfMesh);//helper
 
 
 		std::vector<SamplerSetting> getTextureSamplerSettings(const tinygltf::Model& tinygltfModel);
@@ -59,7 +59,7 @@ namespace Engine
 
 
 
-		BoneAnimationData getBoneAnimationData(const tinygltf::Model& tinygltfModel);
+		//BoneAnimationData getBoneAnimationData(const tinygltf::Model& tinygltfModel);
 
 
 

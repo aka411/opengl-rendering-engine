@@ -1,12 +1,10 @@
-#include "../../include/model-loading/vertex_attributes_repacker.h"
-#include <unordered_map>
-#include "../../include/low-level/rendering_system_data_types.h"
 #include <cassert>
-#include <map>
+#include <cstddef>
+#include <cstring>
+
+
+#include "../../include/model-loading/vertex_attributes_repacker.h"
 #include "../../include/low-level/vertex_format_helper.h"
-#include "../../include/model-loading/model_loading_data_structure.h"
-
-
 
 
 
@@ -14,7 +12,7 @@
 VertexData VertexAttributeRepacker::interleaveVertexAttributes(const std::map<VertexAttributeType, std::vector<std::byte>>& vertexAttributeToRawDatas)
 {
 
-
+    
 
 
     VertexData vertexData;
@@ -62,7 +60,7 @@ VertexData VertexAttributeRepacker::interleaveVertexAttributes(const std::map<Ve
     const size_t stride = currentOffset;
 
 
-    vertexData.vertexLayout = Vertexlayout::INTERLEAVED;
+    vertexData.vertexLayout = VertexLayout::INTERLEAVED;
     vertexData.vertexCount = numVertices;
     vertexData.vertexFormat = vertexFormat;
 

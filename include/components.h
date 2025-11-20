@@ -1,16 +1,32 @@
 #pragma once
-#include "../external/the-engine/the-engine/graphics/include/core/common_enums.h"
+
+#include <vector>
+#include "low-level/gpu_material_system.h"
+
+#include <glm/glm.hpp> 
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/vec3.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include "../external/the-engine/the-engine/ecs/include/common_data_types.h"
+
+
+
+
+
+
+
+
 
 
 struct EngineRenderComponent
 {
-	VertexFormat vertexFormat;
+	VertexFormat vertexFormat = 0;
 	size_t vertexCount = 0;
 	size_t vertexOffset = 0;
 
 	bool isIndexed = false;
 
-	IndexType indexType;
+	IndexType indexType = IndexType::UNKNOWN;
 	size_t indexCount = 0;
 	size_t indexOffset = 0;
 
@@ -27,12 +43,8 @@ struct EngineFatRenderComponent
 struct EngineChildrenComponent
 {
 	std::vector<TheEngine::ECS::EntityId> childrenEntities;
+
 };
-
-
-
-
-
 
 
 
@@ -76,8 +88,9 @@ struct RootEntityComponent
 
 
 
-
+/*
 struct UIEngineRenderComponent
 {
 
 };
+*/

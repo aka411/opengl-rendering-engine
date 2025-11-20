@@ -1,4 +1,7 @@
-#include "../include/data_convertor.h"
+#include "../../include/model-loading/data_convertor.h"
+#include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 glm::mat4 DataConvertor::narrowToMatrix4(const std::vector<double>& doubleVector)
 {

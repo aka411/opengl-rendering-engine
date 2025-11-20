@@ -11,7 +11,7 @@
 
 void VertexFormatManager::createNewVAOForFormat(VertexFormat vertexFormat)
 {
-	GLuint vao;
+	GLuint vao = 0;
 	size_t location = 0;
 	size_t offset = 0;
 	for (uint32_t i = 0; i < vertexFormat.size(); ++i)

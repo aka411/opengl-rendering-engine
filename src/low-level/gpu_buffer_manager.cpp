@@ -1,8 +1,8 @@
 
 #include <stdexcept>
+#include "../../include/low-level/gpu_buffer_manager.h"
 
-#include "../include/gpu_buffer_manager.h"
-#include "../include/low-level/rendering_system_data_types.h"
+
 
 
 
@@ -18,7 +18,7 @@ GPUBufferManager::GPUBufferManager()
 
 }
 
-BufferInfo GPUBufferManager::createMappedVertexBuffer(const size_t size, void* data)
+GPUBufferInfo GPUBufferManager::createMappedVertexBuffer(const size_t size, void* data)
 {
 	GLuint VBO;
 
@@ -37,17 +37,17 @@ BufferInfo GPUBufferManager::createMappedVertexBuffer(const size_t size, void* d
 
 	m_allocatedBuffers.push_back(VBO);
 
-	BufferInfo bufferInfo;
+	GPUBufferInfo gpuBufferInfo;
 
-	bufferInfo.bufferHandle = VBO;
-	bufferInfo.totalSize = size;
-	bufferInfo.mappedPtr = mappedVBOData;
+	gpuBufferInfo.bufferHandle = VBO;
+	gpuBufferInfo.size = size;
+	gpuBufferInfo.mappedPtr = mappedVBOData;
 
 
-	return bufferInfo;
+	return gpuBufferInfo;
 }
 
-BufferInfo GPUBufferManager::createMappedUBOBuffer(const size_t size, void* data)
+GPUBufferInfo GPUBufferManager::createMappedUBOBuffer(const size_t size, void* data)
 {
 	GLuint UBO;
 	glGenBuffers(1, &UBO);
@@ -64,17 +64,17 @@ BufferInfo GPUBufferManager::createMappedUBOBuffer(const size_t size, void* data
 
 	m_allocatedBuffers.push_back(UBO);
 
-	BufferInfo bufferInfo;
+	GPUBufferInfo gpuBufferInfo;
 
-	bufferInfo.bufferHandle = UBO;
-	bufferInfo.totalSize = size;
-	bufferInfo.mappedPtr = mappedUBOData;
+	gpuBufferInfo.bufferHandle = UBO;
+	gpuBufferInfo.size = size;
+	gpuBufferInfo.mappedPtr = mappedUBOData;
 
 
-	return bufferInfo;
+	return gpuBufferInfo;
 }
 
-BufferInfo GPUBufferManager::createMappedIndexBuffer(const size_t size, void* data)
+GPUBufferInfo GPUBufferManager::createMappedIndexBuffer(const size_t size, void* data)
 {
 	GLuint EBO;
 
@@ -93,17 +93,44 @@ BufferInfo GPUBufferManager::createMappedIndexBuffer(const size_t size, void* da
 
 	m_allocatedBuffers.push_back(EBO);
 
-	BufferInfo bufferInfo;
+	GPUBufferInfo gpuBufferInfo;
 
-	bufferInfo.bufferHandle = EBO;
-	bufferInfo.totalSize = size;
-	bufferInfo.mappedPtr = mappedVBOData;
+	gpuBufferInfo.bufferHandle = EBO;
+	gpuBufferInfo.size = size;
+	gpuBufferInfo.mappedPtr = mappedVBOData;
 
 
-	return bufferInfo;
+	return gpuBufferInfo;
 }
 
 
 
+GPUBufferInfo GPUBufferManager::createMappedSSBO(const size_t size, void* data)
+{
+	GLuint SSBO;
 
+
+
+	glGenBuffers(1, &SSBO);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+
+	GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+
+	glBufferStorage(GL_SHADER_STORAGE_BUFFER, size, data, flags);
+
+	void* mappedVBOData = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, size, flags);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	m_allocatedBuffers.push_back(SSBO);
+
+	GPUBufferInfo gpuBufferInfo;
+
+	gpuBufferInfo.bufferHandle = SSBO;
+	gpuBufferInfo.size = size;
+	gpuBufferInfo.mappedPtr = mappedVBOData;
+
+
+	return gpuBufferInfo;
+}
 

@@ -1,4 +1,7 @@
-#include "../include/bone_animation_system.h"
+
+#include "../../include/animation/bone_animation_system.h"
+#include <cassert>
+#include <glm/ext/matrix_float4x4.hpp>
 
 void BoneAnimationSystem::animate(Engine::Model& engineModel) const
 {

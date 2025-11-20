@@ -1,23 +1,18 @@
 #pragma once
 #include <vector>
-#include "../low-level/rendering_system_data_types.h"
-#include "../low-level/gpu_material_system.h"
-
-#include "../animation/animation_data_structures.h"
 #include "../components.h"
+#include "../low-level/rendering_system_data_types.h"
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
-
-
-
-
-
-
+#include <cstddef>
+#include <cstdint>
 
 
 struct VertexData
 {
 
-	Vertexlayout vertexLayout;
+	VertexLayout vertexLayout;
 	VertexFormat vertexFormat;
 	size_t vertexCount = 0;
 
@@ -32,13 +27,6 @@ struct IndexData
 	std::vector<std::byte> data;
 };
 
-
-struct IntermediateMesh
-{
-	std::vector<IntermediatePrimitive> intermediatePrimitives;
-};
-
-
 struct IntermediatePrimitive
 {
 	int vertexDataId = -1; //needs to be converted to offset
@@ -50,6 +38,13 @@ struct IntermediatePrimitive
 
 	int materialId = -1;//
 };
+
+
+struct IntermediateMesh
+{
+	std::vector<IntermediatePrimitive> intermediatePrimitives;
+};
+
 
 //index data is gonna be a bitch
 

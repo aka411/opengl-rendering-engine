@@ -1,5 +1,5 @@
 #pragma once 
-
+#include "rendering_system_data_types.h"
 
 class GPUBufferSubBumpAllocator
 {

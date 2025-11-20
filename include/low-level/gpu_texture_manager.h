@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
-
+#include "rendering_system_data_types.h"
+#include "../../glad/glad.h"
 
 class GPUTextureManager
 {

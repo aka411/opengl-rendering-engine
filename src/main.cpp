@@ -8,13 +8,12 @@
 #include <SDL3/SDL_events.h>
 #include "../glad/glad.h"
 
-#include "../include/transformation_system.h"
-#include "../include/renderer.h"
-#include "../include/gltf_flat_parser.h"
-#include "../include/skin_animation_system.h"
-#include "../include/bone_animation_system.h"
+
 #include <filesystem>
 #include <fstream>
+#include <cassert>
+#include "../include/camera.h"
+#include "../include/engine/engine_core.h"
 
 SDL_Window* init()
 {
@@ -68,36 +67,29 @@ int main(int argc, char* args[])
 
 
 
-	tinygltf::Model model = loadModel();
 
 	SDL_Window* window = init();
-
-	GPUBufferManager gpuBufferManager;
-	GPUTextureManager gpuTextureManager;
-
-	BufferManagementSystem bufferManagementSystem;
-
-	Engine::GLTFFlatParser gltfFlatParser(bufferManagementSystem, gpuTextureManager);
-
-	Engine::Model engineModel = gltfFlatParser.parse(model);
 
 
 	 SDL_Event event;
 
-
 	 bool running = true;
 
-	 TransformationSystem g_transfromationSystem;
-	 
-	 
+	
+	
 
 	 Engine::Camera camera;
-	 Renderer renderer(bufferManagementSystem, gpuTextureManager,camera);
+	
+	
 
-	 renderer.setPhysicalViewport(700, 700);
-	 SkinAnimationSystem animationSystem;
-	 BoneAnimationSystem boneAnimationSystem;
-	 std::cout << "Going to start Rendering" << std::endl;
+	 EngineCore engineCore;
+
+
+
+
+
+
+
 
 
 	 float deltaTime = 0.0f;
@@ -130,7 +122,7 @@ int main(int argc, char* args[])
 				 int width = event.window.data1;
 				 int height = event.window.data2;
 
-				 renderer.setPhysicalViewport(width, height);
+				
 
 			 }
 
@@ -166,14 +158,10 @@ int main(int argc, char* args[])
 
 		 }
 
-		 animationSystem.animate(deltaTime, engineModel, "Take 001");
-
-		 g_transfromationSystem.updateWorldTransforms(engineModel);
-		 boneAnimationSystem.animate(engineModel);
-		 // per frame loop here
+		 
 
 
-		 renderer.renderFrame(engineModel);
+
 
 
 

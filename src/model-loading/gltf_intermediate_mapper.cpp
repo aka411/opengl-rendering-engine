@@ -11,8 +11,8 @@
 #include "../../include/model-loading/gltf_animation_extractor.h"
 #include "../../include/components.h"
 #include "../../include/low-level/vertex_format_helper.h"
-
-
+#include "../../include/animation/animation_data_structures.h"
+#include  <algorithm>
 
 
 
@@ -457,7 +457,7 @@ namespace Engine
 		}
 	}
 
-	std::vector<std::byte> getRawByteDataFromBufferView(const tinygltf::Accessor& accessor, const tinygltf::BufferView bufferView, const tinygltf::Buffer& buffer)
+	std::vector<std::byte> GLTFIntermediateMapper::getRawByteDataFromBufferView(const tinygltf::Accessor& accessor, const tinygltf::BufferView bufferView, const tinygltf::Buffer& buffer)
 	{
 
 
@@ -471,34 +471,37 @@ namespace Engine
 
 
 
-		const size_t elementSize = tinygltf::GetComponentSizeInBytes(accessor.componentType);
-		const size_t count = accessor.count;
-		const size_t totalDataSize = count * elementSize;
+		const size_t componentSizeInBytes = tinygltf::GetComponentSizeInBytes(accessor.componentType);
+		const size_t vectorComponentCount = tinygltf::GetNumComponentsInType(accessor.type);
+		const size_t vectorSizeInBytes = componentSizeInBytes * vectorComponentCount;
 
+		const size_t vectorCount = accessor.count;
+	
+		const size_t totalStreamSizeInBytes = vectorCount * vectorSizeInBytes;
 
 		const size_t stride = bufferView.byteStride;
 
-		std::vector<std::byte> rawByteData(totalDataSize);
+		std::vector<std::byte> rawByteData(totalStreamSizeInBytes);
 
 		if (stride == 0)
 		{
 
-			memcpy(rawByteData.data(), dataPtr, totalDataSize);
+			memcpy(rawByteData.data(), dataPtr, totalStreamSizeInBytes);
 		}
 		else
 		{
 			std::byte* destPtr = rawByteData.data();
 
-			for (size_t i = 0; i < count; ++i)
+			for (size_t i = 0; i < vectorCount; ++i)
 			{
 				// Calculate source address: Start + (element index * stride)
 				const std::byte* srcElementPtr = dataPtr + (i * stride);
 
 				// Copy 'elementSize' bytes from the source to the destination
-				std::memcpy(destPtr, srcElementPtr, elementSize);
+				std::memcpy(destPtr, srcElementPtr, vectorSizeInBytes);
 
 				// Advance the destination pointer by the size of the element (not the stride)
-				destPtr += elementSize;
+				destPtr += vectorSizeInBytes;
 			}
 		}
 		return rawByteData;
@@ -548,7 +551,7 @@ namespace Engine
 
 
 	
-	std::map<VertexAttributeType, int> getGLTFAttributeAccessorMappedToEngineAttribute(const tinygltf::Primitive& tinygltfPrimitive)
+	std::map<VertexAttributeType, int> GLTFIntermediateMapper::getGLTFAttributeAccessorMappedToEngineAttribute(const tinygltf::Primitive& tinygltfPrimitive)
 	{
 
 
@@ -633,19 +636,18 @@ namespace Engine
 
 				const std::map<VertexAttributeType, int> vertexAttributeAcessorIndexMap = getGLTFAttributeAccessorMappedToEngineAttribute(tinygltfPrimitive);
 
-				
+				intermediatePrimitive.materialId = tinygltfPrimitive.material;
 
 
 				std::vector<int> orderedAccessors;
-				std::transform(vertexAttributeAcessorIndexMap.begin(), vertexAttributeAcessorIndexMap.end(), std::back_inserter(orderedAccessors), [](const auto& firstPair, const auto& secondPair)
+				std::transform(vertexAttributeAcessorIndexMap.begin(),
+					vertexAttributeAcessorIndexMap.end(),
+					std::back_inserter(orderedAccessors),
+					[](const auto& mapPair) // mapPair is a const std::pair<const VertexAttributeType, int>
 					{
-						if (firstPair.second > secondPair.second) { return secondPair.second }
-						else
-						{
-							return firstPair.second
-						}
+						return mapPair.second;
 					});
-
+				std::sort(orderedAccessors.begin(), orderedAccessors.end());
 
 				
 				std::uint32_t attributeAccessorHash = simpleArrayHash<int>(orderedAccessors); /// for reusing
@@ -681,7 +683,7 @@ namespace Engine
 				{
 					intermediatePrimitive.isIndexed = true;
 					const auto& IndexIterator = gltfIndiceAccessorIndexToOurIndexData.find(tinygltfPrimitive.indices);
-					if (IndexIterator != gltfIndiceAccessorIndexToOurIndexData.end())
+					if (IndexIterator == gltfIndiceAccessorIndexToOurIndexData.end())
 					{
 
 
@@ -700,7 +702,10 @@ namespace Engine
 
 						//store
 						gltfIndiceAccessorIndexToOurIndexData[tinygltfPrimitive.indices] = indexDatas.size();
+
 						intermediatePrimitive.indexId = indexDatas.size();
+						indexDatas.push_back(indexData);
+
 
 					}
 					else
@@ -709,15 +714,23 @@ namespace Engine
 						intermediatePrimitive.indexId = IndexIterator->second;
 
 					}
+
+
+
+
+
 				}
 
 
 
 
-				//get primitives 
-				intermediateMesh.intermediatePrimitives = intermediatePrimitives;
+				intermediatePrimitives.push_back(intermediatePrimitive);
+
 
 			}
+
+			//get primitives 
+			intermediateMesh.intermediatePrimitives = intermediatePrimitives;
 			intermediateMeshs.push_back(intermediateMesh);
 		}
 
@@ -743,7 +756,7 @@ namespace Engine
 	{
 		size_t rootNodeIndex = 0;
 
-		for (auto scene : tinygltfModel.scenes)
+		for (auto& scene : tinygltfModel.scenes)
 		{
 			for (auto nodeIndex : scene.nodes)
 			{
@@ -784,9 +797,9 @@ namespace Engine
 		//.animationData = extractedAnimationData.animationData;
 		//model.animations = extractedAnimationData.animationsMap;
 
-		BoneAnimationData boneAnimationData;
+		//BoneAnimationData boneAnimationData;
 
-		boneAnimationData = getBoneAnimationData(tinygltfModel);
+		//boneAnimationData = getBoneAnimationData(tinygltfModel);
 
 
 

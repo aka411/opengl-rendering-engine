@@ -14,7 +14,7 @@ enum class BufferUsageType
 };
 
 
-enum class Vertexlayout
+enum class VertexLayout 
 {
 	INTERLEAVED,
 	NON_INTERLEAVED,
