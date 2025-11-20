@@ -1,8 +1,8 @@
 #pragma once
 
 #include <vector>
-#include "../glad/glad.h"
-
+#include "../../glad/glad.h"
+#include "rendering_system_data_types.h"
 
 class GPUBufferManager
 {
@@ -18,11 +18,14 @@ public:
 	GPUBufferManager();
 
 
-	BufferInfo createMappedVertexBuffer(const size_t size, void* data);
+	GPUBufferInfo createMappedVertexBuffer(const size_t size, void* data);
 
-	BufferInfo createMappedUBOBuffer(const size_t size, void* data);
+	GPUBufferInfo createMappedUBOBuffer(const size_t size, void* data);
 
-	BufferInfo createMappedIndexBuffer(const size_t size, void* data);
+	GPUBufferInfo createMappedIndexBuffer(const size_t size, void* data);
+
+	GPUBufferInfo createMappedSSBO(const size_t size, void* data);
+
 
 
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include "../../glad/glad.h"
+#include <bitset>
 
 
 /*VERTEX BUFFER MANAGEMENT SYSTEM*/
@@ -13,64 +14,94 @@ enum class BufferUsageType
 };
 
 
-enum class Vertexlayout
+enum class VertexLayout 
 {
 	INTERLEAVED,
 	NON_INTERLEAVED,
 	UNKNOWN
 };
 
-enum class VertexAttributeType
+
+constexpr size_t MAX_ATTRIBUTES = 15;
+using VertexFormat = std::bitset<MAX_ATTRIBUTES>;
+
+
+
+
+
+enum class VertexAttributeType : std::uint32_t
 {
+	UNKNOWN				    = 0,
 	// Geometric Data
-	POSITION_3F,         // 3 floats for (x, y, z)
-	NORMAL_3F,           // 3 floats for (nx, ny, nz)
-	TANGENT_3F,          // 3 floats for a tangent vector
-	BINORMAL_3F,         // 3 floats for a binormal/bitangent vector
+	POSITION_3F				= 1,         // 3 floats for (x, y, z)
+	NORMAL_3F				= 2,           // 3 floats for (nx, ny, nz)
+	TANGENT_3F				= 3,          // 3 floats for a tangent vector
+	BINORMAL_3F				= 4,         // 3 floats for a binormal/bitangent vector
 
-	// Texture and Color Data
-	TEXCOORD_2F,         // 2 floats for (u, v) texture coordinates
-	COLOR_4UB_NORMALIZED, // 4 unsigned bytes for RGBA, treated as [0.0, 1.0]
+	// Texture
+	TEXCOORD_0_2F			= 5,         // 2 floats for (u, v) texture coordinates
+	TEXCOORD_1_2F			= 6,
+	TEXCOORD_2_2F			= 7,
+	TEXCOORD_3_2F			= 8,
 
+	//Color Data
+	COLOR_0_4UB_NORMALIZED	= 9, // 4 unsigned bytes for RGBA, treated as [0.0, 1.0]
+	COLOR_1_4UB_NORMALIZED = 10,
+	COLOR_2_4UB_NORMALIZED = 11,
+	COLOR_3_4UB_NORMALIZED = 12,
 	// Auxiliary Data
-	JOINT_INDICES_4I,    // 4 integers for skeletal animation joint indices
-	JOINT_WEIGHTS_4F,     // 4 floats for corresponding joint weights
+	JOINT_INDICES_4I		= 13,    // 4 integers for skeletal animation joint indices
+	JOINT_WEIGHTS_4F		= 14,     // 4 floats for corresponding joint weights
 
-	UNKNOWN
+	
 
 };
 
 
 
 
-enum class VertexFormat
+/*Index Data*/
+
+enum class IndexType
 {
-	// Common Formats (P = Position, N = Normal, T = Texture Coords)
+	// Unsigned 8-bit integer (1 byte)
+		// Max index: 255. Use for small meshes only.
+	UBYTE_8, // Maps to GL_UNSIGNED_BYTE (1 byte)
 
-	// P3f
-	POSITION,
+	// Unsigned 16-bit integer (2 bytes)
+	// Max index: 65,535. Very common for moderately sized meshes.
+	USHORT_16, // Maps to GL_UNSIGNED_SHORT (2 bytes)
 
-	// P3f_N3f
-	POSITION_NORMAL,
+	// Unsigned 32-bit integer (4 bytes)
+		// Max index: 4,294,967,295. Use for very large meshes.
+	UINT_32, // Maps to GL_UNSIGNED_INT (4 bytes)
 
-	// P3f_T2f
-	POSITION_TEXCOORD,
-
-	// P3f_N3f_T2f
-	POSITION_NORMAL_TEXCOORD,
-
-	// P3f_N3f_T2f_C4ub
-	POSITION_NORMAL_TEXCOORD_COLOR,
-
-	// P3f_N3f_T2f_Tan3f
-	POSITION_NORMAL_TEXCOORD_TANGENT, // Used for tangent space calculations (Normal Mapping)
-
-	// P3f_N3f_T2f_J4i_W4f (Animated Mesh Format)
-	//SKINNED_MESH
-	POSITION_NORMAL_TEXCOORD_TANGENT_JOINT_WEIGHT,
+	UNKNOWN
+};
 
 
-    UNKNWON
+/* VERTEX ATTRIBUTE CONFIGURATION */
+
+struct VertexAttribute
+{
+	// The type from the VertexAttributeType enum (e.g., POSITION_3F)
+	VertexAttributeType type;
+
+	// The location/index in the shader (e.g., layout (location = 0) in ...)
+	unsigned int location;
+
+	// The number of components (e.g., 3 for POSITION_3F, 2 for TEXCOORD_2F)
+	int count;
+
+	// The OpenGL fundamental type (e.g., GL_FLOAT, GL_UNSIGNED_BYTE)
+	unsigned int glType;
+
+	// Whether fixed-point data should be normalized (GL_TRUE/GL_FALSE).
+	// Crucial for types like COLOR_4UB_NORMALIZED.
+	unsigned char normalized;
+
+	// The size of the attribute in bytes (e.g., 12 bytes for 3 floats)
+	size_t size;
 };
 
 
@@ -117,7 +148,7 @@ struct GPUBufferInfo
 
 
 
-enum class TextureSourceFormat
+enum class TextureSourcePixelFormat
 {
 	UNKNOWN,
 	R,        // GL_RED
@@ -127,8 +158,8 @@ enum class TextureSourceFormat
 	BGRA      // GL_BGRA (Common in some image formats)
 };
 
-// TextureSourceType: Defines the bit size/type of each component in the CPU data.
-enum class TextureSourceType
+// TextureSourceComponentType: Defines the bit size/type of each component in the CPU data.
+enum class TextureSourceComponentType
 {
 	UNKNOWN,
 	UNSIGNED_BYTE, // GL_UNSIGNED_BYTE (8-bit per channel)
@@ -148,15 +179,19 @@ enum class TextureType
 	UNKNOWN
 };
 
-enum class TextureFormat
+enum class TextureInternalFormat
 {
-	// Internal formats
+	// 8-bit Unsigned Integer Formats
 	R8, RG8, RGB8, RGBA8,
 
+	// 16-bit Half-Float Formats
 	R16F, RG16F, RGB16F, RGBA16F,
 
+	//  32-bit Full-Float Formats
+	R32F, RG32F, RGB32F, RGBA32F,
+
 	// Depth/Stencil formats
-	DEPTH_COMPONENT,//TODO : correct to add bit depth
+	DEPTH_COMPONENT16, DEPTH_COMPONENT24, DEPTH_COMPONENT32F,
 	DEPTH_STENCIL,
 	UNKNOWN
 };
@@ -191,6 +226,7 @@ struct SamplerSetting
 
 	TextureWrap wrapS = TextureWrap::REPEAT;
 	TextureWrap wrapT = TextureWrap::REPEAT;
+
 	TextureWrap wrapR = TextureWrap::REPEAT; // For 3D or Cube Maps
 	// Optional: Anisotropy, LOD bias, etc.
 };
@@ -205,7 +241,7 @@ struct TextureInfo
 	int height = 0;
 	int depth = 0; // For 3D or Array Textures
 
-	TextureFormat internalFormat = TextureFormat::UNKNOWN;
+	TextureInternalFormat internalFormat = TextureInternalFormat::UNKNOWN;
 	SamplerSetting samplerSettings;
 
 	bool hasMipmaps = false;
@@ -230,10 +266,10 @@ struct TextureCreateInfo
 
 
 	// --- Format & Type ---
-	TextureFormat internalFormat = TextureFormat::UNKNOWN; // Still your GPU-side enum (e.g., GL_RGBA8)
+	TextureInternalFormat internalFormat = TextureInternalFormat::UNKNOWN; // GPU side, 
 
-	TextureSourceFormat sourceFormat = TextureSourceFormat::RGBA;
-	TextureSourceType sourceType = TextureSourceType::UNSIGNED_BYTE;
+	TextureSourcePixelFormat textureSourcePixelFormat = TextureSourcePixelFormat::RGBA;
+	TextureSourceComponentType textureSourceComponentType = TextureSourceComponentType::UNSIGNED_BYTE;
 };
 
 
@@ -249,7 +285,7 @@ struct BufferTextureCreateInfo
 	int depth = 1;
 
 	// --- Format (The ONLY data format needed) ---
-	TextureFormat internalFormat = TextureFormat::UNKNOWN;
+	TextureInternalFormat textureInternalFormat = TextureInternalFormat::UNKNOWN;
 
 	// --- Mipmaps ---
 	//useful for G-Buffer textures

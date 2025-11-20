@@ -1,13 +1,13 @@
 #pragma once 
-
+#include "rendering_system_data_types.h"
 
 class GPUBufferSubBumpAllocator
 {
 private:
 	const GPUBufferInfo m_gpuBufferInfo;
-	size_t currentPointer = 0;
-private:
-	GPUBufferSubBumpAllocator(BufferInfo bufferInfo);
+	size_t m_currentPointer = 0;
+public:
+	GPUBufferSubBumpAllocator(GPUBufferInfo gpuBufferInfo);
 
 	GPUBufferInfo getGPUBufferInfo();
 

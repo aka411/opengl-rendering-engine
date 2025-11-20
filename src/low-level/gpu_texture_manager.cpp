@@ -1,11 +1,11 @@
 
-#include "../../include/model-loading/stb_image.h"
+
 #include <stdexcept>
 #include <cassert>
 
 #include "../../include/low-level/rendering_system_data_types.h"
 #include "../../include/low-level/gpu_texture_manager.h"
-
+#include "../../glad/glad.h"
 
 
 
@@ -13,42 +13,32 @@
 namespace TextureUtils
 {
 
-	GLenum toGLEnum(TextureSourceFormat format)
+	GLenum toGLEnum(TextureSourcePixelFormat format)
 	{
 		switch (format)
 		{
-		case TextureSourceFormat::R:     return GL_RED;
-		case TextureSourceFormat::RG:    return GL_RG;
-		case TextureSourceFormat::RGB:   return GL_RGB;
-		case TextureSourceFormat::RGBA:  return GL_RGBA;
-		case TextureSourceFormat::BGRA:  return GL_BGRA;
+		case TextureSourcePixelFormat::R:     return GL_RED;
+		case TextureSourcePixelFormat::RG:    return GL_RG;
+		case TextureSourcePixelFormat::RGB:   return GL_RGB;
+		case TextureSourcePixelFormat::RGBA:  return GL_RGBA;
+		case TextureSourcePixelFormat::BGRA:  return GL_BGRA;
 		default: return 0; // Handle error or unknown
 		}
 	}
 
-	GLenum toGLEnum(TextureSourceType type)
+	GLenum toGLEnum(TextureSourceComponentType type)
 	{
 		switch (type)
 		{
-		case TextureSourceType::UNSIGNED_BYTE: return GL_UNSIGNED_BYTE;
-		case TextureSourceType::FLOAT:         return GL_FLOAT;
-		case TextureSourceType::HALF_FLOAT:    return GL_HALF_FLOAT;
+		case TextureSourceComponentType::UNSIGNED_BYTE: return GL_UNSIGNED_BYTE;
+		case TextureSourceComponentType::FLOAT:         return GL_FLOAT;
+		case TextureSourceComponentType::HALF_FLOAT:    return GL_HALF_FLOAT;
 		default: return 0;
 		}
 	}
 
 
 
-	GLenum toGLEnum(TextureSourceType type)
-	{
-		switch (type)
-		{
-		case TextureSourceType::UNSIGNED_BYTE: return GL_UNSIGNED_BYTE;
-		case TextureSourceType::FLOAT:         return GL_FLOAT;
-		case TextureSourceType::HALF_FLOAT:    return GL_HALF_FLOAT;
-		default: return 0;
-		}
-	}
 
 	GLenum toGLEnum(TextureType type)
 	{
@@ -157,8 +147,8 @@ TextureInfo GPUTextureManager::createNewTexture(const TextureCreateInfo& texture
 
 
 	GLenum glInternalFormat = (GLenum)textureCreateInfo.internalFormat;
-	GLenum glSourceFormat = TextureUtils::toGLEnum(textureCreateInfo.sourceFormat);
-	GLenum glSourceType = TextureUtils::toGLEnum(textureCreateInfo.sourceType);
+	GLenum glSourceFormat = TextureUtils::toGLEnum(textureCreateInfo.textureSourcePixelFormat);
+	GLenum glSourceType = TextureUtils::toGLEnum(textureCreateInfo.textureSourceComponentType);
 
 
 
@@ -168,7 +158,7 @@ TextureInfo GPUTextureManager::createNewTexture(const TextureCreateInfo& texture
 
 
 	// Special handling for 1-channel textures (like R/Luminance) to prevent padding issues
-	if (textureCreateInfo.sourceFormat == TextureSourceFormat::R)
+	if (textureCreateInfo.textureSourcePixelFormat == TextureSourcePixelFormat::R)
 	{
 		// OpenGL defaults to 4-byte alignment; this forces 1-byte alignment for R-only data.
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

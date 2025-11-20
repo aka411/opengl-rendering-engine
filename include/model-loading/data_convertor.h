@@ -1,8 +1,7 @@
 #pragma once
-#include <glm/ext/matrix_float4x4.hpp>
-#include <glm/ext/quaternion_float.hpp>
-#include <vector>
 
+#include <vector>
+#include <glm/fwd.hpp>
 
 class DataConvertor
 {

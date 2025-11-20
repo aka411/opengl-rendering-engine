@@ -2,37 +2,59 @@ cmake_minimum_required(VERSION 3.17)
 
 project(project-gltf)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 include(FetchContent)
 
+
+
+
+
+
+
+add_subdirectory(external/the-engine/the-engine/ecs)
+
+
+
+
+
+
+
 add_executable(opengl-rendering-engine
 
-src/main.cpp
-
+ src/main.cpp
  "glad/glad.c"
- "src/buffer_management_system.cpp"
+ 
+ 
  "src/common_header_imp.cpp"
  "src/camera.cpp"
- "src/animation/skin_animation_system.cpp"
+# "src/animation/skin_animation_system.cpp"
 
- "src/renderer.cpp"
- "src/low-level/shader_manager.cpp"
- "src/transformation_system.cpp"
- "src/model-loading/gltf_flat_parser.cpp"
- "src/hierarchy_traverser_flat.cpp"
- "src/animation/bone_animation_system.cpp"
- "src/low-level/vertex_format_manager.cpp"
- "src/model-loading/data_convertor.cpp"
- "src/model-loading/gltf_animation_extractor.cpp"
+# "src/renderer.cpp"
+# "src/low-level/shader_manager.cpp"
+# "src/transformation_system.cpp"
+  "src/model-loading/gltf_intermediate_mapper.cpp"
+# "src/hierarchy_traverser_flat.cpp"
+# "src/animation/bone_animation_system.cpp"
+  "src/low-level/vertex_format_manager.cpp"
+  "src/model-loading/data_convertor.cpp"
+# "src/model-loading/gltf_animation_extractor.cpp"
 
- "src/model-loading/vertex_attribute_repacker.cpp"
- 
+ "src/engine/engine_core.cpp"
+ "src/engine/engine_loader.cpp"
  "src/low-level/vertex_format_manager.cpp"
+ "src/low-level/gpu_buffer_manager.cpp"
  "src/low-level/gpu_buffer_sub_bump_allocator.cpp"
  "src/low-level/gpu_texture_manager.cpp"
+  "src/low-level/gpu_material_system.cpp"
 
- "include/engine_data_structures.h" "include/model-loading/model_loading_data_structure.h")
+ "src/low-level/vertex_format_helper.cpp" 
+ "src/model-loading/vertex_attributes_repacker.cpp"
+ "src/engine/engine_loader.cpp"
+ "src/low-level/world_vertex_buffer_management_system.cpp"
+
+
+ "src/engine/engine_core.cpp")
 
 
  set_target_properties(opengl-rendering-engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
@@ -42,11 +64,13 @@ src/main.cpp
 target_include_directories(opengl-rendering-engine PRIVATE
 
 ${CMAKE_SOURCE_CURRENT_DIR}/include
+
 ${CMAKE_SOURCE_CURRENT_DIR}/glad
+${CMAKE_SOURCE_CURRENT_DIR}/external/the-engine/the-engine/ecs/include
 
 )
 
-
+#target_include_directories(opengl-rendering-engine PUBLIC ${glm_INCLUDE_DIR})
 
 FetchContent_Declare(
   SDL3
@@ -70,7 +94,7 @@ target_link_libraries(opengl-rendering-engine PRIVATE
 
   SDL3::SDL3
   glm::glm
-
+  TheEngine_ECS
 )
 
 

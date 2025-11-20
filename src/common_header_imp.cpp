@@ -16,4 +16,4 @@ implementation so as to avoid redefinitions*/
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
-#include "../include/tiny_gltf.h"
+#include "../include/model-loading/tiny_gltf.h"

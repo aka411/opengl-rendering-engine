@@ -1,4 +1,8 @@
-#include "../include/gltf_animation_extractor.h"
+
+#include <unordered_map>
+#include "../../include/model-loading/tiny_gltf.h"
+#include "../../include/animation/animation_data_structures.h"
+#include "../../include/model-loading/gltf_animation_extractor.h"
 
 namespace Engine
 {
@@ -47,7 +51,7 @@ namespace Engine
 
 
 
-	ExtractedAnimationData GltfAnimationExtractor::extractAnimation(tinygltf::Model& tinygltfModel)
+	 ExtractedAnimationData GltfAnimationExtractor::extractAnimation(const tinygltf::Model& tinygltfModel)
 	{  //gltf Sampler accessor Index , Engine Sampler Index
 
 
@@ -234,5 +238,50 @@ namespace Engine
 		
 		return extractedAnimationData;
 	}
+
+
+
+
+
+
+
+
+
+
+	BoneAnimationData GltfAnimationExtractor::getBoneAnimationData(const tinygltf::Model& tinygltfModel)
+	{
+		const std::vector<tinygltf::Accessor>& accessors = tinygltfModel.accessors;
+		const std::vector<tinygltf::BufferView>& bufferViews = tinygltfModel.bufferViews;
+
+		BoneAnimationData boneAnimationData;
+
+		if (tinygltfModel.skins.size() == 0 /**!(tinygltfModel.skins[0].inverseBindMatrices >= 0)*/)
+		{
+			boneAnimationData.isSkinned = false;
+			return boneAnimationData;
+		}
+		boneAnimationData.isSkinned = true;
+
+		boneAnimationData.jointIndices = tinygltfModel.skins[0].joints;
+
+		boneAnimationData.inverseBindMatrices.resize(boneAnimationData.jointIndices.size());
+
+		boneAnimationData.jointMatrices.resize(boneAnimationData.jointIndices.size(), glm::mat4(1.0f));
+
+
+
+		const std::vector<unsigned char>& buffer = tinygltfModel.buffers[0].data;
+
+		const size_t srcIndex = accessors[tinygltfModel.skins[0].inverseBindMatrices].byteOffset + bufferViews[accessors[tinygltfModel.skins[0].inverseBindMatrices].bufferView].byteOffset;
+
+		memcpy(boneAnimationData.inverseBindMatrices.data(), &buffer[srcIndex], bufferViews[accessors[tinygltfModel.skins[0].inverseBindMatrices].bufferView].byteLength);
+
+
+		return boneAnimationData;
+	}
+
+
+
+
 
 }

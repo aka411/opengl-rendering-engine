@@ -1,6 +1,8 @@
-#include "../include/shader_manager.h"
+
 #include <string>
 #include <iostream>
+#include "../../glad/glad.h"
+#include "../../include/low-level/shader_manager.h"
 
 
 ShaderManager::ShaderManager()

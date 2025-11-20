@@ -1,7 +1,10 @@
 #pragma once
 #include <unordered_map>
-#include "engine_data_structures.h"
 #include "tiny_gltf.h"
+#include "../animation/animation_data_structures.h"
+#include <string>
+
+
 
 namespace Engine
 {
@@ -24,7 +27,10 @@ namespace Engine
 
 
 
-		static ExtractedAnimationData extractAnimation(tinygltf::Model& tinygltfModel);
+		static ExtractedAnimationData extractAnimation(const tinygltf::Model& tinygltfModel);
+
+		static BoneAnimationData getBoneAnimationData(const tinygltf::Model& tinygltfModel);
+
 
 	};
 
