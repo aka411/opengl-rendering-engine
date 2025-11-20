@@ -10,5 +10,7 @@ EngineCore::EngineCore(): m_ecsEngine(), m_gpuBufferManager(), m_gpuTextureManag
 	m_ecsEngine.registerComponent<EngineTransformationComponent>();
 	m_ecsEngine.registerComponent<RootEntityComponent>();
 
-	TheEngine::ECS::EntityId rootEntityId = engineLoader.createRootEntity("C:/Users/Akash/Documents/Factory/visual studio projects/opengl-rendering-engine/asset/block_island/prototype_scene_block_island.glb");
+	TheEngine::ECS::EntityId rootEntityId = engineLoader.createRootEntity("PATH TO FILE");
+
+
 }

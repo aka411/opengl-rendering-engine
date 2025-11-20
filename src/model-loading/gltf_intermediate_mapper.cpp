@@ -73,7 +73,7 @@ namespace Engine::Utils
 		// This function maps the base pixel layout (format) and the data type (component type)
 		// to a specific GPU-ready internal storage format.
 
-		// Using a switch-on-switch or if-else structure for clarity
+		
 		switch (pixelFormat)
 		{
 		case TextureSourcePixelFormat::R: // Single component (Red)
@@ -115,7 +115,7 @@ namespace Engine::Utils
 			{
 			case TextureSourceComponentType::UNSIGNED_BYTE:
 				// Example: GL_RGB8 (8-bit Red, Green, Blue)
-				// Note: You might consider an sRGB format like SRGB8 if the source is for color data.
+				// Note:Might need to consider an sRGB format like SRGB8 if the source is for color data.
 				return TextureInternalFormat::RGB8;
 			case TextureSourceComponentType::FLOAT:
 				// Example: GL_RGB32F
@@ -370,10 +370,10 @@ namespace Engine
 			IntermediatePBRMetallicRoughnessMaterial intermediatePBRMetallicRoughnessMaterial;
 
 
-			const glm::vec4 baseColorFactor = DataConvertor::narrowToVec4(material.pbrMetallicRoughness.baseColorFactor);//vec4
+			const glm::vec4 baseColorFactor = DataConvertor::narrowToVec4(material.pbrMetallicRoughness.baseColorFactor);
 
 
-			const float metallicFactor = material.pbrMetallicRoughness.metallicFactor;//float
+			const float metallicFactor = material.pbrMetallicRoughness.metallicFactor;
 			const float roughnessFactor = material.pbrMetallicRoughness.roughnessFactor;
 			glm::vec3 emissiveFactor = DataConvertor::narrowToVec3(material.emissiveFactor);
 
@@ -426,7 +426,7 @@ namespace Engine
 			EngineIntermediateNode engineIntermediateNode;
 
 			engineIntermediateNode.transformation = getTransformationFromGltfNode(node);
-			engineIntermediateNode.children = node.children;//int vector very bad
+			engineIntermediateNode.children = node.children;// just copy
 			engineIntermediateNode.meshIndex = node.mesh;
 
 			engineIntermediateNodes.push_back(engineIntermediateNode);
@@ -615,11 +615,10 @@ namespace Engine
 		std::vector<IndexData> indexDatas;
 		std::vector<VertexData> vertexDatas;
 
-		//need book kepping for indice asscessor and bufferview
-		//need book keeping for vertex attribute as whole not individual
+		
 
 		//gltf accessor index to our indice vector index
-		std::unordered_map<int, int> gltfIndiceAccessorIndexToOurIndexData; // what if different accessor access same bufferview like jus offset use of index data
+		std::unordered_map<int, int> gltfIndiceAccessorIndexToOurIndexData; // what if different accessor access same bufferview like with different offset use of index data?
 		std::unordered_map<std::uint32_t, int> gltfVertexAttributesAccessorHashToOurVertexData;
 
 		intermediateMeshs.reserve(tinygltfModel.meshes.size());
@@ -643,7 +642,7 @@ namespace Engine
 				std::transform(vertexAttributeAcessorIndexMap.begin(),
 					vertexAttributeAcessorIndexMap.end(),
 					std::back_inserter(orderedAccessors),
-					[](const auto& mapPair) // mapPair is a const std::pair<const VertexAttributeType, int>
+					[](const auto& mapPair) 
 					{
 						return mapPair.second;
 					});
