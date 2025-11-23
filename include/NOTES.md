@@ -58,3 +58,8 @@ nodeIndex will map to EntityId
 
 I come to a solution of storing a mapping from old node index to entityId per instance of model in engine.
 The animation data will be only one copy maybe in a animation manager and use id to get it,only state of animation will be stored per root entity.
+
+#Shader code 
+My system does not support the uint64 bit extension which is needed for using 
+bindless textures in opengl.Instead i have used uvec2 to store 64 bit texture handles 
+and retrive it but there is a case of endianness that i might need to look into later.

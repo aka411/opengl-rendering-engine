@@ -5,7 +5,7 @@
 #include "gpu_buffer_manager.h"
 
 
-class WorldVertexBufferSystem
+class WorldVertexBufferManagementSystem
 {
 
 
@@ -21,11 +21,14 @@ private:
 
 public:
 
-	WorldVertexBufferSystem(GPUBufferManager& gpuBufferManager);
+	WorldVertexBufferManagementSystem(GPUBufferManager& gpuBufferManager);
 
 	//get buffer for given vertex format
 	size_t uploadVertexData(VertexFormat vertexFormat, std::byte* data, size_t size);
 	size_t uploadIndexData(IndexType indexType, std::byte* data, size_t size);
+
+	GPUBufferInfo getBufferInfoForVertexFormat(VertexFormat vertexFormat);
+	GPUBufferInfo getBufferInfoForIndexType(IndexType indextype);
 
 
 };

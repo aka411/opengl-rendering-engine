@@ -11,12 +11,20 @@ const std::unordered_map<VertexAttributeType, size_t> VertexFormatHelper::m_attr
 	// 3 floats = 12 bytes
 	{VertexAttributeType::POSITION_3F, SIZE_FLOAT * 3},
 	{VertexAttributeType::NORMAL_3F, SIZE_FLOAT * 3},
-	{VertexAttributeType::TANGENT_3F, SIZE_FLOAT * 3},
+	{VertexAttributeType::TANGENT_4F, SIZE_FLOAT * 4},
 	{VertexAttributeType::BINORMAL_3F, SIZE_FLOAT * 3},
 
 	// Texture and Color Data
 	{VertexAttributeType::TEXCOORD_0_2F, SIZE_FLOAT * 2}, // 2 floats = 8 bytes
+	{VertexAttributeType::TEXCOORD_1_2F, SIZE_FLOAT * 2}, // 2 floats = 8 bytes
+	{VertexAttributeType::TEXCOORD_2_2F, SIZE_FLOAT * 2}, // 2 floats = 8 bytes
+	{VertexAttributeType::TEXCOORD_3_2F, SIZE_FLOAT * 2}, // 2 floats = 8 bytes
+
 	{VertexAttributeType::COLOR_0_4UB_NORMALIZED, SIZE_UNSIGNED_BYTE * 4}, // 4 bytes
+	{VertexAttributeType::COLOR_1_4UB_NORMALIZED, SIZE_UNSIGNED_BYTE * 4}, // 4 bytes
+	{VertexAttributeType::COLOR_2_4UB_NORMALIZED, SIZE_UNSIGNED_BYTE * 4}, // 4 bytes
+	{VertexAttributeType::COLOR_3_4UB_NORMALIZED, SIZE_UNSIGNED_BYTE * 4}, // 4 bytes
+
 
 	// Auxiliary Data
 	{VertexAttributeType::JOINT_INDICES_4I, SIZE_INT * 4}, // 4 integers = 16 bytes
@@ -62,12 +70,18 @@ VertexAttribute VertexFormatHelper::GetVertexAttributeDetails(VertexAttributeTyp
 	{
 	case VertexAttributeType::POSITION_3F:
 	case VertexAttributeType::NORMAL_3F:
-	case VertexAttributeType::TANGENT_3F:
 	case VertexAttributeType::BINORMAL_3F:
 		attr.count = 3;
 		attr.glType = GL_FLOAT;
 		attr.size = 3 * sizeof(float);
 		break;
+
+	case VertexAttributeType::TANGENT_4F:
+		attr.count = 4;
+		attr.glType = GL_FLOAT;
+		attr.size = 4 * sizeof(float);
+		break;
+
 
 	case VertexAttributeType::TEXCOORD_0_2F:
 	case VertexAttributeType::TEXCOORD_1_2F:

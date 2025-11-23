@@ -4,23 +4,38 @@
 #include "../low-level/world_vertex_buffer_management_system.h"
 #include "../../external/the-engine/the-engine/ecs/include/ecs_engine.h"
 #include "engine_loader.h"
+#include "../rendering-system/render_system.h"
+#include <string>
 
 class EngineCore
 {
 private:
 
 	TheEngine::ECS::ECSEngine m_ecsEngine;
+	TheEngine::ECS::ECSEngine m_uiECSEngine;
 
 	GPUBufferManager m_gpuBufferManager;
 
 	GPUTextureManager m_gpuTextureManager;
 	GPUMaterialSystem m_gpuMaterialSystem;// ---> needsGPUBuffermanager
 
-	WorldVertexBufferSystem m_worldVertexBufferSystem;
+	WorldVertexBufferManagementSystem m_worldVertexBufferManagementSystem;
 
-	EngineLoader engineLoader;
+	EngineLoader m_engineLoader;
+
+
+
+
+
+	RenderSystem m_renderSystem;
+
+
+
+
 
 public:
 	EngineCore();
 
+	void loadModel(std::string pathToFile);
+	void render(Engine::Camera camera);
 };
