@@ -39,6 +39,46 @@ namespace TextureUtils
 
 
 
+	GLenum toGLEnum(TextureInternalFormat format)
+	{
+		switch (format)
+		{
+			// 8-bit Unsigned Integer Formats (Sized Formats)
+		case TextureInternalFormat::R8:          return GL_R8;
+		case TextureInternalFormat::RG8:         return GL_RG8;
+		case TextureInternalFormat::RGB8:        return GL_RGB8;
+		case TextureInternalFormat::RGBA8:       return GL_RGBA8; // This replaces the legacy '3' (GL_RGB) you had trouble with
+
+			// 16-bit Half-Float Formats
+		case TextureInternalFormat::R16F:        return GL_R16F;
+		case TextureInternalFormat::RG16F:       return GL_RG16F;
+		case TextureInternalFormat::RGB16F:      return GL_RGB16F;
+		case TextureInternalFormat::RGBA16F:     return GL_RGBA16F;
+
+			// 32-bit Full-Float Formats
+		case TextureInternalFormat::R32F:        return GL_R32F;
+		case TextureInternalFormat::RG32F:       return GL_RG32F;
+		case TextureInternalFormat::RGB32F:      return GL_RGB32F;
+		case TextureInternalFormat::RGBA32F:     return GL_RGBA32F;
+
+			// Depth/Stencil formats
+		case TextureInternalFormat::DEPTH_COMPONENT16: return GL_DEPTH_COMPONENT16;
+		case TextureInternalFormat::DEPTH_COMPONENT24: return GL_DEPTH_COMPONENT24;
+		case TextureInternalFormat::DEPTH_COMPONENT32F: return GL_DEPTH_COMPONENT32F;
+		case TextureInternalFormat::DEPTH_STENCIL: return GL_DEPTH_STENCIL;
+
+		case TextureInternalFormat::UNKNOWN:
+		default:
+			assert(0);
+			return 0;
+		}
+	}
+
+
+
+
+
+
 
 	GLenum toGLEnum(TextureType type)
 	{
@@ -140,22 +180,39 @@ GPUTextureManager::~GPUTextureManager()
 
 }
 
+static std::string GLErrorToString(GLenum error)
+{
+	switch (error)
+	{
+	case GL_INVALID_ENUM: return "INVALID_ENUM";
+	case GL_INVALID_VALUE: return "INVALID_VALUE";
+	case GL_INVALID_OPERATION: return "INVALID_OPERATION";
+	case GL_STACK_OVERFLOW: return "STACK_OVERFLOW";
+	case GL_OUT_OF_MEMORY: return "OUT_OF_MEMORY";
+		
+	default: return "UNKNOWN_ERROR";
+	}
+}
+
 
 TextureInfo GPUTextureManager::createNewTexture(const TextureCreateInfo& textureCreateInfo)
 {
 
 
 
-	GLenum glInternalFormat = (GLenum)textureCreateInfo.internalFormat;
+	GLenum glInternalFormat = TextureUtils::toGLEnum(textureCreateInfo.internalFormat);
 	GLenum glSourceFormat = TextureUtils::toGLEnum(textureCreateInfo.textureSourcePixelFormat);
 	GLenum glSourceType = TextureUtils::toGLEnum(textureCreateInfo.textureSourceComponentType);
 
 
+	GLenum target = TextureUtils::toGLEnum(textureCreateInfo.type);
+
+	SamplerSetting samplerSettings = textureCreateInfo.samplerSetting;
 
 	
 	GLuint glTextureId;
 	glCreateTextures(GL_TEXTURE_2D, 1, &glTextureId);
-
+	glBindTexture(target, glTextureId);
 
 	// Special handling for 1-channel textures (like R/Luminance) to prevent padding issues
 	if (textureCreateInfo.textureSourcePixelFormat == TextureSourcePixelFormat::R)
@@ -170,9 +227,6 @@ TextureInfo GPUTextureManager::createNewTexture(const TextureCreateInfo& texture
 	}
 
 
-	GLenum target = TextureUtils::toGLEnum(textureCreateInfo.type);
-
-	SamplerSetting samplerSettings = textureCreateInfo.samplerSetting;
 
 
 
@@ -187,38 +241,44 @@ TextureInfo GPUTextureManager::createNewTexture(const TextureCreateInfo& texture
 		0,                                 // Border (must be 0)
 		glSourceFormat,                    // e.g., GL_RGB (CPU Data Layout)
 		glSourceType,                      // e.g., GL_UNSIGNED_BYTE (CPU Component Type)
-		textureCreateInfo.data             // Raw pixel data
+		(void*)textureCreateInfo.data             // Raw pixel data
 	);
+	GLErrorToString(glGetError());
 
-	// 5. **Apply Sampler Settings**
-	// Apply filtering and wrapping modes based on the SAMPLER struct
+	
+	bool hasMipmaps = TextureUtils::requiresMipmaps(samplerSettings.minFilter);
+
+	//if (hasMipmaps)
+	//{
+		glGenerateMipmap(target);
+	//}
+
+	
+
+
 	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, TextureUtils::toGLEnum(samplerSettings.minFilter));
 	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, TextureUtils::toGLEnum(samplerSettings.magFilter));
 	glTexParameteri(target, GL_TEXTURE_WRAP_S, TextureUtils::toGLEnum(samplerSettings.wrapS));
 	glTexParameteri(target, GL_TEXTURE_WRAP_T, TextureUtils::toGLEnum(samplerSettings.wrapT));
-	// Note: If you have a wrapR setting, you'd use it here for 3D textures/cubemaps
 
-	// 6. **Mipmap Generation (Conditional)**
-	bool hasMipmaps = TextureUtils::requiresMipmaps(samplerSettings.minFilter);
 
-	if (hasMipmaps)
-	{
-		glGenerateMipmap(target);
-	}
 
-	// 7. **Bindless Handle (Optional)**
+
+
 	GLuint64 residentHandle = 0;
-	// Assuming you have a global flag/setting to enable bindless
+
 
 		residentHandle = glGetTextureHandleARB(glTextureId);
+		
+		
 		glMakeTextureHandleResidentARB(residentHandle);
-	
+		GLErrorToString(glGetError());
+		
 
-	// 8. **Store and Return Metadata**
 	//m_allotedGLTextureIDs.push_back(glTextureId); // For destruction tracking
 
 
-
+		
 
 	TextureInfo info;
 	//info.textureHandle = glTextureId;
@@ -230,7 +290,7 @@ TextureInfo GPUTextureManager::createNewTexture(const TextureCreateInfo& texture
 	info.samplerSettings = samplerSettings;
 	info.hasMipmaps = hasMipmaps;
 
-	// You would map the info via the residentHandle in m_textureRegistry here
+
 	m_residentHandleToTextureApiHandle.emplace(residentHandle, glTextureId);// info);
 
 	return info;

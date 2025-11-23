@@ -63,7 +63,7 @@ VertexData VertexAttributeRepacker::interleaveVertexAttributes(const std::map<Ve
     vertexData.vertexLayout = VertexLayout::INTERLEAVED;
     vertexData.vertexCount = numVertices;
     vertexData.vertexFormat = vertexFormat;
-
+   
     std::vector<std::byte>& interleavedData = vertexData.data;
     interleavedData.resize(totalByteSize);
 

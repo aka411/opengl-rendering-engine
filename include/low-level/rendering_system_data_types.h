@@ -3,6 +3,12 @@
 #include <bitset>
 
 
+
+
+
+
+
+
 /*VERTEX BUFFER MANAGEMENT SYSTEM*/
 
 enum class BufferUsageType
@@ -28,14 +34,13 @@ using VertexFormat = std::bitset<MAX_ATTRIBUTES>;
 
 
 
-
 enum class VertexAttributeType : std::uint32_t
 {
 	UNKNOWN				    = 0,
 	// Geometric Data
 	POSITION_3F				= 1,         // 3 floats for (x, y, z)
 	NORMAL_3F				= 2,           // 3 floats for (nx, ny, nz)
-	TANGENT_3F				= 3,          // 3 floats for a tangent vector
+	TANGENT_4F				= 3,          // 3 floats for a tangent vector //TODO : correct it spec states Vec4
 	BINORMAL_3F				= 4,         // 3 floats for a binormal/bitangent vector
 
 	// Texture
@@ -296,3 +301,11 @@ struct BufferTextureCreateInfo
 	// If we have plan to use this in a Compute Shader as a GL_IMAGE_... (read/write access)
 	bool useAsStorage = false;
 };
+
+
+
+
+
+
+
+

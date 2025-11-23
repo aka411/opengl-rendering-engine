@@ -14,7 +14,7 @@ private:
 	GPUTextureManager& m_gpuTextureManager;
 	GPUMaterialSystem& m_gpuMaterialSystem;
 
-	WorldVertexBufferSystem& m_worldVertexBufferSystem;
+	WorldVertexBufferManagementSystem& m_worldVertexBufferManagementSystem;
 
 	TheEngine::ECS::ECSEngine& m_ecsEngine;
 
@@ -28,7 +28,7 @@ private:
 
 public:
 	//ecs , texture , material
-	EngineLoader(TheEngine::ECS::ECSEngine& ecsEngine ,GPUTextureManager& gpuTextureManager, GPUMaterialSystem& gpuMaterialSystem , WorldVertexBufferSystem& worldVertexBufferSystem);
+	EngineLoader(TheEngine::ECS::ECSEngine& ecsEngine ,GPUTextureManager& gpuTextureManager, GPUMaterialSystem& gpuMaterialSystem , WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem);
 
 	TheEngine::ECS::EntityId createRootEntity(const std::string& pathToModel);
 

@@ -375,10 +375,11 @@ namespace Engine
 
 			const float metallicFactor = material.pbrMetallicRoughness.metallicFactor;
 			const float roughnessFactor = material.pbrMetallicRoughness.roughnessFactor;
+			
 			glm::vec3 emissiveFactor = DataConvertor::narrowToVec3(material.emissiveFactor);
+			
 
-
-
+			intermediatePBRMetallicRoughnessMaterial.baseColorFactor = baseColorFactor;
 			intermediatePBRMetallicRoughnessMaterial.emissiveFactor = emissiveFactor;
 			intermediatePBRMetallicRoughnessMaterial.metallicFactor = metallicFactor;
 			intermediatePBRMetallicRoughnessMaterial.roughnessFactor = roughnessFactor;
@@ -390,18 +391,83 @@ namespace Engine
 			//optional ones 
 
 			const int normalTextureIndex = material.normalTexture.index;
-			const int occulsionTextureIndex = material.occlusionTexture.index;
+			const int occlusionTextureIndex = material.occlusionTexture.index;
 			const int emissiveTextureIndex = material.emissiveTexture.index;
 
 
+			const int albedoTexCoordIndex = material.pbrMetallicRoughness.baseColorTexture.texCoord;
+			const int metallicRoughnessCoordIndex = material.pbrMetallicRoughness.metallicRoughnessTexture.texCoord;
+
+			const int normalTexCoordIndex = material.normalTexture.texCoord;
+			const int emissiveTexCoordIndex = material.emissiveTexture.texCoord;
+			const int occlusionTexCoordIndex = material.occlusionTexture.texCoord;
+
+			
+
+			auto texturePresent = [](const int textureIndex) { return (textureIndex >= 0) ? true : false; };
+
+			const bool albedoTexturePresent = texturePresent(baseColorTextureIndex);
+			const bool metallicRoughnessPresent = texturePresent(metallicRoughnessTextureIndex); 
+			const bool normalTexturePresent = texturePresent(normalTextureIndex); 
+			const bool occulsionTexturePresent = texturePresent(occlusionTextureIndex); 
+			const bool emissiveTexturePresent = texturePresent(emissiveTextureIndex);
+
+			// Add checks for other potential textures if needed (e.g., clearcoat, transmission)
+
+			intermediatePBRMetallicRoughnessMaterial.albedoTextureIndex = (albedoTexturePresent) ? baseColorTextureIndex : -1;
+			intermediatePBRMetallicRoughnessMaterial.metallicRoughnessTextureIndex = (metallicRoughnessPresent) ? metallicRoughnessTextureIndex : -1;
+			intermediatePBRMetallicRoughnessMaterial.normalTextureIndex = (normalTexturePresent) ? normalTextureIndex : -1;
+			intermediatePBRMetallicRoughnessMaterial.occlusionTextureIndex = (occulsionTexturePresent) ? occlusionTextureIndex : -1; // Corrected spelling and used checked variable
+			intermediatePBRMetallicRoughnessMaterial.emissiveTextureIndex = (emissiveTexturePresent) ? emissiveTextureIndex : -1;
+
+
+			
 
 
 
-			intermediatePBRMetallicRoughnessMaterial.albedoTextureIndex = (baseColorTextureIndex >= 0) ? baseColorTextureIndex : -1;
-			intermediatePBRMetallicRoughnessMaterial.metallicRoughnessTextureIndex = (metallicRoughnessTextureIndex >= 0) ? metallicRoughnessTextureIndex : -1;
-			intermediatePBRMetallicRoughnessMaterial.normalTextureIndex = (normalTextureIndex >= 0) ? normalTextureIndex : -1;
-			intermediatePBRMetallicRoughnessMaterial.occulsionTextureIndex = (occulsionTextureIndex >= 0) ? occulsionTextureIndex : -1;
-			intermediatePBRMetallicRoughnessMaterial.emissiveTextureIndex = (emissiveTextureIndex >= 0) ? emissiveTextureIndex : -1;
+
+			intermediatePBRMetallicRoughnessMaterial.configMask = 0;
+
+			// 1. --- Set Texture Presence Flags (Bits 0-4) ---
+			// Check if the texture index is valid (>= 0) and set the corresponding bit.
+
+			if (albedoTexturePresent)
+			{
+				intermediatePBRMetallicRoughnessMaterial.configMask |= PBR_CONFIG_BITS::HAS_ALBEDO_TEX;
+			}
+			if (metallicRoughnessPresent)
+			{
+				intermediatePBRMetallicRoughnessMaterial.configMask |= PBR_CONFIG_BITS::HAS_MR_TEX;
+			}
+			if (normalTexturePresent)
+			{
+				intermediatePBRMetallicRoughnessMaterial.configMask |= PBR_CONFIG_BITS::HAS_NORMAL_TEX;
+			}
+			if (occulsionTexturePresent)
+			{ // Note: Using the bool variable based on the provided code block
+				intermediatePBRMetallicRoughnessMaterial.configMask |= PBR_CONFIG_BITS::HAS_OCCLUSION_TEX;
+			}
+			if (emissiveTexturePresent)
+			{
+				intermediatePBRMetallicRoughnessMaterial.configMask |= PBR_CONFIG_BITS::HAS_EMISSIVE_TEX;
+			}
+
+			// 2. --- Set Texture Coordinate Index Shifts (Bits 5-14) ---
+			// Use bitwise shift to place the texture coordinate index (0 or 1 in glTF) 
+			// into its reserved 2-bit field.
+
+			intermediatePBRMetallicRoughnessMaterial.configMask |= (albedoTexCoordIndex << PBR_CONFIG_BITS::ALBEDO_TEXCOORD_SHIFT);
+			intermediatePBRMetallicRoughnessMaterial.configMask |= (metallicRoughnessCoordIndex << PBR_CONFIG_BITS::MR_TEXCOORD_SHIFT);
+			intermediatePBRMetallicRoughnessMaterial.configMask |= (normalTexCoordIndex << PBR_CONFIG_BITS::NORMAL_TEXCOORD_SHIFT);
+			intermediatePBRMetallicRoughnessMaterial.configMask |= (occlusionTexCoordIndex << PBR_CONFIG_BITS::OCCLUSION_TEXCOORD_SHIFT);
+			intermediatePBRMetallicRoughnessMaterial.configMask |= (emissiveTexCoordIndex << PBR_CONFIG_BITS::EMISSIVE_TEXCOORD_SHIFT);
+
+
+
+
+
+
+
 
 
 			intermediatePBRMetallicRoughnessMaterials.push_back(intermediatePBRMetallicRoughnessMaterial);
@@ -583,7 +649,7 @@ namespace Engine
 
 			// Tangent Space Data
 
-			{"TANGENT",     VertexAttributeType::TANGENT_3F}
+			{"TANGENT",     VertexAttributeType::TANGENT_4F}
 
 
 		};
@@ -595,7 +661,7 @@ namespace Engine
 		for (const auto& gltfAttributeNameToAcessorInt : tinygltfPrimitive.attributes)
 		{
 
-
+			//TODO : Need to accomodate VertexAttribute sub data types,like for example color can be float or unsgined byte, joint bone can be eihter unsigned byte or integer or short;
 			engineAttributeToAttributeAccessorIndex[gltfToEngineVertexAttributeMap.at(gltfAttributeNameToAcessorInt.first)] = gltfAttributeNameToAcessorInt.second;
 
 		}
@@ -703,6 +769,7 @@ namespace Engine
 						gltfIndiceAccessorIndexToOurIndexData[tinygltfPrimitive.indices] = indexDatas.size();
 
 						intermediatePrimitive.indexId = indexDatas.size();
+
 						indexDatas.push_back(indexData);
 
 

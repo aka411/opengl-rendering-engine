@@ -22,7 +22,7 @@ struct VertexData
 
 struct IndexData
 {
-	IndexType indexType;
+	IndexType indexType = IndexType::UNKNOWN;
 	size_t indexCount = 0;
 	std::vector<std::byte> data;
 };
@@ -96,8 +96,11 @@ struct IntermediatePBRMetallicRoughnessMaterial
 	int32_t metallicRoughnessTextureIndex = -1;
 
 	int32_t normalTextureIndex = -1;
-	int32_t occulsionTextureIndex = -1;
+	int32_t occlusionTextureIndex = -1;
 	int32_t emissiveTextureIndex = -1;
+
+
+	uint64_t configMask = 0; // 8 bytes
 
 };
 
@@ -116,7 +119,7 @@ struct EngineIntermediateModel
 	std::vector<IntermediateImage> intermediateImage;
 	std::vector<SamplerSetting> samplerSettings;
 
-	int rootNodeIndex;
+	int rootNodeIndex = -1;
 
 
 
