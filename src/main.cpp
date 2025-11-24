@@ -86,7 +86,7 @@ int main(int argc, char* args[])
 
 
 
-	 engineCore.loadModel("PATH TO FILE");
+	 engineCore.loadModel("Path To file");
 
 	
 	 float deltaTime = 0.0f;
