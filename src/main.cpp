@@ -85,10 +85,11 @@ int main(int argc, char* args[])
 	 EngineCore engineCore;
 
 
+	 
+	engineCore.loadModel("PATH TO FILE");
 
-	 engineCore.loadModel("Path To file");
 
-	
+
 	 float deltaTime = 0.0f;
 	 float lastFrameTime = SDL_GetTicks() / 1000.0f;
 	 float currentFrameTime = lastFrameTime;

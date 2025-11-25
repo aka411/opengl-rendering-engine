@@ -155,7 +155,8 @@ static std::string pbrNormalBaseFragmentCode = R"(
 #INSERT_FLAGS
 
 
-// ---  Capability Flags (Bits 0-4) ---
+
+// ---  Presence Flags (Bits 0-4) ---
     #define HAS_ALBEDO_TEX      1u << 0  // Base Color Texture
     #define HAS_MR_TEX          1u << 1  // Metallic Roughness Texture
     #define HAS_NORMAL_TEX      1u << 2  // Normal Texture
@@ -163,8 +164,8 @@ static std::string pbrNormalBaseFragmentCode = R"(
     #define HAS_EMISSIVE_TEX    1u << 4  // Emissive Texture
 
     // ---  Texture Coordinate Index Shifts (Bits 5-14) ---
-    // These define the starting bit position for a 2-bit field (0, 1, 2 or 3)
-    // The actual value (0 or 1) will be extracted using bitwise operations.
+    // These define the starting bit position for a 2-bit field (0, 1, 2 or 3) upto 3 texture coordinates.
+    // The actual value (0 or 1 ..3) will be extracted using bitwise operations.
 
     #define ALBEDO_TEXCOORD_SHIFT    5
     #define MR_TEXCOORD_SHIFT        7
@@ -174,7 +175,7 @@ static std::string pbrNormalBaseFragmentCode = R"(
 
 
 
-
+//Note : Need to add support for 5 texture coordinates
 
 
 
@@ -185,27 +186,22 @@ static std::string pbrNormalBaseFragmentCode = R"(
 struct PBRMetallicRoughnessMaterial 
 {
 
-	vec4 baseColorFactor; // 4 * 4 = 16 bytes
-	vec3 emissiveFactor; // 3 * 4 = 12 bytes
+	vec4 baseColorFactor; 
+	vec3 emissiveFactor; 
 
-	float metallicFactor ; // 4 bytes
-	float roughnessFactor; // 4 bytes
-
-    float padding1;                  // Offset 36, Size 4.
-    float padding2;                  // Offset 40, Size 4.
-    float padding3;                  // Offset 44, Size 4.
+	float metallicFactor ;
+	float roughnessFactor; 
 
 
 
-	uvec2 albedoTextureHandle;// 8 bytes
-	uvec2 metallicRoughnessTextureHandle; // 8 bytes
+	uvec2 albedoTextureHandle;
+	uvec2 metallicRoughnessTextureHandle; 
 
-	uvec2 normalTextureHandle ; // 8 bytes
+	uvec2 normalTextureHandle ; 
 	uvec2 occlusionTextureHandle;
 	uvec2 emissiveTextureHandle ;
 
-	uvec2 configMask; // 8 bytes
-
+	uvec2 configMask; 
 
 };
 
@@ -372,7 +368,7 @@ const int emissiveTexCoordIndex  =  int((material.configMask.x >> EMISSIVE_TEXCO
 
     
 
-    // --- Albedo Texture Fetch ---
+    // ****** Albedo Texture Fetch ******//
 
     if (albedoTexturePresent != 0) {
       
@@ -384,7 +380,7 @@ const int emissiveTexCoordIndex  =  int((material.configMask.x >> EMISSIVE_TEXCO
     
 
 
-    // --- Metallic Roughness Texture Fetch ---
+    // ********Metallic Roughness Texture Fetch ****//
 
     if (mrTexturePresent != 0) 
    {
@@ -414,7 +410,7 @@ const int emissiveTexCoordIndex  =  int((material.configMask.x >> EMISSIVE_TEXCO
 
 
 
-    // --- Normal Map Fetch (Requires TBN basis, assuming T and B are available) ---
+    // ********** Normal Map Fetch (TBN basis)********//
 
 vec3 finalNormal;
 
@@ -517,8 +513,7 @@ vec3 ambient = vec3(0.1) * albedo * occlusion;
 vec3 finalColor = ambient + Lo + emissive;
 
 
-FragColor = vec4(finalColor, baseColor.a);
-
+    FragColor = vec4(finalColor, baseColor.a);
 
 }
 

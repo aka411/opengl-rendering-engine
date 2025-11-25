@@ -32,16 +32,14 @@ enum class VertexLayout
 /**VERTEX ATTRIBUTES***/
 
 
-constexpr size_t MAX_BITS_USED_FOR_VERTEX_FORMAT = 25;
-using VertexFormat = std::bitset<MAX_BITS_USED_FOR_VERTEX_FORMAT>;
+constexpr size_t MAX_BITS_USED_FOR_VERTEX_FORMAT = 35;
+//using VertexFormat = std::bitset<MAX_BITS_USED_FOR_VERTEX_FORMAT>;
+
+
+using VertexFormat = std::uint64_t;
 
 
 
-/*
-
-|P|N|T|TexCoordCount(5 values,3 bits)|TexCoordDataType(2 bits ) x 5|Color_0|ColorComponentType 1 bit|DataType 2 bit|Joints(1)|Weights(1)|
-
-*/
 
 
 
@@ -93,13 +91,16 @@ enum class ComponentDataType
 
 struct VertexAttributeInfo
 {
-	VertexAttributeType vertexAttributeType;
+	VertexAttributeType vertexAttributeType = VertexAttributeType::UNKNOWN;
 	int index = -1; // n , -1 means no index
 
 
 	ComponentType componentType = ComponentType::UNKNOWN;
 	ComponentDataType componentDataType = ComponentDataType::UNKNOWN ;
+
 	bool normalise = false;
+
+	size_t sizeInBytes = 0; 
 
 };
 

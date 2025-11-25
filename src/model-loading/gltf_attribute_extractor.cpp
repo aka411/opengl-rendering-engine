@@ -1,11 +1,20 @@
 #include <vector>
 #include "../../include/model-loading/gltf_attribute_extractor.h"
 #include <iostream>
+#include  <algorithm>
+#include "../../include/low-level/vertex_format_helper.h"
+
+/***COMPONENT TYPE AND DATA TYPE METRICS *****/
 
 
 
 
-const static std::map<std::string, VertexAttributeType> BASE_ATTRIBUTE_MAP = {
+
+
+
+
+
+const std::map<std::string, VertexAttributeType> GLTFAttributeExtractor::BASE_ATTRIBUTE_MAP = {
 {"POSITION", VertexAttributeType::POSITION},
 {"NORMAL", VertexAttributeType::NORMAL},
 {"TANGENT", VertexAttributeType::TANGENT},
@@ -47,7 +56,7 @@ const std::map<std::string, ComponentType> GTLFAttributeExtractor::GLTF_COMPONEN
 
 
 //TinyGLTF uses int for componentType
-const std::map<int, ComponentType> GTLFAttributeExtractor::GLTF_COMPONENT_TYPE_MAP =
+const std::map<int, ComponentType> GLTFAttributeExtractor::GLTF_COMPONENT_TYPE_MAP =
 {
 
     {1,ComponentType::SCALAR}, // SCALAR
@@ -64,7 +73,7 @@ const std::map<int, ComponentType> GTLFAttributeExtractor::GLTF_COMPONENT_TYPE_M
 
 
 
-const std::map<int, ComponentDataType> GTLFAttributeExtractor::GLTF_COMPONENT_DATA_TYPE_MAP =
+const std::map<int, ComponentDataType> GLTFAttributeExtractor::GLTF_COMPONENT_DATA_TYPE_MAP =
 {
     /*
         Allowed values :
@@ -99,7 +108,9 @@ const std::map<int, ComponentDataType> GTLFAttributeExtractor::GLTF_COMPONENT_DA
 
 
 
-bool GTLFAttributeExtractor::getGltfAttributeTypeFromGltf(const std::string& gltfName, VertexAttributeInfo& info)
+
+
+bool GLTFAttributeExtractor::getGltfAttributeTypeFromGltf(const std::string& gltfName, VertexAttributeInfo& info)
 {
      
         size_t underscorePos = gltfName.find('_');
@@ -151,7 +162,7 @@ bool GTLFAttributeExtractor::getGltfAttributeTypeFromGltf(const std::string& glt
 
 }
 
-ComponentType GTLFAttributeExtractor::getComponentTypeFromGLTFAccessorType(const int gltfComponentType)
+ComponentType GLTFAttributeExtractor::getComponentTypeFromGLTFAccessorType(const int gltfComponentType)
 {
 
     auto it = GLTF_COMPONENT_TYPE_MAP.find(gltfComponentType);
@@ -168,7 +179,7 @@ ComponentType GTLFAttributeExtractor::getComponentTypeFromGLTFAccessorType(const
 
 }
 
-ComponentDataType GTLFAttributeExtractor::getComponentDataTypeFromGLTFAccessorComponentType(const int gltfComponentDataType)
+ComponentDataType GLTFAttributeExtractor::getComponentDataTypeFromGLTFAccessorComponentType(const int gltfComponentDataType)
 {
 
     auto it = GLTF_COMPONENT_DATA_TYPE_MAP.find(gltfComponentDataType);
@@ -186,7 +197,7 @@ ComponentDataType GTLFAttributeExtractor::getComponentDataTypeFromGLTFAccessorCo
  
 }
 
-std::vector<AttributeExtractionResult> GTLFAttributeExtractor::getEngineAttributesToAccessorIndex(const tinygltf::Primitive& gltfPrimitive, const std::vector<tinygltf::Accessor>& gltfAccessor)
+std::vector<AttributeExtractionResult> GLTFAttributeExtractor::getEngineAttributesToAccessorIndex(const tinygltf::Primitive& gltfPrimitive, const std::vector<tinygltf::Accessor>& gltfAccessors)
 {
 	
 
@@ -204,16 +215,25 @@ std::vector<AttributeExtractionResult> GTLFAttributeExtractor::getEngineAttribut
         if (getGltfAttributeTypeFromGltf(gltfAttributeName, attributeInfo))
         {
             AttributeExtractionResult extractionResult;
+
             extractionResult.accessorIndex = accessorIndex;
-			attributeInfo.componentDataType = getComponentDataTypeFromGLTFAccessorComponentType(gltfAccessor[accessorIndex].componentType);
-			attributeInfo.componentType = getComponentTypeFromGLTFAccessorType(gltfAccessor[accessorIndex].type);
-			attributeInfo.normalise = gltfAccessor[accessorIndex].normalized;
-           
+
+			attributeInfo.componentDataType = getComponentDataTypeFromGLTFAccessorComponentType(gltfAccessors[accessorIndex].componentType);
+			attributeInfo.componentType = getComponentTypeFromGLTFAccessorType(gltfAccessors[accessorIndex].type);
+			attributeInfo.normalise = gltfAccessors[accessorIndex].normalized;
+
+            const size_t numComponents = VertexFormatHelper::getNumComponentsForComponentType(attributeInfo.componentType);
+            const size_t componentSizeInBytes = VertexFormatHelper::getSizeInBytesForComponentDataType(attributeInfo.componentDataType);
+
+            attributeInfo.sizeInBytes = numComponents* componentSizeInBytes;
             extractionResult.vertexAttributeInfo = attributeInfo;
+
+
+
 			assert(extractionResult.vertexAttributeInfo.vertexAttributeType != VertexAttributeType::UNKNOWN);
 			assert(extractionResult.vertexAttributeInfo.componentDataType != ComponentDataType::UNKNOWN);
 			assert(extractionResult.vertexAttributeInfo.componentType != ComponentType::UNKNOWN);
-			assert(extractionResult.accessorIndex >= 0 && extractionResult.accessorIndex < static_cast<int>(gltfAccessor.size()));
+			assert(extractionResult.accessorIndex >= 0 && extractionResult.accessorIndex < static_cast<int>(gltfAccessors.size()));
 			assert(attributeInfo.index < 5); // assuming a reasonable limit on attribute indices
             results.push_back(extractionResult);
         }

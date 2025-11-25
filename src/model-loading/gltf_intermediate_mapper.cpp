@@ -13,6 +13,7 @@
 #include "../../include/low-level/vertex_format_helper.h"
 #include "../../include/animation/animation_data_structures.h"
 #include  <algorithm>
+#include "../../include/model-loading/gltf_attribute_extractor.h"
 
 
 
@@ -574,39 +575,45 @@ namespace Engine
 	}
 
 
-
-
-	Engine::GLTFIntermediateMapper::ExtractedAttributeData GLTFIntermediateMapper::getVertexDataFromAccessors(const std::map<VertexAttributeType, int>& vertexAttributeAcessorIndexMap, const tinygltf::Model& tinygltfModel)
+	
+	
+	ExtractedAttributeData GLTFIntermediateMapper::getVertexDataFromAccessors(const std::vector<AttributeExtractionResult>& attributeExtractionResults, const tinygltf::Model& tinygltfModel)
 	{
+		//These two loops could be merged but for clarity kept separate
 
-
-		ExtractedAttributeData extractedAttributeData;
-
-		std::map<VertexAttributeType, std::vector<std::byte>>& vertexAttributeToRawData = extractedAttributeData.vertexAttributeToRawData;
-
+	
 		const std::vector<tinygltf::Accessor>& accessors = tinygltfModel.accessors;
 		const std::vector<tinygltf::BufferView>& bufferViews = tinygltfModel.bufferViews;
 
-
-
+		std::vector<VertexAttributeInfo> vertexAttributeInfos;
+		vertexAttributeInfos.reserve(attributeExtractionResults.size());
+		for(const auto& attributeExtractionResult : attributeExtractionResults)
+		{
+			vertexAttributeInfos.push_back(attributeExtractionResult.vertexAttributeInfo);
+	
+		}
+	
 
 		//get individual data
-		VertexFormat vertexFormat;
-		for (const auto& vertexAttributeAcessorIndex : vertexAttributeAcessorIndexMap)
+		VertexFormat vertexFormat = VertexFormatHelper::createVertexFormatFromAttributeInfos(vertexAttributeInfos);
+		ExtractedAttributeData extractedAttributeData;
+
+		extractedAttributeData.vertexAttributeInfos.reserve(attributeExtractionResults.size());
+		extractedAttributeData.vertexAttributeRawDatas.reserve(attributeExtractionResults.size());
+	
+		for (const auto& attributeExtractionResult : attributeExtractionResults)
 		{
 
-			//TODO : WE NEED TO VALIDATE THAT THE ENGINE ATTRIBUTES AND GLTF ATTRIBUTES MATCH ON BYTE LEVEL AND COMPONENT NUMBERS
+			const size_t accessorIndex = attributeExtractionResult.accessorIndex;
 
-			const tinygltf::Accessor& accessor = accessors[vertexAttributeAcessorIndex.second];
+
+			const tinygltf::Accessor& accessor = accessors[accessorIndex];
 			const tinygltf::BufferView& bufferView = bufferViews[accessor.bufferView];
 			const tinygltf::Buffer& buffer = tinygltfModel.buffers[bufferView.buffer];
 
-			const VertexAttributeType vertexAttributeType = vertexAttributeAcessorIndex.first;
-			if (vertexAttributeType != VertexAttributeType::UNKNOWN)
-			{
-				vertexFormat.set(static_cast<uint32_t>(vertexAttributeType));
-				vertexAttributeToRawData[vertexAttributeType] = getRawByteDataFromBufferView(accessor, bufferView, buffer);
-			}
+			extractedAttributeData.vertexAttributeInfos.push_back(attributeExtractionResult.vertexAttributeInfo);
+			extractedAttributeData.vertexAttributeRawDatas.push_back (getRawByteDataFromBufferView(accessor, bufferView, buffer));
+		
 
 		}
 		extractedAttributeData.vertexFormat = vertexFormat;
@@ -614,67 +621,12 @@ namespace Engine
 		return extractedAttributeData;
 	}
 
-
-
 	
-	std::map<VertexAttributeType, int> GLTFIntermediateMapper::getGLTFAttributeAccessorMappedToEngineAttribute(const tinygltf::Primitive& tinygltfPrimitive)
-	{
-
-
-		const std::unordered_map<std::string, VertexAttributeType> gltfToEngineVertexAttributeMap =
-		{
-			// glTF Semantic    // Engine VertexAttributeType (with specific type/size)
-
-			// Geometric Data
-			{"POSITION",    VertexAttributeType::POSITION_3F},
-			{"NORMAL",      VertexAttributeType::NORMAL_3F},
-
-			// Texture and Color Data
-			{"TEXCOORD_0",  VertexAttributeType::TEXCOORD_0_2F}, // First UV set
-			{"TEXCOORD_1",  VertexAttributeType::TEXCOORD_1_2F}, // Second UV set
-
-			// glTF specifies COLOR_0 data types can be various, but 4UB_NORMALIZED is a common engine choice.
-			{"COLOR_0",     VertexAttributeType::COLOR_0_4UB_NORMALIZED},
-			{"COLOR_1",     VertexAttributeType::COLOR_1_4UB_NORMALIZED},
-			{"COLOR_3",     VertexAttributeType::COLOR_3_4UB_NORMALIZED},
-
-
-			// Skinning Data
-			// glTF JOINTS_0/WEIGHTS_0 can have 1, 2, 3, or 4 components. 
-			// Mapped to the max/common 4-component types for safety/consistency.
-			{"JOINTS_0",    VertexAttributeType::JOINT_INDICES_4I},   // Skinning Joint/Bone Indices
-			{"WEIGHTS_0",   VertexAttributeType::JOINT_WEIGHTS_4F},   // Skinning Weights
-
-
-
-			// Tangent Space Data
-
-			{"TANGENT",     VertexAttributeType::TANGENT_4F}
-
-
-		};
 
 
 
 
-		std::map<VertexAttributeType, int> engineAttributeToAttributeAccessorIndex;
-		for (const auto& gltfAttributeNameToAcessorInt : tinygltfPrimitive.attributes)
-		{
-
-			//TODO : Need to accomodate VertexAttribute sub data types,like for example color can be float or unsgined byte, joint bone can be eihter unsigned byte or integer or short;
-			engineAttributeToAttributeAccessorIndex[gltfToEngineVertexAttributeMap.at(gltfAttributeNameToAcessorInt.first)] = gltfAttributeNameToAcessorInt.second;
-
-		}
-
-
-		return engineAttributeToAttributeAccessorIndex;
-
-
-	}
-
-
-
-	Engine::GLTFIntermediateMapper::MeshRelatedData GLTFIntermediateMapper::getMeshRelatedData(const tinygltf::Model& tinygltfModel)
+	MeshRelatedData GLTFIntermediateMapper::getMeshRelatedData(const tinygltf::Model& tinygltfModel)
 	{
 
 		std::vector<IntermediateMesh> intermediateMeshs;
@@ -689,6 +641,8 @@ namespace Engine
 
 		intermediateMeshs.reserve(tinygltfModel.meshes.size());
 
+		const std::vector<tinygltf::Accessor>& gltfAccessors = tinygltfModel.accessors;
+
 		for (const auto& tinygltfMesh : tinygltfModel.meshes)
 		{
 			IntermediateMesh intermediateMesh;
@@ -699,18 +653,18 @@ namespace Engine
 				IntermediatePrimitive intermediatePrimitive;
 
 
-				const std::map<VertexAttributeType, int> vertexAttributeAcessorIndexMap = getGLTFAttributeAccessorMappedToEngineAttribute(tinygltfPrimitive);
+				const std::vector<AttributeExtractionResult> attributeExtractionResults = GLTFAttributeExtractor::getEngineAttributesToAccessorIndex(tinygltfPrimitive, gltfAccessors);//getGLTFAttributeAccessorMappedToEngineAttribute(tinygltfPrimitive);
 
 				intermediatePrimitive.materialId = tinygltfPrimitive.material;
 
 
 				std::vector<int> orderedAccessors;
-				std::transform(vertexAttributeAcessorIndexMap.begin(),
-					vertexAttributeAcessorIndexMap.end(),
+				std::transform(attributeExtractionResults.begin(),
+					attributeExtractionResults.end(),
 					std::back_inserter(orderedAccessors),
-					[](const auto& mapPair) 
+					[](const auto& attributeExtractionResult)
 					{
-						return mapPair.second;
+						return attributeExtractionResult.accessorIndex;
 					});
 				std::sort(orderedAccessors.begin(), orderedAccessors.end());
 
@@ -722,12 +676,14 @@ namespace Engine
 				const auto& it = gltfVertexAttributesAccessorHashToOurVertexData.find(attributeAccessorHash);
 				if (it == gltfVertexAttributesAccessorHashToOurVertexData.end())
 				{
+
+
 					//extract then store
 	
-					const ExtractedAttributeData extractedAttributeData = getVertexDataFromAccessors(vertexAttributeAcessorIndexMap, tinygltfModel);
+					const ExtractedAttributeData extractedAttributeData = getVertexDataFromAccessors(attributeExtractionResults, tinygltfModel);
 
-					VertexData vertexData = VertexAttributeRepacker::interleaveVertexAttributes(extractedAttributeData.vertexAttributeToRawData);
-					
+					VertexData vertexData = VertexAttributeRepacker::interleaveVertexAttributes(extractedAttributeData);
+		
 				
 
 					gltfVertexAttributesAccessorHashToOurVertexData[attributeAccessorHash] = vertexDatas.size();
@@ -744,7 +700,7 @@ namespace Engine
 
 
 				//get get indice data
-				if (tinygltfPrimitive.indices > 0)
+				if (tinygltfPrimitive.indices >= 0)
 				{
 					intermediatePrimitive.isIndexed = true;
 					const auto& IndexIterator = gltfIndiceAccessorIndexToOurIndexData.find(tinygltfPrimitive.indices);

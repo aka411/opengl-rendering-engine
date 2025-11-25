@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include "../low-level/rendering_system_data_types.h"
 #include <vector>
@@ -9,7 +10,7 @@ struct AttributeExtractionResult
 	VertexAttributeInfo vertexAttributeInfo;
 };
 
-class GTLFAttributeExtractor
+class GLTFAttributeExtractor
 {
 
 private:
@@ -29,8 +30,13 @@ private:
 	const static std::map<int, ComponentDataType> GLTF_COMPONENT_DATA_TYPE_MAP;
 
 
-public:
+	/***COMPONENT TYPE AND DATA TYPE METRICS *****/
 
+	const static std::map <ComponentType, int> COMPONENT_TYPE_TO_NUM_COMPONENTS_MAP;
+	const static std::map <ComponentDataType, int> COMPONENT_DATA_TYPE_TO_SIZE_IN_BYTES_MAP;
+
+
+public:
 
 	static bool getGltfAttributeTypeFromGltf(const std::string& gltfName, VertexAttributeInfo& info);
 

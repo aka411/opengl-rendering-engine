@@ -270,19 +270,21 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 		m_ecsEngine.addComponentToEntity<EngineTransformationComponent>(entityId, node.transformation);//transformation
 
 
-
-		EngineMesh& engineMesh = m_engineMeshs[node.meshIndex];
-
-		if (engineMesh.isfat)
-		{
-			m_ecsEngine.addComponentToEntity<EngineFatRenderComponent>(entityId, engineMesh.engineFatRenderComponent);
-
-		}
-		else
-		{
-			m_ecsEngine.addComponentToEntity<EngineRenderComponent>(entityId, engineMesh.engineRenderComponent);
-		}
 		
+		
+		if (node.meshIndex >= 0)
+		{
+			EngineMesh& engineMesh = m_engineMeshs[node.meshIndex];
+			if (engineMesh.isfat)
+			{
+				m_ecsEngine.addComponentToEntity<EngineFatRenderComponent>(entityId, engineMesh.engineFatRenderComponent);
+
+			}
+			else
+			{
+				m_ecsEngine.addComponentToEntity<EngineRenderComponent>(entityId, engineMesh.engineRenderComponent);
+			}
+		}
 
 		if (node.children.size() > 0)
 		{
