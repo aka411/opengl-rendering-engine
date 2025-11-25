@@ -8,13 +8,12 @@
 #include <SDL3/SDL_events.h>
 #include "../glad/glad.h"
 
-#include "../include/transformation_system.h"
-#include "../include/renderer.h"
-#include "../include/gltf_flat_parser.h"
-#include "../include/skin_animation_system.h"
-#include "../include/bone_animation_system.h"
+
 #include <filesystem>
 #include <fstream>
+#include <cassert>
+#include "../include/camera.h"
+#include "../include/engine/engine_core.h"
 
 SDL_Window* init()
 {
@@ -35,7 +34,7 @@ SDL_Window* init()
 	SDL_GL_MakeCurrent(window, gl_context);
 
 
-
+	gladLoadGL();
 
 
 
@@ -52,51 +51,7 @@ SDL_Window* init()
 	
 
 
-tinygltf::Model loadModel()
-{
 
-tinygltf::Model model;
-tinygltf::TinyGLTF loader;
-std::string err;
-std::string warn;
-
-std::cout << "Enter File Path (supports both .glb and .gltf) : "<<std::endl<<"Example Format -> C:/documents/asset/block_island/prototype_scene_block_island.glb" << std::endl;
-
-std::string filePath;
-
-std::getline(std::cin, filePath);
-
-bool ret = false;
-if (filePath.substr(filePath.length() - 3) == "gltf")
-{
-	ret = loader.LoadASCIIFromFile(&model, &err, &warn, filePath);
-}
-else
-{
-	ret = loader.LoadBinaryFromFile(&model, &err, &warn, filePath); // for binary glTF(.glb)
-}
-
-if (!warn.empty())
-{
-	printf("Warn: %s\n", warn.c_str());
-}
-
-if (!err.empty())
-{
-	printf("Err: %s\n", err.c_str());
-	assert(0);
-}
-
-if (!ret)
-{
-	printf("Failed to parse glTF\n");
-	assert(0);
-}
-
-std::cout << "Loaded GLTF successfully" << std::endl;
-return model;
-
-}
 
 
 
@@ -112,36 +67,27 @@ int main(int argc, char* args[])
 
 
 
-	tinygltf::Model model = loadModel();
 
 	SDL_Window* window = init();
-
-	GPUBufferManager gpuBufferManager;
-	GPUTextureManager gpuTextureManager;
-
-	BufferManagementSystem bufferManagementSystem;
-
-	Engine::GLTFFlatParser gltfFlatParser(bufferManagementSystem, gpuTextureManager);
-
-	Engine::Model engineModel = gltfFlatParser.parse(model);
 
 
 	 SDL_Event event;
 
-
 	 bool running = true;
 
-	 TransformationSystem g_transfromationSystem;
-	 
-	 
+	
+	
 
 	 Engine::Camera camera;
-	 Renderer renderer(bufferManagementSystem, gpuTextureManager,camera);
+	
+	
+	 camera.setPerspectiveProjection(60.0f, static_cast<float>(700) / static_cast<float>(700), 0.1f, 1000.0f);
+	 EngineCore engineCore;
 
-	 renderer.setPhysicalViewport(700, 700);
-	 SkinAnimationSystem animationSystem;
-	 BoneAnimationSystem boneAnimationSystem;
-	 std::cout << "Going to start Rendering" << std::endl;
+
+	 
+	engineCore.loadModel("PATH TO FILE");
+
 
 
 	 float deltaTime = 0.0f;
@@ -174,7 +120,7 @@ int main(int argc, char* args[])
 				 int width = event.window.data1;
 				 int height = event.window.data2;
 
-				 renderer.setPhysicalViewport(width, height);
+				
 
 			 }
 
@@ -210,15 +156,11 @@ int main(int argc, char* args[])
 
 		 }
 
-		 animationSystem.animate(deltaTime, engineModel, "Take 001");
-
-		 g_transfromationSystem.updateWorldTransforms(engineModel);
-		 boneAnimationSystem.animate(engineModel);
-		 // per frame loop here
+		 
 
 
-		 renderer.renderFrame(engineModel);
 
+		 engineCore.render(camera);
 
 
 
