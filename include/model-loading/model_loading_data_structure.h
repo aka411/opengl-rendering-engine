@@ -9,20 +9,24 @@
 #include <cstdint>
 
 
-struct VertexData
+
+
+
+
+
+
+struct ExtractedAttributeData
 {
-
-	VertexLayout vertexLayout;
-	VertexFormat vertexFormat;
-	size_t vertexCount = 0;
-
-	//Interleaved Only
-	std::vector<std::byte> data;
+	VertexFormat vertexFormat = 0;
+	//1 to 1 map from attribute type to raw data
+	std::vector<VertexAttributeInfo> vertexAttributeInfos;
+	std::vector<std::vector<std::byte>> vertexAttributeRawDatas;
 };
+
 
 struct IndexData
 {
-	IndexType indexType;
+	IndexType indexType = IndexType::UNKNOWN;
 	size_t indexCount = 0;
 	std::vector<std::byte> data;
 };
@@ -55,7 +59,25 @@ struct EngineIntermediateNode
 	std::vector<int> children;
 };
 
+struct VertexData
+{
 
+	VertexLayout vertexLayout;
+	VertexFormat vertexFormat;
+	size_t vertexCount = 0;
+
+	//Interleaved Only
+	std::vector<std::byte> data;
+};
+
+
+struct MeshRelatedData
+{
+	std::vector<IntermediateMesh> intermediateMeshs;
+	std::vector<VertexData > intermediateVertexDatas;
+	std::vector<IndexData> indexDatas;
+
+};
 
 struct IntermediateImage
 {
@@ -85,8 +107,8 @@ struct IntermediatePBRMetallicRoughnessMaterial
 
 
 
-	glm::vec4 baseColorFactor{}; // 4 * 4 = 16 bytes
-	glm::vec3 emissiveFactor{};//optional // 3 * 4 = 12 bytes
+	glm::vec4 baseColorFactor{0.0f}; // 4 * 4 = 16 bytes
+	glm::vec3 emissiveFactor{0.0f};// 3 * 4 = 12 bytes
 
 	float metallicFactor = 0.0f; // 4 bytes
 	float roughnessFactor = 0.0f; // 4 bytes
@@ -96,8 +118,11 @@ struct IntermediatePBRMetallicRoughnessMaterial
 	int32_t metallicRoughnessTextureIndex = -1;
 
 	int32_t normalTextureIndex = -1;
-	int32_t occulsionTextureIndex = -1;
+	int32_t occlusionTextureIndex = -1;
 	int32_t emissiveTextureIndex = -1;
+
+
+	uint64_t configMask = 0; // 8 bytes
 
 };
 
@@ -116,7 +141,7 @@ struct EngineIntermediateModel
 	std::vector<IntermediateImage> intermediateImage;
 	std::vector<SamplerSetting> samplerSettings;
 
-	int rootNodeIndex;
+	int rootNodeIndex = -1;
 
 
 

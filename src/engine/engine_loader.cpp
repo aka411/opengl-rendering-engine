@@ -3,8 +3,8 @@
 
 
 
-EngineLoader::EngineLoader(TheEngine::ECS::ECSEngine& ecsEngine, GPUTextureManager& gpuTextureManager, GPUMaterialSystem& gpuMaterialSystem, WorldVertexBufferSystem& worldVertexBufferSystem)
-	: m_ecsEngine(ecsEngine), m_gpuTextureManager(gpuTextureManager), m_gpuMaterialSystem(gpuMaterialSystem), m_worldVertexBufferSystem(worldVertexBufferSystem)
+EngineLoader::EngineLoader(TheEngine::ECS::ECSEngine& ecsEngine, GPUTextureManager& gpuTextureManager, GPUMaterialSystem& gpuMaterialSystem, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem)
+	: m_ecsEngine(ecsEngine), m_gpuTextureManager(gpuTextureManager), m_gpuMaterialSystem(gpuMaterialSystem), m_worldVertexBufferManagementSystem(worldVertexBufferManagementSystem)
 {
 
 
@@ -41,19 +41,25 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 
 		textureCreateInfo.data = image.data.data();
 
-		const uint64_t imagehandle = m_gpuTextureManager.createNewTexture(textureCreateInfo).resisdentHandle;
-		localImageIndexToImageHandle.push_back(imagehandle);
+		const uint64_t imageHandle = m_gpuTextureManager.createNewTexture(textureCreateInfo).resisdentHandle;
+		localImageIndexToImageHandle.push_back(imageHandle);
 	}
+
+
+
+
 
 	std::vector<uint64_t> localTextureToEngineTexture;
 	localTextureToEngineTexture.reserve(engineIntermediateModel.intermediateTextures.size());
+
 	for (auto& texture : engineIntermediateModel.intermediateTextures)
-	{
+	{ 
+		
 		localTextureToEngineTexture.push_back(localImageIndexToImageHandle[texture.imageIndex]);
-	
+		
 	}
 
-
+	
 	std::vector<MaterialId> localToEnginePBRMaterial;
 	localToEnginePBRMaterial.reserve(engineIntermediateModel.intermdediatePBRMetallicRoughnessMaterials.size());
 
@@ -72,13 +78,16 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 		pbrMetallicRoughnessMaterial.metallicRoughnessTextureHandle = getCorrectTextureIndex(material.metallicRoughnessTextureIndex, localTextureToEngineTexture);
 		pbrMetallicRoughnessMaterial.normalTextureHandle = getCorrectTextureIndex(material.normalTextureIndex, localTextureToEngineTexture);
 		pbrMetallicRoughnessMaterial.emissiveTextureHandle = getCorrectTextureIndex(material.emissiveTextureIndex, localTextureToEngineTexture);
-		pbrMetallicRoughnessMaterial.occulsionTextureHandle = getCorrectTextureIndex(material.occulsionTextureIndex, localTextureToEngineTexture);
+		pbrMetallicRoughnessMaterial.occlusionTextureHandle = getCorrectTextureIndex(material.occlusionTextureIndex, localTextureToEngineTexture);
 
 
 		pbrMetallicRoughnessMaterial.baseColorFactor = material.baseColorFactor;
 		pbrMetallicRoughnessMaterial.emissiveFactor = material.emissiveFactor;
 		pbrMetallicRoughnessMaterial.metallicFactor = material.metallicFactor;
 		pbrMetallicRoughnessMaterial.roughnessFactor = material.roughnessFactor;
+
+		pbrMetallicRoughnessMaterial.configMask = material.configMask;
+
 
 		MaterialId materialId = m_gpuMaterialSystem.uploadMaterial(MaterialType::PBR_METALLIC_ROUGHNESS, reinterpret_cast<std::byte*>(&pbrMetallicRoughnessMaterial), sizeof(pbrMetallicRoughnessMaterial));
 
@@ -96,7 +105,7 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 	engineVertexoffsets.reserve(engineIntermediateModel.vertexDatas.size());
 	for (auto& vertex : engineIntermediateModel.vertexDatas)
 	{
-		size_t engineVertexOffset = m_worldVertexBufferSystem.uploadVertexData(vertex.vertexFormat, vertex.data.data(), vertex.data.size());
+		size_t engineVertexOffset = m_worldVertexBufferManagementSystem.uploadVertexData(vertex.vertexFormat, vertex.data.data(), vertex.data.size());
 		engineVertexoffsets.push_back(engineVertexOffset);
 
 	}
@@ -106,7 +115,7 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 	engineIndexoffsets.reserve(engineIntermediateModel.indiceDatas.size());
 	for (auto& index : engineIntermediateModel.indiceDatas)
 	{
-		size_t engineIndexOffset = m_worldVertexBufferSystem.uploadIndexData(index.indexType, index.data.data(), index.data.size());
+		size_t engineIndexOffset = m_worldVertexBufferManagementSystem.uploadIndexData(index.indexType, index.data.data(), index.data.size());
 		engineIndexoffsets.push_back(engineIndexOffset);
 
 	}
@@ -261,19 +270,21 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 		m_ecsEngine.addComponentToEntity<EngineTransformationComponent>(entityId, node.transformation);//transformation
 
 
-
-		EngineMesh& engineMesh = m_engineMeshs[node.meshIndex];
-
-		if (engineMesh.isfat)
-		{
-			m_ecsEngine.addComponentToEntity<EngineFatRenderComponent>(entityId, engineMesh.engineFatRenderComponent);
-
-		}
-		else
-		{
-			m_ecsEngine.addComponentToEntity<EngineRenderComponent>(entityId, engineMesh.engineRenderComponent);
-		}
 		
+		
+		if (node.meshIndex >= 0)
+		{
+			EngineMesh& engineMesh = m_engineMeshs[node.meshIndex];
+			if (engineMesh.isfat)
+			{
+				m_ecsEngine.addComponentToEntity<EngineFatRenderComponent>(entityId, engineMesh.engineFatRenderComponent);
+
+			}
+			else
+			{
+				m_ecsEngine.addComponentToEntity<EngineRenderComponent>(entityId, engineMesh.engineRenderComponent);
+			}
+		}
 
 		if (node.children.size() > 0)
 		{
@@ -317,7 +328,8 @@ tinygltf::Model EngineLoader::loadGLTFModel(const std::string& pathToModel)
 
 
 	bool ret = false;
-	if (pathToModel.substr(pathToModel.length() - 3) == "gltf")
+
+	if (pathToModel.substr(pathToModel.length() - 4) == "gltf")
 	{
 		ret = loader.LoadASCIIFromFile(&model, &err, &warn, pathToModel);
 	}

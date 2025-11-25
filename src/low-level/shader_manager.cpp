@@ -12,6 +12,21 @@ ShaderManager::ShaderManager()
 
 }
 
+GLuint ShaderManager::getShaderProgramForVertexFormat(VertexFormat vertexFormat)
+{
+
+
+	const auto it = m_vertexFormatToShaderProgram.find(vertexFormat);
+	if (it == m_vertexFormatToShaderProgram.end())
+	{
+		createNewShaderProgramForFormat(vertexFormat);
+
+		return m_vertexFormatToShaderProgram.at(vertexFormat);
+	}
+
+	return m_vertexFormatToShaderProgram.at(vertexFormat);
+}
+
 GLuint ShaderManager::compileShader(const std::string& vertShaderCode, const std::string& fragShaderCode)
 {
 
@@ -71,4 +86,13 @@ GLuint ShaderManager::compileShader(const std::string& vertShaderCode, const std
 
 	return shaderProgram;
 
+}
+
+void ShaderManager::createNewShaderProgramForFormat(VertexFormat vertexFormat)
+{
+
+	ShaderCode shaderCode = m_shaderCodeGenerator.getShaderCodeForFormat(vertexFormat);
+	GLuint shaderProgram = compileShader(shaderCode.vertexShaderCode, shaderCode.fragmentShaderCode);
+
+	m_vertexFormatToShaderProgram[vertexFormat] = shaderProgram;
 }

@@ -34,7 +34,7 @@ SDL_Window* init()
 	SDL_GL_MakeCurrent(window, gl_context);
 
 
-
+	gladLoadGL();
 
 
 
@@ -81,14 +81,12 @@ int main(int argc, char* args[])
 	 Engine::Camera camera;
 	
 	
-
+	 camera.setPerspectiveProjection(60.0f, static_cast<float>(700) / static_cast<float>(700), 0.1f, 1000.0f);
 	 EngineCore engineCore;
 
 
-
-
-
-
+	 
+	engineCore.loadModel("PATH TO FILE");
 
 
 
@@ -162,7 +160,7 @@ int main(int argc, char* args[])
 
 
 
-
+		 engineCore.render(camera);
 
 
 

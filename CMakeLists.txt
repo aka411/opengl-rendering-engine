@@ -28,14 +28,13 @@ add_executable(opengl-rendering-engine
  
  "src/common_header_imp.cpp"
  "src/camera.cpp"
-# "src/animation/skin_animation_system.cpp"
 
-# "src/renderer.cpp"
-# "src/low-level/shader_manager.cpp"
-# "src/transformation_system.cpp"
+
+
+
+
   "src/model-loading/gltf_intermediate_mapper.cpp"
-# "src/hierarchy_traverser_flat.cpp"
-# "src/animation/bone_animation_system.cpp"
+
   "src/low-level/vertex_format_manager.cpp"
   "src/model-loading/data_convertor.cpp"
 # "src/model-loading/gltf_animation_extractor.cpp"
@@ -46,15 +45,24 @@ add_executable(opengl-rendering-engine
  "src/low-level/gpu_buffer_manager.cpp"
  "src/low-level/gpu_buffer_sub_bump_allocator.cpp"
  "src/low-level/gpu_texture_manager.cpp"
-  "src/low-level/gpu_material_system.cpp"
-
+ "src/low-level/gpu_material_system.cpp"
+ "src/low-level/shader_code_generator.cpp"
+ "src/low-level/shader_manager.cpp"
  "src/low-level/vertex_format_helper.cpp" 
- "src/model-loading/vertex_attributes_repacker.cpp"
- "src/engine/engine_loader.cpp"
  "src/low-level/world_vertex_buffer_management_system.cpp"
 
+ "src/model-loading/vertex_attributes_repacker.cpp"
+ "src/engine/engine_loader.cpp"
 
- "src/engine/engine_core.cpp")
+
+
+ "src/engine/engine_core.cpp"
+ "src/rendering-system/render_system.cpp"
+ "src/rendering-system/world_renderer.cpp"
+
+ "src/model-loading/gltf_attribute_extractor.cpp"
+
+)
 
 
  set_target_properties(opengl-rendering-engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")

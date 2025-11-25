@@ -2,7 +2,7 @@
 
 #include <vector>
 #include "low-level/gpu_material_system.h"
-
+#include "low-level/rendering_system_data_types.h"
 #include <glm/glm.hpp> 
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/vec3.hpp>
@@ -87,10 +87,30 @@ struct RootEntityComponent
 
 
 
-
-/*
-struct UIEngineRenderComponent
+/******NOT COMPONENTS****/
+struct PerObjectData
 {
+	uint64_t materialId;
+	EngineTransformationComponent engineTransformationComponent;
 
 };
-*/
+
+
+
+struct RenderCommand
+{
+
+	size_t	vertexOffset = 0;//in bytes
+	size_t	vertexCount = 0;
+
+	IndexType indexType;
+
+	bool isIndexed = false;
+	size_t	indexOffset = 0;
+	size_t	indexCount = 0;
+
+
+
+	PerObjectData perObjectData;
+
+};
