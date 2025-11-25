@@ -10,6 +10,9 @@ enum class MaterialType
 	PBR_METALLIC_ROUGHNESS
 };
 
+
+
+
 enum PBR_CONFIG_BITS : uint32_t
 {
     // ---  Texture Presence Flags (Bits 0-4) ---
@@ -39,6 +42,7 @@ enum PBR_CONFIG_BITS : uint32_t
     // Emissive TexCoord Index (e.g., bits 13 & 14)
     EMISSIVE_TEXCOORD_SHIFT = 13,
 
+    /**
     // ---  Optional Vertex Attribute Flags (Bits 15+) ---
     // A single bit to check if the mesh primitive contains the vertex attribute.
     HAS_VERTEX_COLOR = 1u << 15, // COLOR_0 attribute presence
@@ -52,34 +56,37 @@ enum PBR_CONFIG_BITS : uint32_t
     IS_DOUBLESIDED = 1u << 19,
     IS_UNLIT = 1u << 20
 
-  
+  */
 };
 
 
 struct PBRMetallicRoughnessMaterial
 {
 	//This goes to GPU Padding is crucial
+    
+    //N = 4
+	//Alignement : 4N , 4 * 4 =16
+	glm::vec4 baseColorFactor{ 0 };//4N ,offset =  0
+	glm::vec3 emissiveFactor{ 0 };// offset = 16
 
-	glm::vec4 baseColorFactor{0}; // 4 * 4 = 16 bytes
-	glm::vec3 emissiveFactor{0};//optional // 3 * 4 = 12 bytes
+    //Alignement : N , 4
+	float metallicFactor = 0.0f; //offset = 28
+	float roughnessFactor = 0.0f; //offset = 32
 
+    float padding = 0;//offset = 36
 
-	float metallicFactor = 0.0f; // 4 bytes
-	float roughnessFactor = 0.0f; // 4 bytes
+	// Alignement : 2N , 2*4 = 8 
+	uint64_t albedoTextureHandle = 0; //offset = 40
+	uint64_t metallicRoughnessTextureHandle = 0; //offset = 48
 
-    float padding1 = 0;                     // Offset 36, Size 4.
-    float padding2 = 0;                     // Offset 40, Size 4.
-    float padding3 = 0;
+	uint64_t normalTextureHandle = 0; //offset = 56
+	uint64_t occlusionTextureHandle = 0;// offset = 64
+	uint64_t emissiveTextureHandle = 0;//offset =  72
 
-	uint64_t albedoTextureHandle =0;// 8 bytes
-	uint64_t metallicRoughnessTextureHandle = 0; // 8 bytes
+	uint64_t configMask = 0; //offset = 80
 
-	uint64_t normalTextureHandle = 0; // 8 bytes
-	uint64_t occlusionTextureHandle = 0;
-	uint64_t emissiveTextureHandle = 0;
-
-	uint64_t configMask = 0; // 8 bytes
-
+	//Total: 88 bytes
+	uint64_t padding2 = 0; // Padding to make the struct size a multiple of 16 bytes
 };
 
 using MaterialId = uint64_t;

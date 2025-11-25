@@ -25,7 +25,14 @@ MaterialId GPUMaterialSystem::uploadMaterial(MaterialType materialType, std::byt
 	GPUBufferInfo gpuBufferInfo  = gpuBufferSubBumpAllocator.getGPUBufferInfo();
 	std::byte* bufferBasePtr = reinterpret_cast<std::byte*>(gpuBufferInfo.mappedPtr);
 
+	assert(bufferBasePtr != nullptr);
+
 	std::byte* absoluteBufferPtr = bufferBasePtr + allocationInfo.offset;
+
+
+	assert(gpuBufferInfo.size > allocationInfo.offset + size);
+	
+
 	memcpy(absoluteBufferPtr, ptr, size);
 
 	

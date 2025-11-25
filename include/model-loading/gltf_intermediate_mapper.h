@@ -2,6 +2,7 @@
 
 #include "tiny_gltf.h"
 #include "model_loading_data_structure.h"
+#include "gltf_attribute_extractor.h"
 
 
 namespace Engine
@@ -40,20 +41,9 @@ namespace Engine
 
 		std::map<VertexAttributeType, int> getGLTFAttributeAccessorMappedToEngineAttribute(const tinygltf::Primitive& tinygltfPrimitive);
 
-		struct MeshRelatedData
-		{
-			std::vector<IntermediateMesh> intermediateMeshs;
-			std::vector<VertexData > intermediateVertexDatas;
-			std::vector<IndexData> indexDatas;
 
-		};
-		struct ExtractedAttributeData
-		{
-			VertexFormat vertexFormat;
-			std::map<VertexAttributeType, std::vector<std::byte>> vertexAttributeToRawData;
-		};
-		ExtractedAttributeData getVertexDataFromAccessors(const std::map<VertexAttributeType, int>& vertexAttributeAcessorIndexMap, const tinygltf::Model& tinygltfModel);
-
+		ExtractedAttributeData getVertexDataFromAccessors(const std::vector<AttributeExtractionResult>& attributeExtractionResults, const tinygltf::Model& tinygltfModel);
+	
 		
 		MeshRelatedData getMeshRelatedData(const tinygltf::Model& tinygltfModel);
 

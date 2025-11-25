@@ -13,59 +13,100 @@
 
 enum class BufferUsageType
 {
+	UNKNOWN,
 	STATIC,
 	DYNAMIC,
-	STREAMING,
-	UNKNOWN
+	STREAMING
+	
 };
 
 
 enum class VertexLayout 
 {
+	UNKNOWN,
 	INTERLEAVED,
-	NON_INTERLEAVED,
-	UNKNOWN
+	NON_INTERLEAVED
+	
 };
 
-
-constexpr size_t MAX_ATTRIBUTES = 15;
-using VertexFormat = std::bitset<MAX_ATTRIBUTES>;
+/**VERTEX ATTRIBUTES***/
 
 
+constexpr size_t MAX_BITS_USED_FOR_VERTEX_FORMAT = 35;
+//using VertexFormat = std::bitset<MAX_BITS_USED_FOR_VERTEX_FORMAT>;
 
 
-enum class VertexAttributeType : std::uint32_t
+using VertexFormat = std::uint64_t;
+
+
+
+
+
+
+
+enum class VertexAttributeType 
 {
-	UNKNOWN				    = 0,
-	// Geometric Data
-	POSITION_3F				= 1,         // 3 floats for (x, y, z)
-	NORMAL_3F				= 2,           // 3 floats for (nx, ny, nz)
-	TANGENT_4F				= 3,          // 3 floats for a tangent vector //TODO : correct it spec states Vec4
-	BINORMAL_3F				= 4,         // 3 floats for a binormal/bitangent vector
+	UNKNOWN,
 
-	// Texture
-	TEXCOORD_0_2F			= 5,         // 2 floats for (u, v) texture coordinates
-	TEXCOORD_1_2F			= 6,
-	TEXCOORD_2_2F			= 7,
-	TEXCOORD_3_2F			= 8,
+	POSITION,
+	NORMAL,
+	TANGENT,
 
-	//Color Data
-	COLOR_0_4UB_NORMALIZED	= 9, // 4 unsigned bytes for RGBA, treated as [0.0, 1.0]
-	COLOR_1_4UB_NORMALIZED = 10,
-	COLOR_2_4UB_NORMALIZED = 11,
-	COLOR_3_4UB_NORMALIZED = 12,
-	// Auxiliary Data
-	JOINT_INDICES_4I		= 13,    // 4 integers for skeletal animation joint indices
-	JOINT_WEIGHTS_4F		= 14,     // 4 floats for corresponding joint weights
 
+	TEXCOORD,//support up to 5
+
+	COLOR,//support only 1
+
+	JOINTS,//support only 1
+	WEIGHTS // support only 1
 	
 
 };
 
 
+enum class ComponentType
+{
+	UNKNOWN,
+	SCALAR, // do i need this?
+
+	VEC2,
+	VEC3,
+	VEC4
+
+};
+
+enum class ComponentDataType
+{
+	UNKNOWN,
+	FLOAT,
+	UNSIGNED_BYTE,//normalised usually
+	UNSIGNED_SHORT//normalised usually
+
+};
 
 
-/*Index Data*/
+
+
+
+
+struct VertexAttributeInfo
+{
+	VertexAttributeType vertexAttributeType = VertexAttributeType::UNKNOWN;
+	int index = -1; // n , -1 means no index
+
+
+	ComponentType componentType = ComponentType::UNKNOWN;
+	ComponentDataType componentDataType = ComponentDataType::UNKNOWN ;
+
+	bool normalise = false;
+
+	size_t sizeInBytes = 0; 
+
+};
+
+
+
+/*INDEX DATA*/
 
 enum class IndexType
 {
@@ -85,29 +126,8 @@ enum class IndexType
 };
 
 
-/* VERTEX ATTRIBUTE CONFIGURATION */
 
-struct VertexAttribute
-{
-	// The type from the VertexAttributeType enum (e.g., POSITION_3F)
-	VertexAttributeType type;
 
-	// The location/index in the shader (e.g., layout (location = 0) in ...)
-	unsigned int location;
-
-	// The number of components (e.g., 3 for POSITION_3F, 2 for TEXCOORD_2F)
-	int count;
-
-	// The OpenGL fundamental type (e.g., GL_FLOAT, GL_UNSIGNED_BYTE)
-	unsigned int glType;
-
-	// Whether fixed-point data should be normalized (GL_TRUE/GL_FALSE).
-	// Crucial for types like COLOR_4UB_NORMALIZED.
-	unsigned char normalized;
-
-	// The size of the attribute in bytes (e.g., 12 bytes for 3 floats)
-	size_t size;
-};
 
 
 

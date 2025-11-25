@@ -60,6 +60,8 @@ add_executable(opengl-rendering-engine
  "src/rendering-system/render_system.cpp"
  "src/rendering-system/world_renderer.cpp"
 
+ "src/model-loading/gltf_attribute_extractor.cpp"
+
 )
 
 

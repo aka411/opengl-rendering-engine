@@ -34,8 +34,7 @@ GLenum IndexTypeToGLType(IndexType type)
 
 	case IndexType::UNKNOWN:
 	default:
-		// Handle the error case or return 0, depending on your error handling strategy
-		// 0 is often a safe, non-standard GLenum value to indicate failure.
+		// non-standard GLenum value to indicate failure.
 		return 0;
 	}
 }
@@ -51,9 +50,9 @@ void WorldRenderer::render(std::unordered_map<VertexFormat, std::vector<RenderCo
 	glClearDepth(1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//glDisable(GL_CULL_FACE);
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
+	//glEnable(GL_CULL_FACE);
+	//glFrontFace(GL_CCW);
+	//glCullFace(GL_BACK);
 
 
 	//material ssbo
@@ -140,6 +139,9 @@ void WorldRenderer::render(std::unordered_map<VertexFormat, std::vector<RenderCo
 				GPUBufferInfo indexBufferInfo = m_worldVertexBufferManagementSystem.getBufferInfoForIndexType(renderCommand.indexType);
 
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferInfo.bufferHandle);
+				assert(renderCommand.indexType != IndexType::UNKNOWN);
+				assert(renderCommand.vertexOffset% VertexFormatHelper::getSizeOfVertexForFormatInBytes(vertexFormat) == 0);
+				assert(renderCommand.indexOffset % (renderCommand.indexType == IndexType::USHORT_16 ? 2 : (renderCommand.indexType == IndexType::UINT_32 ? 4 : 1)) == 0);
 				const size_t vertexOffset = ((renderCommand.vertexOffset) / VertexFormatHelper::getSizeOfVertexForFormatInBytes(vertexFormat));
 				glDrawElementsBaseVertex(GL_TRIANGLES, renderCommand.indexCount, glIndexFormat, (const void*)renderCommand.indexOffset,vertexOffset);
 				
@@ -154,7 +156,7 @@ void WorldRenderer::render(std::unordered_map<VertexFormat, std::vector<RenderCo
 
 
 		}
-
+		
 	}
 
 

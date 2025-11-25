@@ -6,6 +6,7 @@
 #include "../../include/low-level/rendering_system_data_types.h"
 #include "../../include/low-level/gpu_texture_manager.h"
 #include "../../glad/glad.h"
+#include <iostream>
 
 
 
@@ -47,7 +48,7 @@ namespace TextureUtils
 		case TextureInternalFormat::R8:          return GL_R8;
 		case TextureInternalFormat::RG8:         return GL_RG8;
 		case TextureInternalFormat::RGB8:        return GL_RGB8;
-		case TextureInternalFormat::RGBA8:       return GL_RGBA8; // This replaces the legacy '3' (GL_RGB) you had trouble with
+		case TextureInternalFormat::RGBA8:       return GL_RGBA8; 
 
 			// 16-bit Half-Float Formats
 		case TextureInternalFormat::R16F:        return GL_R16F;
@@ -189,7 +190,7 @@ static std::string GLErrorToString(GLenum error)
 	case GL_INVALID_OPERATION: return "INVALID_OPERATION";
 	case GL_STACK_OVERFLOW: return "STACK_OVERFLOW";
 	case GL_OUT_OF_MEMORY: return "OUT_OF_MEMORY";
-		
+	case 0: return "NO_ERROR";
 	default: return "UNKNOWN_ERROR";
 	}
 }
@@ -270,9 +271,10 @@ TextureInfo GPUTextureManager::createNewTexture(const TextureCreateInfo& texture
 
 		residentHandle = glGetTextureHandleARB(glTextureId);
 		
-		
+		assert(residentHandle != 0);
 		glMakeTextureHandleResidentARB(residentHandle);
-		GLErrorToString(glGetError());
+
+		//std::cout<<GLErrorToString(glGetError())<<std::endl;
 		
 
 	//m_allotedGLTextureIDs.push_back(glTextureId); // For destruction tracking

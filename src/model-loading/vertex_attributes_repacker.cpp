@@ -9,94 +9,93 @@
 
 
 
-VertexData VertexAttributeRepacker::interleaveVertexAttributes(const std::map<VertexAttributeType, std::vector<std::byte>>& vertexAttributeToRawDatas)
+VertexData VertexAttributeRepacker::interleaveVertexAttributes(const ExtractedAttributeData& extractedAttributeData)
 {
 
-    
+	const std::vector<VertexAttributeInfo>& vertexAttributeInfos = extractedAttributeData.vertexAttributeInfos;
+	const std::vector<std::vector<std::byte>>& vertexAttributeRawDatas = extractedAttributeData.vertexAttributeRawDatas;
 
 
-    VertexData vertexData;
- 
+
+
     size_t totalByteSize = 0;
-
-    std::map<VertexAttributeType, size_t> attributeOffsets;
- 
-    size_t currentOffset = 0;
     size_t numVertices = 0;
-    VertexFormat vertexFormat;
-    for (const auto& vertexAttributeToRawData : vertexAttributeToRawDatas)
+    size_t stride = 0;
+
+	assert(vertexAttributeInfos.size() == vertexAttributeRawDatas.size() && "Attribute infos and raw data size mismatch!");
+
+	const size_t ATTRIBUTE_COUNT = vertexAttributeInfos.size();
+
+
+    for (size_t i = 0 ; i < ATTRIBUTE_COUNT; ++i)
     {
+		const VertexAttributeInfo& attributeInfo = vertexAttributeInfos[i];
+		const std::vector<std::byte>& rawData = vertexAttributeRawDatas[i];
 
+		const size_t attributeSize = attributeInfo.sizeInBytes;
 
-        VertexAttributeType type = vertexAttributeToRawData.first;
-
-        vertexFormat.set(static_cast<uint32_t>(type));
-
-        const std::vector<std::byte>& rawData = vertexAttributeToRawData.second;
-        size_t attributeSize = VertexFormatHelper::getSizeInBytesOfSingleAttribute(type); // Get size from your map
-
-        // 1. Store the offset, keyed by the attribute type
-        attributeOffsets[type] = currentOffset;
-
-        // 2. Update the running offset (which is the Stride)
-        currentOffset += attributeSize;
-
-        // 3. Calculate total size (and number of vertices)
+        stride += attributeSize;
+        
         totalByteSize += rawData.size();
-
-
-        const size_t currentAttributeVertices = rawData.size() / attributeSize;
+		assert(rawData.size() % attributeSize == 0 && "Raw data size must be multiple of attribute size!");
+        const size_t attributeTotalNumOfElements = rawData.size() / attributeSize;
         if (numVertices == 0)
         {
-            numVertices = currentAttributeVertices;
+            numVertices = attributeTotalNumOfElements;
         }
         else
         {
             // Add an assert/exception check
-            assert(numVertices == currentAttributeVertices && "All vertex attribute arrays must have the same number of vertices!");
+            assert(numVertices == attributeTotalNumOfElements && "All vertex attribute arrays must have the same number of vertices!");
         }
 
+
+
     }
-    const size_t stride = currentOffset;
+
+
+    VertexData vertexData;
+
+
+
+    
 
 
     vertexData.vertexLayout = VertexLayout::INTERLEAVED;
     vertexData.vertexCount = numVertices;
-    vertexData.vertexFormat = vertexFormat;
+    vertexData.vertexFormat = extractedAttributeData.vertexFormat;
    
     std::vector<std::byte>& interleavedData = vertexData.data;
     interleavedData.resize(totalByteSize);
 
 
-
-    for (const auto& vertexAttributeToRawData : vertexAttributeToRawDatas)
+    size_t currentOffset = 0;
+    for (size_t i = 0; i < ATTRIBUTE_COUNT; ++i)
     {
+        //assuming ordered
+        const VertexAttributeInfo& attributeInfo = vertexAttributeInfos[i];
+        const std::vector<std::byte>& srcRawData = vertexAttributeRawDatas[i];
 
-        const std::vector<std::byte>& srcRawByteData = vertexAttributeToRawData.second;
+       
 
-        const size_t offset = attributeOffsets.at(vertexAttributeToRawData.first);
-        const size_t attributeSizeInBytes = VertexFormatHelper::getSizeInBytesOfSingleAttribute(vertexAttributeToRawData.first);
+        const size_t offset = currentOffset;
+        const size_t attributeSizeInBytes = attributeInfo.sizeInBytes;
 
-       // std::uintptr_t baseDestAddress = reinterpret_cast<std::uintptr_t>(interleavedData.data()) ;
-        //std::uintptr_t baseSrcAddress = reinterpret_cast<std::uintptr_t>(srcRawByteData.data());
 
         std::byte* destBasePtr = interleavedData.data();
-        const std::byte* srcBasePtr = srcRawByteData.data();
+        const std::byte* srcBasePtr = srcRawData.data();
 
         for (size_t i = 0; i < numVertices; ++i)
         {
 
-           // std::uintptr_t destByteIndex = offset + i * stride;
-            ///std::uintptr_t srcByteIndex = i * attributeSizeInBytes;
 
-           // void* finalDestPtr = reinterpret_cast<void*>(baseDestAddress + destByteIndex);
-           // void* finalSrcPtr = reinterpret_cast<void*>(baseSrcAddress + srcByteIndex);
 
             std::byte* finalDestPtr = destBasePtr + (offset + i * stride);
             const std::byte* finalSrcPtr = srcBasePtr + (i * attributeSizeInBytes);
 
             memcpy(finalDestPtr, finalSrcPtr, attributeSizeInBytes);
         }
+		currentOffset += attributeSizeInBytes;
 
     }
 
