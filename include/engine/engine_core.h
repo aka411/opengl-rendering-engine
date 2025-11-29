@@ -38,4 +38,14 @@ public:
 
 	void loadModel(std::string pathToFile);
 	void render(Engine::Camera camera);
+
+
+	void renderUI();
+
+	//UI 
+	//getUIBuilder();
+
+	
+
+
 };

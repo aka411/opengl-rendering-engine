@@ -14,6 +14,7 @@
 #include <cassert>
 #include "../include/camera.h"
 #include "../include/engine/engine_core.h"
+#include "../ui/include/ui_renderer.h"
 
 SDL_Window* init()
 {
@@ -80,20 +81,26 @@ int main(int argc, char* args[])
 
 	 Engine::Camera camera;
 	
-	
 	 camera.setPerspectiveProjection(60.0f, static_cast<float>(700) / static_cast<float>(700), 0.1f, 1000.0f);
 	 EngineCore engineCore;
 
+	 
 
 	 
-	engineCore.loadModel("PATH TO FILE");
+	 UI::UIRenderer uiRenderer;
+	
+	 uiRenderer.runCustomCode();
+	 uiRenderer.setPhysicalViewport(700, 700);
+	 
+	 
+	//engineCore.loadModel("PATH TO FILE");
 
 
 
 	 float deltaTime = 0.0f;
 	 float lastFrameTime = SDL_GetTicks() / 1000.0f;
 	 float currentFrameTime = lastFrameTime;
-
+	 float accumulator = 0.0f;
 	 while (running)
 	 {
 		 currentFrameTime = SDL_GetTicks() / (1000.0f); // retuns time in milliseconds converted to seconds
@@ -155,12 +162,15 @@ int main(int argc, char* args[])
 			 }
 
 		 }
+		 accumulator += deltaTime;
+		 if (accumulator > 1 / 60.0f)
+		 {
+			 accumulator = 0;
+			 uiRenderer.updateFPS(deltaTime);
+		 }
+		 uiRenderer.renderUI();
 
-		 
-
-
-
-		 engineCore.render(camera);
+		// engineCore.render(camera);
 
 
 

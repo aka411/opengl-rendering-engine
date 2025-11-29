@@ -24,12 +24,18 @@ namespace Engine
 
 
 
-
+		/*
 		m_projectionMatrix = glm::mat4(
 			2.0f / (right - left), 0.0f, 0.0f, -(right + left) / (right - left),
 			0.0f, 2.0f / (top - bottom), 0.0f, -(top + bottom) / (top - bottom),
 			0.0f, 0.0f, 2.0f / (near - far), -(near + far) / (near - far),
 			0.0f, 0.0f, 0.0f, 1.0f);
+			*/
+
+		//This glm ortho method does a thing where it negates the input z values so to get right hand coordinate system we need to
+		//negate it  here ,thats why its -near and -far 
+		//cause the caller of this method assumes right hand coordinate system
+		m_projectionMatrix = glm::ortho(left, right, bottom, top, -near, -far);
 
 
 	}

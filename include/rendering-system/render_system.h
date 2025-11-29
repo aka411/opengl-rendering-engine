@@ -9,6 +9,7 @@
 #include "world_renderer.h"
 #include <map>
 
+
 //This class is the composer and conductor
 class RenderSystem
 {
@@ -23,7 +24,13 @@ private:
 
 	WorldRenderer m_worldRenderer;
 
+
+
 	WorldVertexBufferManagementSystem& m_worldVertexBufferManagementSystem;
+
+
+
+
 
 public:
 

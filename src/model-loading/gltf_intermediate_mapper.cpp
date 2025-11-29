@@ -431,7 +431,7 @@ namespace Engine
 
 			// 1. --- Set Texture Presence Flags (Bits 0-4) ---
 			// Check if the texture index is valid (>= 0) and set the corresponding bit.
-
+			/**
 			if (albedoTexturePresent)
 			{
 				intermediatePBRMetallicRoughnessMaterial.configMask |= PBR_CONFIG_BITS::HAS_ALBEDO_TEX;
@@ -463,7 +463,7 @@ namespace Engine
 			intermediatePBRMetallicRoughnessMaterial.configMask |= (occlusionTexCoordIndex << PBR_CONFIG_BITS::OCCLUSION_TEXCOORD_SHIFT);
 			intermediatePBRMetallicRoughnessMaterial.configMask |= (emissiveTexCoordIndex << PBR_CONFIG_BITS::EMISSIVE_TEXCOORD_SHIFT);
 
-
+			*/
 
 
 

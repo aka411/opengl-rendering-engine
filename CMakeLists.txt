@@ -19,7 +19,6 @@ add_subdirectory(external/the-engine/the-engine/ecs)
 
 
 
-
 add_executable(opengl-rendering-engine
 
  src/main.cpp
@@ -62,6 +61,27 @@ add_executable(opengl-rendering-engine
 
  "src/model-loading/gltf_attribute_extractor.cpp"
 
+  "ui/src/ui_vertex_buffer_system.cpp"
+  "ui/src/ui_renderer.cpp"
+  "ui/src/geometry_generator.cpp"
+  
+
+ "ui/src/vertex_buffer_upload_manager.cpp" 
+
+
+ "ui/src/ui_mesh_generation_system.cpp" 
+ 
+  "ui/src/hierarchy_builder.cpp"
+
+  "ui/src/builder/ui_builder.cpp"
+  "ui/src/builder/ui_base_builder.cpp" 
+  "ui/src/builder/ui_panel_builder.cpp"
+
+ "ui/src/ui_transformation_system.cpp"
+
+ "ui/src/ui_graph_system.cpp" 
+ "ui/src/performance_monitor_system.cpp"
+
 )
 
 
@@ -75,6 +95,8 @@ ${CMAKE_SOURCE_CURRENT_DIR}/include
 
 ${CMAKE_SOURCE_CURRENT_DIR}/glad
 ${CMAKE_SOURCE_CURRENT_DIR}/external/the-engine/the-engine/ecs/include
+
+${CMAKE_SOURCE_CURRENT_DIR}/ui/include
 
 )
 
