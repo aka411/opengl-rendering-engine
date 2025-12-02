@@ -61,27 +61,40 @@ add_executable(opengl-rendering-engine
 
  "src/model-loading/gltf_attribute_extractor.cpp"
 
-  "ui/src/ui_vertex_buffer_system.cpp"
-  "ui/src/ui_renderer.cpp"
-  "ui/src/geometry_generator.cpp"
+
+
+ # UI SOURCE FILES
+
+
+ "src/ui/src/builder/ui_element.cpp"
+
+  "src/ui/src/systems/ui_vertex_buffer_management_system.cpp"
+
+  "src/ui/src/utils/geometry_generator.cpp"
   
 
- "ui/src/vertex_buffer_upload_manager.cpp" 
 
 
- "ui/src/ui_mesh_generation_system.cpp" 
+ "src/ui/src/systems/ui_mesh_system.cpp" 
  
-  "ui/src/hierarchy_builder.cpp"
 
-  "ui/src/builder/ui_builder.cpp"
-  "ui/src/builder/ui_base_builder.cpp" 
-  "ui/src/builder/ui_panel_builder.cpp"
 
- "ui/src/ui_transformation_system.cpp"
 
- "ui/src/ui_graph_system.cpp" 
- "ui/src/performance_monitor_system.cpp"
+ "src/ui/src/systems/ui_transformation_system.cpp"
 
+ "src/ui/src/systems/performance_monitor_system.cpp"
+
+
+ "src/ui/src/builder/ui_text_label_builder.cpp"
+   "src/ui/src/builder/ui_graph_builder.cpp"
+  "src/ui/src/builder/ui_builder.cpp"
+  "src/ui/src/builder/ui_base_builder.cpp" 
+  "src/ui/src/builder/ui_panel_builder.cpp"
+
+
+ "src/ui/src/core/ui_shader_manager.cpp"
+  "src/ui/src/core/ui_core_system.cpp"
+   "src/ui/src/ui_renderer.cpp"
 )
 
 

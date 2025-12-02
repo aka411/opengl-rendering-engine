@@ -14,15 +14,9 @@ EngineCore::EngineCore():
 	m_engineLoader(m_ecsEngine,m_gpuTextureManager,
 	m_gpuMaterialSystem,m_worldVertexBufferManagementSystem),
 
-	m_renderSystem(m_ecsEngine, m_uiECSEngine, m_worldVertexBufferManagementSystem, m_gpuMaterialSystem)
-{
+	m_uiCoreSystem(m_ecsEngine, m_gpuBufferManager),
 
-
-
-}
-
-
-void EngineCore::loadModel(std::string pathToFile)
+	m_renderSystem(m_ecsEngine, m_worldVertexBufferManagementSystem, m_gpuMaterialSystem, m_uiCoreSystem)
 {
 
 	m_ecsEngine.registerComponent<EngineRenderComponent>();
@@ -31,8 +25,16 @@ void EngineCore::loadModel(std::string pathToFile)
 	m_ecsEngine.registerComponent<EngineTransformationComponent>();
 	m_ecsEngine.registerComponent<RootEntityComponent>();
 
-	TheEngine::ECS::EntityId rootEntityId = m_engineLoader.createRootEntity(pathToFile);
+}
 
+
+void EngineCore::loadModel(std::string pathToFile)
+{
+
+
+
+	TheEngine::ECS::EntityId rootEntityId = m_engineLoader.createRootEntity(pathToFile);
+	//return this
 }
 
 void EngineCore::render(Engine::Camera camera)
@@ -40,4 +42,15 @@ void EngineCore::render(Engine::Camera camera)
 
 	m_renderSystem.render(camera);
 
+}
+
+
+
+
+/***********UI SYSTEM********************/
+//getUIBuilder();
+UI::UICoreSystem& EngineCore::getUICoreSystem()
+{
+
+	return m_uiCoreSystem;
 }

@@ -28,9 +28,8 @@ private:
 		GLuint compileShader(const std::string& vertShaderCode, const std::string& fragShaderCode);
 		void createNewShaderProgramForFormat(VertexFormat vertexFormat);
 public:
-	ShaderManager();
 
-	
+	ShaderManager();
 
 	GLuint getShaderProgramForVertexFormat(VertexFormat vertexFormat);
 };

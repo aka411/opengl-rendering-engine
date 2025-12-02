@@ -1,17 +1,34 @@
 #include "../../include/rendering-system/render_system.h"
 #include <unordered_map>
 
-RenderSystem::RenderSystem(TheEngine::ECS::ECSEngine& ecsEngine, TheEngine::ECS::ECSEngine& uiECSEngine, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem, GPUMaterialSystem& gpuMaterialSystem)
+RenderSystem::RenderSystem(TheEngine::ECS::ECSEngine& ecsEngine, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem, GPUMaterialSystem& gpuMaterialSystem, UI::UICoreSystem& uiCoreSystem)
 	:
 	m_vertexFormatManager(),
 	m_ecsEngine(ecsEngine),
-	m_uiECSEngine(uiECSEngine),
 	m_worldVertexBufferManagementSystem(worldVertexBufferManagementSystem),
+	m_uiRenderer(uiCoreSystem),
 	m_worldRenderer(m_vertexFormatManager, worldVertexBufferManagementSystem, gpuMaterialSystem)
 {
 
 
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void RenderSystem::render(Engine::Camera& camera)
 {
@@ -112,6 +129,11 @@ void RenderSystem::render(Engine::Camera& camera)
 
 void RenderSystem::renderUI()
 {
+
+
+
+
+
 
 
 

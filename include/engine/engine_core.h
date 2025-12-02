@@ -6,28 +6,35 @@
 #include "engine_loader.h"
 #include "../rendering-system/render_system.h"
 #include <string>
+#include "../low-level/gpu_buffer_manager.h"
+
+
 
 class EngineCore
 {
 private:
 
-	TheEngine::ECS::ECSEngine m_ecsEngine;
-	TheEngine::ECS::ECSEngine m_uiECSEngine;
+	TheEngine::ECS::ECSEngine m_ecsEngine;//owner
+	
 
 	GPUBufferManager m_gpuBufferManager;
 
-	GPUTextureManager m_gpuTextureManager;
-	GPUMaterialSystem m_gpuMaterialSystem;// ---> needsGPUBuffermanager
+	GPUTextureManager m_gpuTextureManager;//owner
 
-	WorldVertexBufferManagementSystem m_worldVertexBufferManagementSystem;
+	GPUMaterialSystem m_gpuMaterialSystem;// ---> needs GPUBufferManager
+
+	WorldVertexBufferManagementSystem m_worldVertexBufferManagementSystem;//-->needs GPUBufferManager
+
 
 	EngineLoader m_engineLoader;
 
+	/**UI SYSTEM**/
+
+	UI::UICoreSystem m_uiCoreSystem; // needs ECSEngine, GPUBufferManager
 
 
 
-
-	RenderSystem m_renderSystem;
+	RenderSystem m_renderSystem;// contains both world renderer and ui renderer
 
 
 
@@ -42,9 +49,9 @@ public:
 
 	void renderUI();
 
-	//UI 
+	/***** UI SYSTEM *****/
 	//getUIBuilder();
-
+	UI::UICoreSystem& getUICoreSystem();
 	
 
 
