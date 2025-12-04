@@ -29,9 +29,15 @@ namespace UI
 		//glDisable(GL_DEPTH_TEST);
 		glEnable(GL_DEPTH_TEST);
 
-		glClearColor(0.4, 0.4, 0.5, 1.0);
-		//glClear(GL_COLOR_BUFFER_BIT);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearDepth(1.0f);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		glDisable(GL_CULL_FACE);//WARNING : This is done cause in our UI 
+		//system the Y is down and we do this by flipping Y Axis in camera parameters
+		//But since we flipped the Y in camera matrix and when we use the projection matrix in
+		//shader it causes the winding order to become CW from CCW.
+		//So for now disabling culling is a temp fix.
+
 		glEnable(GL_BLEND);
 	
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -94,8 +100,7 @@ namespace UI
 	
 				
 
-				//GLuint startIdxLoc = glGetUniformLocation(uiShaderProgram, "u_StartVertexIndex");
-				//glUniform1ui(startIdxLoc, uiRenderMeshComponentPtr[i].vertexBufferOffset / 32);
+		
 
 			
 			

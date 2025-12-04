@@ -168,10 +168,10 @@ static std::string pbrNormalBaseFragmentCode = R"(
     // The actual value (0 or 1 ..3) will be extracted using bitwise operations.
 
     #define ALBEDO_TEXCOORD_SHIFT    5
-    #define MR_TEXCOORD_SHIFT        7
-    #define NORMAL_TEXCOORD_SHIFT    9
-    #define OCCLUSION_TEXCOORD_SHIFT 11
-    #define EMISSIVE_TEXCOORD_SHIFT  13
+    #define MR_TEXCOORD_SHIFT        8
+    #define NORMAL_TEXCOORD_SHIFT    11
+    #define OCCLUSION_TEXCOORD_SHIFT 14
+    #define EMISSIVE_TEXCOORD_SHIFT  17
 
 
 
@@ -201,7 +201,7 @@ struct PBRMetallicRoughnessMaterial
 	uvec2 occlusionTextureHandle;
 	uvec2 emissiveTextureHandle ;
 
-	uvec2 configMask; 
+	uvec2 materialBitMask; 
 
 };
 
@@ -338,18 +338,18 @@ void main()
 
 PBRMetallicRoughnessMaterial material = materials[vs_materialId];
 
-const int albedoTexturePresent = int( material.configMask.x & HAS_ALBEDO_TEX);
-const int mrTexturePresent       = int(material.configMask.x & HAS_MR_TEX);
-const int normalTexturePresent   =  int(material.configMask.x & HAS_NORMAL_TEX);
-const int occlusionTexturePresent =  int(material.configMask.x & HAS_OCCLUSION_TEX);
-const int emissiveTexturePresent  =  int(material.configMask.x & HAS_EMISSIVE_TEX);
+const int albedoTexturePresent = int( material.materialBitMask.x & HAS_ALBEDO_TEX);
+const int mrTexturePresent       = int(material.materialBitMask.x & HAS_MR_TEX);
+const int normalTexturePresent   =  int(material.materialBitMask.x & HAS_NORMAL_TEX);
+const int occlusionTexturePresent =  int(material.materialBitMask.x & HAS_OCCLUSION_TEX);
+const int emissiveTexturePresent  =  int(material.materialBitMask.x & HAS_EMISSIVE_TEX);
 
 
-const int albedoTexCoordIndex  =  int((material.configMask.x >> ALBEDO_TEXCOORD_SHIFT) & 3);
-const int mrTexCoordIndex        = int( (material.configMask.x >> MR_TEXCOORD_SHIFT) & 3);
-const int normalTexCoordIndex    =  int((material.configMask.x >> NORMAL_TEXCOORD_SHIFT) & 3);
-const int occlusionTexCoordIndex =  int((material.configMask.x >> OCCLUSION_TEXCOORD_SHIFT) & 3);
-const int emissiveTexCoordIndex  =  int((material.configMask.x >> EMISSIVE_TEXCOORD_SHIFT) & 3);
+const int albedoTexCoordIndex  =  int((material.materialBitMask.x >> ALBEDO_TEXCOORD_SHIFT) & 3);
+const int mrTexCoordIndex        = int( (material.materialBitMask.x >> MR_TEXCOORD_SHIFT) & 3);
+const int normalTexCoordIndex    =  int((material.materialBitMask.x >> NORMAL_TEXCOORD_SHIFT) & 3);
+const int occlusionTexCoordIndex =  int((material.materialBitMask.x >> OCCLUSION_TEXCOORD_SHIFT) & 3);
+const int emissiveTexCoordIndex  =  int((material.materialBitMask.x >> EMISSIVE_TEXCOORD_SHIFT) & 3);
 
 
 

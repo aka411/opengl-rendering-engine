@@ -122,7 +122,7 @@ struct IntermediatePBRMetallicRoughnessMaterial
 	int32_t emissiveTextureIndex = -1;
 
 
-	uint64_t configMask = 0; // 8 bytes
+	uint64_t materialBitMask = 0; // 8 bytes
 
 };
 
