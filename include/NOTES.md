@@ -103,3 +103,12 @@ So for now disabling culling is a temp fix.
 
 Also in in performance monitor system we have used a hack where we negate the height when we generate 
 rectangles as the GeometryGenerators are in Y up coordinate system but our UI system is in Y down.
+
+
+# 	Usage of glFinish() in world renderer.cpp
+NOTE : This is a PERFORMANCE KILLER
+	We are using glFinish() before rendering as to avoid a  synchronisation 
+	issue where a old frame might not be done with the buffer when we write new data for new frame
+	in the per object buffer we use to send modal matrix and material id,
+	The issue is caused by us not using multiple buffers to avoid this kind of issue.
+	But i am intentionally temporarily using this while i solidy the designs.

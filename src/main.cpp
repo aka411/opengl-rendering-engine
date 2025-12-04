@@ -119,7 +119,6 @@ int main(int argc, char* args[])
 	 performanceMonitorSystem.setUp(fpsGraph);
 
 
-	 engineCore.update();
 
 	 float deltaTime = 0.0f;
 	 float lastFrameTime = SDL_GetTicks() / 1000.0f;
@@ -202,6 +201,10 @@ int main(int argc, char* args[])
 		
 
 		 }
+
+
+
+		 engineCore.update();
 		 engineCore.render(camera);
 		 engineCore.renderUI();
 	

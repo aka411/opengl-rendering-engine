@@ -41,6 +41,11 @@ GLenum IndexTypeToGLType(IndexType type)
 
 void WorldRenderer::render(std::unordered_map<VertexFormat, std::vector<RenderCommand>>& vertexFormatToRenderCommands, Engine::Camera& camera)
 {
+	glFinish();//NOTE : PERFORMANCE KILLER
+	//We are using this cause of synchronisation issue 
+	//with the per object buffer we use to send modal matrix and material id,
+	// The issue is caused by us not using multiple buffers to avoid this kind of issue.
+	// But i am intentionally temporarily using this while i solidy the designs
 	
 	//set up 
 	glClearColor(0.2, 0.4, 0.5, 1.0);
@@ -51,7 +56,7 @@ void WorldRenderer::render(std::unordered_map<VertexFormat, std::vector<RenderCo
 	glClearDepth(1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	
-	//glDisable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
 	//glEnable(GL_CULL_FACE);
 	//glFrontFace(GL_CCW);
 	//glCullFace(GL_BACK);
