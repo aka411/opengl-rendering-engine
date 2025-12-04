@@ -427,43 +427,49 @@ namespace Engine
 
 
 
-			intermediatePBRMetallicRoughnessMaterial.configMask = 0;
+			intermediatePBRMetallicRoughnessMaterial.materialBitMask = 0;
+
+			//Is actually a uint64_t
+			uint64_t& materialBitMask = intermediatePBRMetallicRoughnessMaterial.materialBitMask;
 
 			// 1. --- Set Texture Presence Flags (Bits 0-4) ---
 			// Check if the texture index is valid (>= 0) and set the corresponding bit.
+			
 
 			if (albedoTexturePresent)
 			{
-				intermediatePBRMetallicRoughnessMaterial.configMask |= PBR_CONFIG_BITS::HAS_ALBEDO_TEX;
+				materialBitMask |= MaterialConfigMask::HAS_ALBEDO_TEX;
 			}
 			if (metallicRoughnessPresent)
 			{
-				intermediatePBRMetallicRoughnessMaterial.configMask |= PBR_CONFIG_BITS::HAS_MR_TEX;
+				materialBitMask |= MaterialConfigMask::HAS_MR_TEX;
 			}
 			if (normalTexturePresent)
 			{
-				intermediatePBRMetallicRoughnessMaterial.configMask |= PBR_CONFIG_BITS::HAS_NORMAL_TEX;
+				materialBitMask |= MaterialConfigMask::HAS_NORMAL_TEX;
 			}
 			if (occulsionTexturePresent)
-			{ // Note: Using the bool variable based on the provided code block
-				intermediatePBRMetallicRoughnessMaterial.configMask |= PBR_CONFIG_BITS::HAS_OCCLUSION_TEX;
+			{ 
+				materialBitMask |= MaterialConfigMask::HAS_OCCLUSION_TEX;
 			}
 			if (emissiveTexturePresent)
 			{
-				intermediatePBRMetallicRoughnessMaterial.configMask |= PBR_CONFIG_BITS::HAS_EMISSIVE_TEX;
+				materialBitMask |= MaterialConfigMask::HAS_EMISSIVE_TEX;
 			}
+
+
 
 			// 2. --- Set Texture Coordinate Index Shifts (Bits 5-14) ---
 			// Use bitwise shift to place the texture coordinate index (0 or 1 in glTF) 
 			// into its reserved 2-bit field.
 
-			intermediatePBRMetallicRoughnessMaterial.configMask |= (albedoTexCoordIndex << PBR_CONFIG_BITS::ALBEDO_TEXCOORD_SHIFT);
-			intermediatePBRMetallicRoughnessMaterial.configMask |= (metallicRoughnessCoordIndex << PBR_CONFIG_BITS::MR_TEXCOORD_SHIFT);
-			intermediatePBRMetallicRoughnessMaterial.configMask |= (normalTexCoordIndex << PBR_CONFIG_BITS::NORMAL_TEXCOORD_SHIFT);
-			intermediatePBRMetallicRoughnessMaterial.configMask |= (occlusionTexCoordIndex << PBR_CONFIG_BITS::OCCLUSION_TEXCOORD_SHIFT);
-			intermediatePBRMetallicRoughnessMaterial.configMask |= (emissiveTexCoordIndex << PBR_CONFIG_BITS::EMISSIVE_TEXCOORD_SHIFT);
+			materialBitMask |= (albedoTexCoordIndex << MaterialConfigMask::ALBEDO_TEXCOORD_INDEX_SHIFT);
+			materialBitMask |= (metallicRoughnessCoordIndex << MaterialConfigMask::MR_TEXCOORD_INDEX_SHIFT);
+			materialBitMask |= (normalTexCoordIndex << MaterialConfigMask::NORMAL_TEXCOORD_INDEX_SHIFT);
+			materialBitMask |= (occlusionTexCoordIndex << MaterialConfigMask::OCCLUSION_TEXCOORD_INDEX_SHIFT);
+			materialBitMask |= (emissiveTexCoordIndex << MaterialConfigMask::EMISSIVE_TEXCOORD_SHIFT);
 
-
+		
 
 
 

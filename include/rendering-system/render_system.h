@@ -8,6 +8,9 @@
 #include "../components.h"
 #include "world_renderer.h"
 #include <map>
+#include "../ui/include/ui_renderer.h"
+#include "../ui/include/ui_renderer.h"
+
 
 //This class is the composer and conductor
 class RenderSystem
@@ -16,18 +19,24 @@ class RenderSystem
 private:
 
 	TheEngine::ECS::ECSEngine& m_ecsEngine; // world ecs
-	TheEngine::ECS::ECSEngine& m_uiECSEngine; // ui ecs 
+
 
 	ShaderManager m_shaderManager;
 	VertexFormatManager m_vertexFormatManager;
 
-	WorldRenderer m_worldRenderer;
+	WorldRenderer m_worldRenderer;//owner
+	UI::UIRenderer m_uiRenderer;//owner
+
 
 	WorldVertexBufferManagementSystem& m_worldVertexBufferManagementSystem;
 
+
+
+
+
 public:
 
-	RenderSystem(TheEngine::ECS::ECSEngine& ecsEngine, TheEngine::ECS::ECSEngine& uiECSEngine, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem, GPUMaterialSystem& gpuMaterialSystem);
+	RenderSystem(TheEngine::ECS::ECSEngine& ecsEngine, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem, GPUMaterialSystem& gpuMaterialSystem,UI::UICoreSystem& uiCoreSystem);
 
 	void render(Engine::Camera& camera); 
 

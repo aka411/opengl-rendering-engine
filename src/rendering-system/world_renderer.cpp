@@ -41,6 +41,7 @@ GLenum IndexTypeToGLType(IndexType type)
 
 void WorldRenderer::render(std::unordered_map<VertexFormat, std::vector<RenderCommand>>& vertexFormatToRenderCommands, Engine::Camera& camera)
 {
+	
 	//set up 
 	glClearColor(0.2, 0.4, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -49,6 +50,7 @@ void WorldRenderer::render(std::unordered_map<VertexFormat, std::vector<RenderCo
 	glEnable(GL_DEPTH_TEST);
 	glClearDepth(1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT);
+	
 	//glDisable(GL_CULL_FACE);
 	//glEnable(GL_CULL_FACE);
 	//glFrontFace(GL_CCW);

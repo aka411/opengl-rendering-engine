@@ -52,19 +52,8 @@ struct EngineChildrenComponent
 
 struct EngineTransformationComponent
 {
-	glm::mat4 localTransformMatrix = glm::mat4(
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f
-	);
-
-	glm::mat4 worldTransformMatrix = glm::mat4(
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f
-	);//used by rendersystem
+	glm::mat4 localTransformMatrix = glm::identity<glm::mat4>();
+	glm::mat4 worldTransformMatrix = glm::identity<glm::mat4>();//used by rendersystem
 
 	glm::vec3 position{ 0.0f,0.0f,0.0f };
 	glm::vec3 scale{ 1.0f,1.0f,1.0f };
