@@ -11,7 +11,8 @@ I have added the build instructions to build and run it below, the build and run
 _If you have any issue or need help don't hesitate to contact me or raise an issue._
 ## Rendering Demo
 
-https://github.com/user-attachments/assets/585f3910-599b-4a91-a188-ea8b9d1bb905
+https://github.com/user-attachments/assets/5fd0ce10-e963-4496-8abc-d5d17ad4cae4
+
 
 ## Build And Run Instructions
 ### Prerequisites
