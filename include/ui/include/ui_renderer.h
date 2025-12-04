@@ -12,6 +12,7 @@ namespace UI
 		UICoreSystem& m_uiCoreSystem;//not owner
 
 
+		GLuint m_dummyVAO = 0;
 
 		Engine::Camera m_uiCamera;
 	

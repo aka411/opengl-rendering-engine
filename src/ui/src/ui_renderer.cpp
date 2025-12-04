@@ -12,14 +12,10 @@ namespace UI
 	UIRenderer::UIRenderer(UICoreSystem& uiCoreSystem) : m_uiCoreSystem(uiCoreSystem)
 	{
 
-		//GLuint vao = 0;
-		//glCreateVertexArrays(1, &vao);
-		//glBindVertexArray(vao);//GODAMN BUG ,Need valid vao for vertx pulling to work
-		//glVertexAttribFormat(0,4, GL_FLOAT, false, 0);
+		
+		glCreateVertexArrays(1, &m_dummyVAO);
+		//GODAMN BUG ,Need valid vao binded for vertx pulling to work
 
-		//glVertexAttribBinding(0, 0);
-		//glEnableVertexAttribArray(0);
-		//m_vao = vao;
 
 		m_uiCamera.setOrthographicProjection(0, 700, 700, 0, 10, -100);
 
@@ -40,8 +36,9 @@ namespace UI
 	
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
-		//glBindVertexArray(m_vao);
+		glBindVertexArray(m_dummyVAO);//Even though we are using 
+		//vertex pulling we need a dummy VAO binded for it to work
+		
 
 
 
