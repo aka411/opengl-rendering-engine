@@ -40,7 +40,7 @@ void main()
 {
 
  
- gl_Position =  projection * model * vec4(data[gl_VertexID].positionIn);
+ gl_Position = projection *  model * vec4(data[gl_VertexID].positionIn);
 
  vs_color = vec4(data[gl_VertexID].colorIn);
 }

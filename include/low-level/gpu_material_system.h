@@ -66,13 +66,13 @@ namespace MaterialConfigMask
 		constexpr MaskType NORMAL_TEXCOORD_INDEX_MASK = 0b111u << NORMAL_TEXCOORD_INDEX_SHIFT;
 
 		// Occlusion TexCoord Index 
-		constexpr MaskType OCCLUSION_TEXCOORD_INDEX_SHIFT = 13;
+		constexpr MaskType OCCLUSION_TEXCOORD_INDEX_SHIFT = 14;
 		constexpr MaskType	OCCLUSION_TEXCOORD_INDEX_MASK = 0b111u << OCCLUSION_TEXCOORD_INDEX_SHIFT;
 
 
-		constexpr MaskType EMISSIVE_TEXCOORD_SHIFT = 16;
+		constexpr MaskType EMISSIVE_TEXCOORD_SHIFT = 17;
 		constexpr MaskType EMISSIVE_TEXCOORD_MASK = 0b111u << EMISSIVE_TEXCOORD_SHIFT;
-
+		//till bit 19
 };
 
 
@@ -99,7 +99,7 @@ struct PBRMetallicRoughnessMaterial
 	uint64_t occlusionTextureHandle = 0;// offset = 64
 	uint64_t emissiveTextureHandle = 0;//offset =  72
 
-	uint64_t configMask = 0; //offset = 80
+	uint64_t materialBitMask = 0; //offset = 80
 
 	//Total: 88 bytes
 	uint64_t padding2 = 0; // Padding to make the struct size a multiple of 16 bytes

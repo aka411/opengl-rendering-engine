@@ -46,8 +46,7 @@ namespace UI
 				const float height = uiRectDimensionsComponentPtr[i].height;
 
 
-				//Generate Quad Mesh
-				//GeometryGenerator::MeshData quadMeshData = GeometryGenerator::getRectangle(width, height);
+
 				GeometryGenerator::MeshData quadMeshData = GeometryGenerator::getColouredRectangle(width, height, uiMaterialComponentPtr[i].color);
 
 				const auto bufferType = uRenderMeshComponentPtr[i].bufferType;

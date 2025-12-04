@@ -86,7 +86,7 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 		pbrMetallicRoughnessMaterial.metallicFactor = material.metallicFactor;
 		pbrMetallicRoughnessMaterial.roughnessFactor = material.roughnessFactor;
 
-		pbrMetallicRoughnessMaterial.configMask = material.configMask;
+		pbrMetallicRoughnessMaterial.materialBitMask = material.materialBitMask;
 
 
 		MaterialId materialId = m_gpuMaterialSystem.uploadMaterial(MaterialType::PBR_METALLIC_ROUGHNESS, reinterpret_cast<std::byte*>(&pbrMetallicRoughnessMaterial), sizeof(pbrMetallicRoughnessMaterial));
