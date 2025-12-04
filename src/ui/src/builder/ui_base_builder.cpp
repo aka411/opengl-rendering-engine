@@ -1,5 +1,6 @@
 #include "../../../../include/ui/include/builder/ui_base_builder.h"
 #include "../../../../include/ui/include/core/ui_component.h"
+#include "../../../../include/components.h"
 
 
 
@@ -14,9 +15,10 @@ namespace UI
 	{
 
 		
-		UITransformComponent uiTransformComponent;
-		m_ecsEngine.addComponentToEntity<UITransformComponent>(m_uiElement.getEntityId(), uiTransformComponent);
+		EngineTransformationComponent engineTransformationComponent;
 		UIRectDimensionsComponent uiRectDimensionsComponent;
+
+		m_ecsEngine.addComponentToEntity<EngineTransformationComponent>(m_uiElement.getEntityId(), engineTransformationComponent);
 		m_ecsEngine.addComponentToEntity<UIRectDimensionsComponent>(m_uiElement.getEntityId(), uiRectDimensionsComponent);
 		
 		m_ecsEngine.processBufferedCommands();//or add a direct add method to bypass buffering
@@ -31,11 +33,11 @@ namespace UI
 		//these base methods are always retrival
 
 		TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
-		UITransformComponent* uiTransformComponent = entityChunkView.getComponent<UITransformComponent>();
+		EngineTransformationComponent* engineTransformationComponent = entityChunkView.getComponent<EngineTransformationComponent>();
 		
-		assert(uiTransformComponent != nullptr);
+		assert(engineTransformationComponent != nullptr);
 
-		uiTransformComponent->position = position;
+		engineTransformationComponent->position = position;
 
 		return *this;
 	}

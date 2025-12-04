@@ -94,7 +94,7 @@ void WorldRenderer::render(std::unordered_map<VertexFormat, std::vector<RenderCo
 		//set up vao
 		VertexFormat vertexFormat = vertexFormatToRenderCommand.first;
 		GLuint vao = m_vertexFormatManager.getVAO(vertexFormat);
-		glBindVertexArray(vao);
+		//glBindVertexArray(vao);
 
 		//set up shader 
 		GLuint shaderProgram = m_shaderManager.getShaderProgramForVertexFormat(vertexFormat);

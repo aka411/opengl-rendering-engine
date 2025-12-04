@@ -58,6 +58,7 @@ namespace UI
 	};
 	*/
 
+	/*
 	struct UITransformComponent
 	{
 		glm::mat4 worldTransform = glm::identity<glm::mat4>();
@@ -69,7 +70,7 @@ namespace UI
 		glm::quat rotation{1.0f, 0.0f,0.0f,0.0f};
 
 	};
-
+	*/
 
 
 	struct UITextComponent
@@ -100,13 +101,14 @@ namespace UI
 
 
 
-
+	/*
 	struct UIHierarchyComponent
 	{
 
 	std::vector<UIEntity> children;
 
 	};
+	*/
 
 
 

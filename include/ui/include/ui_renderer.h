@@ -14,7 +14,7 @@ namespace UI
 
 
 		Engine::Camera m_uiCamera;
-
+	
 	public:
 	
 		UIRenderer(UICoreSystem& uiCoreSystem);

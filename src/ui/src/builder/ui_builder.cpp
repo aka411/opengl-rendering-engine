@@ -13,6 +13,17 @@ namespace UI
 
 	}
 
+
+
+
+
+	UIWindowBuilder UIBuilder::createUIWindow()
+	{
+
+		return UIWindowBuilder(m_uiCoreSystem);
+
+	}
+
 	UIPanelBuilder UIBuilder::createUIPanel()
 	{
 

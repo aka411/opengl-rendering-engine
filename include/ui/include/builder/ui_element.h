@@ -27,7 +27,7 @@ namespace UI
 
 		//component access method
 		template <typename ComponentType>
-		ComponentType& getComponent();
+		ComponentType* getComponent();
 	
 
 		void addChild(UIElement& uiChildElement);
@@ -37,7 +37,15 @@ namespace UI
 	};
 
 
+	template <typename ComponentType>
+	ComponentType* UIElement::getComponent()
+	{
+		TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_entityId);
 
+		ComponentType* componentPtr = entityChunkView.getComponent<ComponentType>();
+
+		return componentPtr;
+	}
 
 
 

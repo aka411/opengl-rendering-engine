@@ -16,7 +16,9 @@ EngineCore::EngineCore():
 
 	m_uiCoreSystem(m_ecsEngine, m_gpuBufferManager),
 
-	m_renderSystem(m_ecsEngine, m_worldVertexBufferManagementSystem, m_gpuMaterialSystem, m_uiCoreSystem)
+	m_renderSystem(m_ecsEngine, m_worldVertexBufferManagementSystem, m_gpuMaterialSystem, m_uiCoreSystem),
+	m_uiSystem(m_uiCoreSystem),
+	m_uiBuilder(m_uiCoreSystem)
 {
 
 	m_ecsEngine.registerComponent<EngineRenderComponent>();
@@ -24,7 +26,7 @@ EngineCore::EngineCore():
 	m_ecsEngine.registerComponent<EngineChildrenComponent>();
 	m_ecsEngine.registerComponent<EngineTransformationComponent>();
 	m_ecsEngine.registerComponent<RootEntityComponent>();
-
+	
 }
 
 
@@ -37,6 +39,14 @@ void EngineCore::loadModel(std::string pathToFile)
 	//return this
 }
 
+
+
+
+void EngineCore::update()
+{
+	m_uiSystem.update();
+}
+
 void EngineCore::render(Engine::Camera camera)
 {
 
@@ -45,10 +55,22 @@ void EngineCore::render(Engine::Camera camera)
 }
 
 
+void EngineCore::renderUI()
+{
+	m_renderSystem.renderUI();
 
+}
 
 /***********UI SYSTEM********************/
-//getUIBuilder();
+
+	/***** UI SYSTEM *****/
+UI::UIBuilder& EngineCore::getUIBuilder()
+{
+	return m_uiBuilder;
+}
+
+
+
 UI::UICoreSystem& EngineCore::getUICoreSystem()
 {
 

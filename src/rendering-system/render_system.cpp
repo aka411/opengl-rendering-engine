@@ -132,7 +132,7 @@ void RenderSystem::renderUI()
 
 
 
-
+	m_uiRenderer.renderUI();
 
 
 

@@ -3,6 +3,7 @@
 #include "ui_panel_builder.h"
 #include "ui_graph_builder.h"
 #include "ui_text_label_builder.h"
+#include "ui_window_builder.h"
 
 namespace UI
 {
@@ -20,7 +21,8 @@ namespace UI
         UIBuilder(UICoreSystem& uiCoreSystem);
 
     
-
+        UIWindowBuilder createUIWindow();
+    
         // Factory function for Panel
         UIPanelBuilder createUIPanel();
 

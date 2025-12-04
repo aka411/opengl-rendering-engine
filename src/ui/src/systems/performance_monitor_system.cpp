@@ -15,47 +15,49 @@ PerformanceMonitorSystem::PerformanceMonitorSystem(UI::UICoreSystem& uiCoreSyste
 
 }
 
-void PerformanceMonitorSystem::setUp()
+void PerformanceMonitorSystem::setUp(UI::UIElement& fpsGraphElement)
 {
 	
-	/**
-	m_fpsUIEntity = UI::UIBuilder::createUIPanel()
-		.withColour({ 0.5f,0.3f,0.2f,0.7f })
-		.withRectDimensions(400, 400)
-		.withPosition({ 50,300,0 })
-		.build();
+	m_fpsGraphElement = &fpsGraphElement;
 
-	UI::UIGraphComponent uiGraphComponent;
 
-	m_ecsEngine->addComponentToEntity(m_fpsUIEntity, uiGraphComponent);
-	m_ecsEngine->processBufferedCommands();
-	*/
 }
 
 void PerformanceMonitorSystem::UpdateFPSMeter(const float deltaTime)
 {
 
-	TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_fpsUIEntity);
+	assert(m_fpsGraphElement != nullptr);
+
+	TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_fpsGraphElement->getEntityId());
 
 	UI::UIGraphComponent* uiGraphComponentPtr = entityChunkView.getComponent<UI::UIGraphComponent>();
 	UI::UIRenderMeshComponent* uiRenderMeshComponent = entityChunkView.getComponent<UI::UIRenderMeshComponent>();
+	UI::UIRectDimensionsComponent* uiRectDimensionsComponentPtr = entityChunkView.getComponent<UI::UIRectDimensionsComponent>();
+	
 
-	uiGraphComponentPtr->store(1.0f/deltaTime);
+
+	uiGraphComponentPtr->store(1.0f/(deltaTime+0.000001));
 
 	//TODO : need more optimization
 	//generate mesh
 	const float maxValue = uiGraphComponentPtr->maxValue;
 	std::vector<float> data = uiGraphComponentPtr->getData();
-	float offset = 0;
+
+	float offset = 0;//x axis
+
 	std::vector<std::byte> resultMesh;
-	resultMesh.reserve(uiGraphComponentPtr->buffer.size() * 6 * 3 * sizeof(float));
+
+	resultMesh.reserve(uiGraphComponentPtr->buffer.size() * (4 * 2) * sizeof(float));
+
 	uiRenderMeshComponent->vertexCount = 0;
 	for (float dataPoint : data)
 	{
 		//if (dataPoint < 0.0001) continue;
 		float scaledHeight = (dataPoint / (maxValue > 0 ? maxValue : 1.0f)) * 50.0f;
-		GeometryGenerator::MeshData mesh = GeometryGenerator::getRectangleWithOffset(5,-scaledHeight, { offset ,0,0});
+		GeometryGenerator::MeshData mesh = GeometryGenerator::getColouredRectangleWithOffset(5,-scaledHeight, { offset ,100,0}, uiGraphComponentPtr->color);
 		offset += 6;
+
+		if (uiRectDimensionsComponentPtr->width < offset) break;
 		uiRenderMeshComponent->vertexCount += mesh.numOfVertex;
 
 		resultMesh.insert(
@@ -72,10 +74,13 @@ void PerformanceMonitorSystem::UpdateFPSMeter(const float deltaTime)
 	size_t bufferOffset = m_uiCoreSystem.getUIVertexBufferManagementSystem().uploadVertexData(vertexFormat, bufferType, resultMesh.data(), resultMesh.size());
 
 
-	uiRenderMeshComponent->vertexCount =0 /*not byte count*/;
+	//uiRenderMeshComponent->vertexCount =;
 
 	uiRenderMeshComponent->vertexBufferOffset = bufferOffset;
 	uiRenderMeshComponent->isDirty = false;
+
+
+
 }
 
 void PerformanceMonitorSystem::UpdateMemoryUsage(const size_t UsedBytes)

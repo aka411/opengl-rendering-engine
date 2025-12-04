@@ -5,10 +5,10 @@
 std::string normalUIShaderVertexCode = R"(
 #version 460 core
 
-/*
-layout (location = 0) in vec3 inPosition;
-layout(location = 1) in vec4 color;
-*/
+
+//layout (location = 0) in vec4 inPosition;
+//layout(location = 1) in vec4 color;
+
 
 
 
@@ -20,7 +20,8 @@ struct VertexData
 };
 
 // readonly SSBO containing the data
-layout(binding = 0, std430) readonly buffer ssbo1 {
+layout(binding = 0, std430) readonly buffer ssbo1 
+{
     VertexData data[];
 };
 
@@ -33,14 +34,15 @@ uniform mat4 model;
  
 
 
-//out vec4 fs_color;
+out vec4 vs_color;
 
 void main()
 {
 
+ 
+ gl_Position =  projection * model * vec4(data[gl_VertexID].positionIn);
 
- gl_Position = projection * model * vec4(inPosition,1.0f);
-
+ vs_color = vec4(data[gl_VertexID].colorIn);
 }
 
 

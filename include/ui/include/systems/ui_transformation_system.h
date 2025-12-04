@@ -1,5 +1,7 @@
 #pragma once
-
+#include "../builder/ui_element.h"
+#include "../core/ui_core_system.h"
+#include "../../../../include/components.h"
 
 
 
@@ -14,13 +16,19 @@ namespace UI
 
 	private:
 
+		UICoreSystem& m_uiCoreSystem;
 
 	public:
 
 
-		UITransformationSystem();
+		UITransformationSystem(UICoreSystem& uiCoreSystem);
 
-		void updateTransformation();
+		EngineTransformationComponent& getTransformationComponent(TheEngine::ECS::EntityId& entityId);
+
+		void buildLocalMatrix(EngineTransformationComponent& transform);
+		
+		void updateTransformation(TheEngine::ECS::EntityId rootEntityId);
+		void updateTransformation(UIElement& rootUIElement);
 
 	};
 

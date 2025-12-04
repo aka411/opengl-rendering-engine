@@ -32,6 +32,8 @@ public:
 
 	//MeshData?
 	static MeshData getColouredRectangle(const float length, const float breadth, glm::vec4 colour);
+	static MeshData getColouredRectangleWithOffset(const float length, const float breadth, const glm::vec3 offset, const glm::vec4 colour);
+
 	static MeshData getColouredCuboidMesh(const float legnth, const float breadth, const float height,glm::vec4 colour);
 
 

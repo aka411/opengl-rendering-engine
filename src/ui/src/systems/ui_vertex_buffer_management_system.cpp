@@ -12,6 +12,7 @@ namespace UI
 	GPUBufferSubBumpAllocator UIVertexBufferManagementSystem::createNewSSBOAllocator()
 	{
 		GPUBufferInfo gpuBufferInfo = m_gpuBufferManager.createMappedSSBO(50 * 1024 * 1024, nullptr);//50MiB
+		//GPUBufferInfo gpuBufferInfo = m_gpuBufferManager.createMappedVertexBuffer(50 * 1024 * 1024, nullptr);//50MiB
 
 		return GPUBufferSubBumpAllocator (gpuBufferInfo);
 		

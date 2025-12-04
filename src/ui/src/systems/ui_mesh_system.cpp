@@ -26,32 +26,38 @@ namespace UI
 		{
 			const size_t count = chunkArrayView.getCount();
 
+
+			UIRectDimensionsComponent* uiRectDimensionsComponentPtr = chunkArrayView.getComponentArray<UIRectDimensionsComponent>();
+			UIRenderMeshComponent* uRenderMeshComponentPtr = chunkArrayView.getComponentArray<UIRenderMeshComponent>();
+			UIMaterialComponent* uiMaterialComponentPtr = chunkArrayView.getComponentArray<UIMaterialComponent>();
+
+			//use the geometry generator to create a quad mesh based on rect bounds
+
+			if (uiRectDimensionsComponentPtr == nullptr || uRenderMeshComponentPtr == nullptr || !uiRectDimensionsComponentPtr->isDirty)
+			{
+				continue;
+			}
+
 			for (size_t i = 0; i < count; ++i)
 			{
-				UIRectDimensionsComponent* uiRectDimensionsComponentPtr = chunkArrayView.getComponentArray<UIRectDimensionsComponent>();
-				UIRenderMeshComponent* uRenderMeshComponentPtr = chunkArrayView.getComponentArray<UIRenderMeshComponent>();
-
-				//use the geometry generator to create a quad mesh based on rect bounds
-
-				if(uiRectDimensionsComponentPtr == nullptr || uRenderMeshComponentPtr == nullptr || !uiRectDimensionsComponentPtr->isDirty)
-				{
-					continue; 
-				}
+			
 
 				const float width = uiRectDimensionsComponentPtr[i].width;
 				const float height = uiRectDimensionsComponentPtr[i].height;
 
 
 				//Generate Quad Mesh
-				GeometryGenerator::MeshData quadMeshData = GeometryGenerator::getRectangle(width, height);
-				const auto bufferType = uRenderMeshComponentPtr->bufferType;
-				const auto vertexFormat = uRenderMeshComponentPtr->vertexFormat;
+				//GeometryGenerator::MeshData quadMeshData = GeometryGenerator::getRectangle(width, height);
+				GeometryGenerator::MeshData quadMeshData = GeometryGenerator::getColouredRectangle(width, height, uiMaterialComponentPtr[i].color);
+
+				const auto bufferType = uRenderMeshComponentPtr[i].bufferType;
+				const auto vertexFormat = uRenderMeshComponentPtr[i].vertexFormat;
 
 				size_t offset = m_uiCoreSystem.getUIVertexBufferManagementSystem().uploadVertexData(vertexFormat, bufferType,quadMeshData.data.data(), quadMeshData.data.size());
 			
-				uRenderMeshComponentPtr->vertexBufferOffset = offset;
-				uRenderMeshComponentPtr->vertexCount =0/*Not in Bytes*/;
-				uRenderMeshComponentPtr->isDirty = false;
+				uRenderMeshComponentPtr[i].vertexBufferOffset = offset;
+				uRenderMeshComponentPtr[i].vertexCount = quadMeshData.numOfVertex/*Not in Bytes*/;
+				uRenderMeshComponentPtr[i].isDirty = false;
 
 			}
 		}
