@@ -58,7 +58,7 @@ add_executable(opengl-rendering-engine
  "src/model-loading/gltf_attribute_extractor.cpp"
 
  "src/ecs_hierarchy_traverser.cpp" 
-
+ "src/transformation_system.cpp"
 
  # UI SOURCE FILES
 
@@ -92,9 +92,6 @@ add_executable(opengl-rendering-engine
 
  "src/ui/src/builder/ui_window_builder.cpp"
 
-
-
- 
 )
 
 

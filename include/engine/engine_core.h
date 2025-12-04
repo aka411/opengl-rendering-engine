@@ -9,6 +9,7 @@
 #include "../low-level/gpu_buffer_manager.h"
 #include "../ui/include/core/ui_system.h"
 #include "../ui/include/builder/ui_builder.h"
+#include "../transformation_system.h"
 
 
 
@@ -29,6 +30,16 @@ private:
 
 
 	EngineLoader m_engineLoader;
+
+
+
+	/***MODEL RENDERING SYSTEMS***/
+
+
+	TransformationSystem m_transformationSystem;
+
+
+
 
 	/**UI SYSTEM**/
 

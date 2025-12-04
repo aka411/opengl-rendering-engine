@@ -3,16 +3,18 @@
 
 
 
-EngineCore::EngineCore(): 
+EngineCore::EngineCore() :
 	m_ecsEngine(),
 	m_gpuBufferManager(),
 	m_gpuTextureManager(),
 
 	m_gpuMaterialSystem(m_gpuBufferManager),
-	m_worldVertexBufferManagementSystem(m_gpuBufferManager), 
+	m_worldVertexBufferManagementSystem(m_gpuBufferManager),
 
-	m_engineLoader(m_ecsEngine,m_gpuTextureManager,
-	m_gpuMaterialSystem,m_worldVertexBufferManagementSystem),
+	m_engineLoader(m_ecsEngine, m_gpuTextureManager,
+		m_gpuMaterialSystem, m_worldVertexBufferManagementSystem),
+	m_transformationSystem(m_ecsEngine),
+
 
 	m_uiCoreSystem(m_ecsEngine, m_gpuBufferManager),
 
@@ -44,6 +46,7 @@ void EngineCore::loadModel(std::string pathToFile)
 
 void EngineCore::update()
 {
+	m_transformationSystem.updateTransformationsForAllEntities();
 	m_uiSystem.update();
 }
 
