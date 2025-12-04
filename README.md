@@ -4,7 +4,7 @@ This is a simple opengl rendering system that is currently being developed.Curre
 The Renderer as of now can : 
 - Load simple gltf models and render them.
 - move camera with mouse and keyboard keys WASD.
-- Run skeletal animation and keyframe animation.
+- Run skeletal animation and keyframe animation.(Temporarily disabled while integrating with ECS).
   
 I have added the build instructions to build and run it below, the build and run instructions may seem a little verbose cause the project is **work in progress**, but if you follow it correctly it should work.
 
@@ -29,23 +29,22 @@ cd opengl-rendering-engine
 ````
   
 
-#### 4. Configure Animation (Optional)
-I have made some changes in code so that we can enter the filepath of gltf model in the console window that comes with main window, but animation name is still hardcoded in the code so if if you know name of the animations in the gltf file you are going to load then you can follow the below instruction else you can skip this step.
-If your model has skeletal animation and you want it to play, find the animationSystem.animate line (around line 200 in main.cpp) and replace the third parameter with the exact name of the animation you want to play.
+#### 2. Configure Path To Model To be Loaded
+You need to add the filepath to the model to be loaded in `main.cpp`
 
 ```cpp
-// Near line 200 in src/main.cpp
-animationSystem.animate(deltaTime, engineModel, "YOUR_ANIMATION_NAME");
+// Near line 110 in src/main.cpp
+	engineCore.loadModel("PATH TO GLTF FILE");
 ```
 
-#### 4. Build the Project
+#### 3. Build the Project
 ```bash
 cmake -B build
 cmake --build build
 ```
 This will create the executable named opengl-rendering-engine.exe inside the `build/bin/` directory.
 
-#### 5. Run the Renderer
+#### 4. Run the Renderer
 ```bash
 ./build/bin/opengl-rendering-engine
 ```
