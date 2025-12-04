@@ -94,17 +94,17 @@ int main(int argc, char* args[])
 
 	 UI::UIElement panel1 = engineCore.getUIBuilder()//RED
 		 .createUIPanel()
-		 .withColour({ 23.0 / 255.0, 23.0 / 255.0, 23.0 / 255.0,1.0 })
-		 .withPosition({ 20,50,0 })
-		 .withRectDimensions(200, 200)
+		 .withColour({ 23.0 / 255.0, 23.0 / 255.0, 23.0 / 255.0,0.6 })
+		 .withPosition({ 0,0,0 })
+		 .withRectDimensions(200, 100)
 		 .build();
 
 
 
 	 UI::UIElement fpsGraph = engineCore.getUIBuilder().createUIGraph()
-		 .withColour({ 0.0,1.0,0.0,1.0 })
-		 .withPosition({ 0,100,1 })
-		 .withRectDimensions(200,200)
+		 .withColour({ 0.0,1.0,0.0,0.8 })
+		 .withPosition({ 0,0,1 })
+		 .withRectDimensions(200,100)
 		 .build();
 
 	engineCore.loadModel("PATH TO GLTF FILE");
@@ -112,7 +112,7 @@ int main(int argc, char* args[])
 	 uiWindow.addChild(panel1);
 	 panel1.addChild(fpsGraph);
 	
-
+	 
 
 	 PerformanceMonitorSystem performanceMonitorSystem(engineCore.getUICoreSystem());
 
