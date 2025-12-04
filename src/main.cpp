@@ -14,7 +14,8 @@
 #include <cassert>
 #include "../include/camera.h"
 #include "../include/engine/engine_core.h"
-#include "../ui/include/ui_renderer.h"
+#include "../include/ui/include/systems/performance_monitor_system.h"
+
 
 SDL_Window* init()
 {
@@ -85,22 +86,44 @@ int main(int argc, char* args[])
 	 EngineCore engineCore;
 
 	 
+	 UI::UIElement uiWindow = engineCore.getUIBuilder()
+		 .createUIWindow()
+		 .withPosition({ 0,0,0 })
+		 .withRectDimensions(700, 700)
+		 .build();
 
-	 
-	 UI::UIRenderer uiRenderer;
-	
-	 uiRenderer.runCustomCode();
-	 uiRenderer.setPhysicalViewport(700, 700);
-	 
-	 
+	 UI::UIElement panel1 = engineCore.getUIBuilder()//RED
+		 .createUIPanel()
+		 .withColour({ 23 / 255.0, 23 / 255.0, 23 / 255.0,1.0 })
+		 .withPosition({ 100,100,-3 })
+		 .withRectDimensions(200, 200)
+		 .build();
+
+	 UI::UIElement fpsGraph = engineCore.getUIBuilder().createUIGraph()
+		 .withColour({ 0.0,1.0,0.0,1.0 })
+		 .withPosition({ 0,100,10 })
+		 .withRectDimensions(200,200)
+		 .build();
+
 	//engineCore.loadModel("PATH TO FILE");
+	 uiWindow.addChild(panel1);
+	 panel1.addChild(fpsGraph);
 
 
+
+	 PerformanceMonitorSystem performanceMonitorSystem(engineCore.getUICoreSystem());
+
+	 performanceMonitorSystem.setUp(fpsGraph);
+
+
+	 engineCore.update();
 
 	 float deltaTime = 0.0f;
 	 float lastFrameTime = SDL_GetTicks() / 1000.0f;
 	 float currentFrameTime = lastFrameTime;
-	 float accumulator = 0.0f;
+	 float accumulator = 0;
+	 float frameNumber = 1;
+	 performanceMonitorSystem.UpdateFPSMeter(0);
 	 while (running)
 	 {
 		 currentFrameTime = SDL_GetTicks() / (1000.0f); // retuns time in milliseconds converted to seconds
@@ -162,19 +185,22 @@ int main(int argc, char* args[])
 			 }
 
 		 }
-		 accumulator += deltaTime;
-		 if (accumulator > 1 / 60.0f)
-		 {
-			 accumulator = 0;
-			 uiRenderer.updateFPS(deltaTime);
-		 }
-		 uiRenderer.renderUI();
 
+		 frameNumber++;
 		// engineCore.render(camera);
+		 accumulator += deltaTime;
+		 if (accumulator > 1/60.0)
+		 {
+			 
+			 performanceMonitorSystem.UpdateFPSMeter(accumulator/ frameNumber);
+			 accumulator = 0;
+			 frameNumber =1;
+		
+		
 
-
-
-
+		 }
+		 engineCore.renderUI();
+	
 
 		 //buffer swap
 		 SDL_GL_SwapWindow(window);

@@ -74,3 +74,18 @@ The word component does not feel right as it does not capture the meaning well e
 The meaning of component changs based on context.
 
 
+# During developement i have noticed that
+even to do vertex pulling with ssbo we need to bind a VAO even a dummy one for it to work.
+
+# DESIGN PROBLEM IN ECS RENDERING SYSTEM INTERACTION
+
+Another thing is that due to our lazy buffer creation when 
+only data is uploaded if we try to render something without uplaoding 
+data first it will cause to throw a error , 
+THIS IS MORE OF A DESIGN PROBLEM IN RENDERING SYSTEM DRAW CALL CREATION SYSTEM WHERE WE GET DATA
+FOR RENDERING FROM ECS,LIKE WE HAVE CURRENTLY NO WAY TO KNOW WHICH IS
+ACTIVE IN SCENE,THE ECS JSUT GIVES ALL ENTITIES WITH REQUESTED COMPONENTS.
+
+The problem arises when we just create a ui element and not upload
+data to it and keep it for later use and when rendering system goes to 
+render it will try to render this entity also.

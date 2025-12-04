@@ -5,6 +5,7 @@
 #include "../../include/low-level/shader_manager.h"
 
 
+
 ShaderManager::ShaderManager()
 {
 
@@ -87,6 +88,7 @@ GLuint ShaderManager::compileShader(const std::string& vertShaderCode, const std
 	return shaderProgram;
 
 }
+
 
 void ShaderManager::createNewShaderProgramForFormat(VertexFormat vertexFormat)
 {
