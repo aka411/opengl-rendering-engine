@@ -15,7 +15,7 @@ WorldRenderer::WorldRenderer(VertexFormatManager& vertexFormatManager, WorldVert
 	m_cameraBufferInfo = m_gpuBufferManager.createMappedUBOBuffer(1024 *10,nullptr);//10 KiB
 	m_objectBufferInfo = m_gpuBufferManager.createMappedUBOBuffer(1024 * 1024*3,nullptr);//10 KiB
 
-
+	
 }
 
 

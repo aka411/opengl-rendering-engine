@@ -83,14 +83,15 @@ void RenderSystem::render(Engine::Camera& camera)
 	{
 		const size_t count = chunkArrayView.getCount();
 
+		EngineTransformationComponent* engineTransformationComponentArray = chunkArrayView.getComponentArray<EngineTransformationComponent>();
+		EngineFatRenderComponent* engineFatRenderComponentArray = chunkArrayView.getComponentArray<EngineFatRenderComponent>();
+
 		for (size_t i = 0; i < count; ++i)
 		{
-			EngineTransformationComponent* engineTransformationComponentArray = chunkArrayView.getComponentArray<EngineTransformationComponent>();
-			EngineFatRenderComponent* engineFatRenderComponentArray = chunkArrayView.getComponentArray<EngineFatRenderComponent>();
 
 
-			EngineTransformationComponent engineTransformationComponent = engineTransformationComponentArray[i];
-			EngineFatRenderComponent engineFatRenderComponent = engineFatRenderComponentArray[i];
+			const EngineTransformationComponent& engineTransformationComponent = engineTransformationComponentArray[i];
+			const EngineFatRenderComponent& engineFatRenderComponent = engineFatRenderComponentArray[i];
 
 			for (auto& engineRenderComponent : engineFatRenderComponent.engineRenderComponents)
 			{

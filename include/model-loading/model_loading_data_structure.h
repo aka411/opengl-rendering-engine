@@ -7,6 +7,9 @@
 
 #include <cstddef>
 #include <cstdint>
+#include "../animation/animation_data_structures.h"
+#include "../animation/animation_data_structures.h"
+
 
 
 
@@ -56,7 +59,11 @@ struct EngineIntermediateNode
 {
 	EngineTransformationComponent transformation;
 	int meshIndex = -1;//index to intermediateMeshs
+
 	std::vector<int> children;
+
+	//TODO : ADD A isBoned bool
+	//but is skinning a mesh level or primitive level 
 };
 
 struct VertexData
@@ -149,7 +156,12 @@ struct EngineIntermediateModel
 
 	/**CPU DATA**/
 
-	//BoneAnimationData boneAnimationData;
+	//ANIMATION DATA
+	bool hasAnimations = false;
+	Engine::AnimationData animationData;
+	std::unordered_map<std::string, Engine::Animation> animationsMap;
+
+	Engine::BoneAnimationData boneAnimationData;
 
 
 

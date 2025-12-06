@@ -191,7 +191,7 @@ int main(int argc, char* args[])
 		 frameNumber++;
 		
 		 accumulator += deltaTime;
-		 if (accumulator > 1/60.0)
+		 if (accumulator > 1/30.0)
 		 {
 			 
 			 performanceMonitorSystem.UpdateFPSMeter(accumulator/ frameNumber);

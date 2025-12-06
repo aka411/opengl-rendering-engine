@@ -112,3 +112,12 @@ NOTE : This is a PERFORMANCE KILLER
 	in the per object buffer we use to send modal matrix and material id,
 	The issue is caused by us not using multiple buffers to avoid this kind of issue.
 	But i am intentionally temporarily using this while i solidy the designs.
+
+
+
+# Animation System Design Note :
+
+We need to keep bone data in a cpu side manager
+which also manages a gpu buffer for all bone data with a id system the 
+root and all suscequent  meshs recieve this id.
+

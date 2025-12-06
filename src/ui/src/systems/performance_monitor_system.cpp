@@ -36,7 +36,7 @@ void PerformanceMonitorSystem::UpdateFPSMeter(const float deltaTime)
 	
 
 
-	uiGraphComponentPtr->store(1.0f/(deltaTime+0.000001));
+	uiGraphComponentPtr->store(1.0f/(deltaTime+0.0000000001));
 
 	//TODO : need more optimization
 	//generate mesh

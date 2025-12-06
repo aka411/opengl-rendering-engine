@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <glm/mat4x4.hpp>
+#include "../../external/the-engine/the-engine/ecs/include/common_data_types.h"
 
 
 
@@ -28,29 +29,6 @@ namespace Engine
 		UNKNOWN
 	};
 
-	/**
-struct AnimationTranslationSampler
-{
-	AnimationInterpolationMode interpolationMode;
-	std::vector<float> inputKeyframes; //time
-	std::vector<glm::vec3> translations; //can be vec3 or vec4 depending on path type
-};
-
-struct AnimationRotationSampler
-{
-	AnimationInterpolationMode interpolationMode;
-	std::vector<float> inputKeyframes; //time
-	std::vector<glm::quat> rotations; //can be vec3 or vec4 depending on path type
-};
-
-struct AnimationScaleSampler
-{
-	AnimationInterpolationMode interpolationMode;
-	std::vector<float> inputKeyframes; //time
-	std::vector<glm::vec3> scales; //can be vec3 or vec4 depending on path type
-};
-*/
-
 
 
 	struct AnimationTimeInput
@@ -62,14 +40,15 @@ struct AnimationScaleSampler
 		std::vector<float> outputValues;
 	};
 
+
+
+
 	struct AnimationSampler
 	{
 		AnimationInterpolationMode interpolationMode = AnimationInterpolationMode::UNKNOWN;
 		int inputIndex = -1;
 		int outputIndex = -1;
 	};
-
-
 
 	struct AnimationChannel
 	{
@@ -79,15 +58,26 @@ struct AnimationScaleSampler
 	};
 
 
+
+
+
+
+	//Need to be in root, common for all
 	struct AnimationData
 	{
+
 		/** STAND ALONE **/
 		//Master struct to hold all animation data
 		std::vector<AnimationTimeInput> inputs;
 		std::vector<AnimationOutputValue> outputs;
 
+
+
 	};
 
+
+	//Per animation, need a unordered map from name to this
+	//
 	struct Animation
 	{
 		std::vector<AnimationChannel> animationChannel;
@@ -98,15 +88,16 @@ struct AnimationScaleSampler
 
 
 
-	//struct 
+	
 
 
 	struct BoneAnimationData
 	{
 		std::vector<glm::mat4> inverseBindMatrices;
-		std::vector<int> jointIndices; //
+		std::vector<int> jointIndices; //Indice into nodes, we need to map local index to entity id
 
-		std::vector<glm::mat4> jointMatrices;//important prereserve size
+		//upload this per frame
+		std::vector<glm::mat4> jointMatrices;//important pre-reserve size
 
 		bool isSkinned = false;
 	};

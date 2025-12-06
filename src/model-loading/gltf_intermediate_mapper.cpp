@@ -820,16 +820,27 @@ namespace Engine
 		
 		engineIntermediateModel.rootNodeIndex = tinygltfModel.scenes[0].nodes[0];// very fragile
 
-		//ExtractedAnimationData extractedAnimationData = GltfAnimationExtractor::extractAnimation(tinygltfModel);
-
-		//.animationData = extractedAnimationData.animationData;
-		//model.animations = extractedAnimationData.animationsMap;
-
-		//BoneAnimationData boneAnimationData;
-
-		//boneAnimationData = getBoneAnimationData(tinygltfModel);
 
 
+
+		/**Animation Area***/
+
+
+		ExtractedAnimation extractedAnimation = GltfAnimationExtractor::extractAnimation(tinygltfModel);
+
+
+
+		BoneAnimationData boneAnimationData = GltfAnimationExtractor::getBoneAnimationData(tinygltfModel);
+
+
+
+		engineIntermediateModel.hasAnimations = extractedAnimation.hasAnimations;
+
+		engineIntermediateModel.boneAnimationData = boneAnimationData;
+		engineIntermediateModel.animationData = extractedAnimation.animationData;
+
+
+		engineIntermediateModel.animationsMap = extractedAnimation.animationsMap;
 
 		return engineIntermediateModel;
 

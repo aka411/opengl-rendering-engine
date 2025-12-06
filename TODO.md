@@ -1,7 +1,9 @@
 # TODO
 
-1) Integrate ECS system into Transformation system.----> DONE
-2) Add new animation data structures and its supporting structures.
+
+
+1) Add new animation data structures and its supporting structures.
+2) Design a animation system to better help ecs integrate with animation and rendering system.
 3) Integrate ECS into animation system.
 
 

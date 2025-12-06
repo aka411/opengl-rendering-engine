@@ -3,8 +3,12 @@
 
 
 
-EngineLoader::EngineLoader(TheEngine::ECS::ECSEngine& ecsEngine, GPUTextureManager& gpuTextureManager, GPUMaterialSystem& gpuMaterialSystem, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem)
-	: m_ecsEngine(ecsEngine), m_gpuTextureManager(gpuTextureManager), m_gpuMaterialSystem(gpuMaterialSystem), m_worldVertexBufferManagementSystem(worldVertexBufferManagementSystem)
+EngineLoader::EngineLoader(TheEngine::ECS::ECSEngine& ecsEngine, GPUTextureManager& gpuTextureManager, GPUMaterialSystem& gpuMaterialSystem, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem, Engine::AnimationSystem& animationSystem)
+	: m_ecsEngine(ecsEngine),
+	m_gpuTextureManager(gpuTextureManager),
+	m_gpuMaterialSystem(gpuMaterialSystem), 
+	m_worldVertexBufferManagementSystem(worldVertexBufferManagementSystem),
+	m_animationSystem(animationSystem)
 {
 
 
@@ -305,14 +309,82 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 
 
 
+
 	TheEngine::ECS::EntityId rootEntityId = engineEntityIds[engineIntermediateModel.rootNodeIndex];
 	RootEntityComponent rootEntityComponent{};
 	m_ecsEngine.addComponentToEntity<RootEntityComponent>(rootEntityId, rootEntityComponent);
 
+
+
+	/*ANIMATION ADDING AREA*/
+
+	if (engineIntermediateModel.hasAnimations)
+	{
+
+
+		Engine::AnimationData& animationData = engineIntermediateModel.animationData;
+		std::unordered_map<std::string, Engine::Animation>& animationsMap = engineIntermediateModel.animationsMap;
+
+		Engine::BoneAnimationData& boneAnimationData = engineIntermediateModel.boneAnimationData;
+
+
+
+
+
+		AnimationCPUComponent animationCPUComponent;
+
+		animationCPUComponent.animationData = animationData;
+		animationCPUComponent.animationsMap = animationsMap;
+		animationCPUComponent.engineEntityIds = engineEntityIds;//a map from gltf global node array to entity id
+
+		AnimationComponent animationComponent;
+		animationComponent.id = m_animationSystem.getKeyframeAnimationManager().storeAnimationCPUComponent(std::move(animationCPUComponent));
+
+		m_ecsEngine.addComponentToEntity<AnimationComponent>(rootEntityId, animationComponent);
+
+		if (engineIntermediateModel.boneAnimationData.isSkinned)
+		{
+			Engine::BoneAnimationData& boneAnimationData = engineIntermediateModel.boneAnimationData;
+
+			BoneAnimationCPUComponent boneAnimationCPUComponent;
+			boneAnimationCPUComponent.inverseBindMatrices = boneAnimationData.inverseBindMatrices;
+			boneAnimationCPUComponent.jointIndices = boneAnimationData.jointIndices;//indice into engineEntityIds
+			boneAnimationCPUComponent.jointMatrices = boneAnimationData.jointMatrices;
+
+			BoneAnimationComponent boneAnimationComponent;
+
+			boneAnimationComponent.id = m_animationSystem.getSkeletalAnimationManager().storeBoneAnimationCPUComponent(std::move(boneAnimationCPUComponent));
+
+			m_ecsEngine.addComponentToEntity<BoneAnimationComponent>(rootEntityId, boneAnimationComponent);
+
+
+
+		}
+
+
+
+	}
+
+
+
+
+
+
+
 	m_ecsEngine.processBufferedCommands();
 
 	return rootEntityId;
+
+
+
 }
+
+
+
+
+
+
+
 
 
 tinygltf::Model EngineLoader::loadGLTFModel(const std::string& pathToModel)
