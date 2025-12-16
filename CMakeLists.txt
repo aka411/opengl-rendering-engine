@@ -32,7 +32,7 @@ add_executable(opengl-rendering-engine
 
  "src/low-level/vertex_format_manager.cpp"
  "src/model-loading/data_convertor.cpp"
-# "src/model-loading/gltf_animation_extractor.cpp"
+ "src/model-loading/gltf_animation_extractor.cpp"
 
  "src/engine/engine_core.cpp"
  "src/engine/engine_loader.cpp"
@@ -56,6 +56,7 @@ add_executable(opengl-rendering-engine
  "src/rendering-system/world_renderer.cpp"
 
  "src/model-loading/gltf_attribute_extractor.cpp"
+ "src/model-loading/gltf_animation_extractor.cpp"
 
  "src/ecs_hierarchy_traverser.cpp" 
  "src/transformation_system.cpp"
@@ -91,6 +92,19 @@ add_executable(opengl-rendering-engine
  "src/ui/src/utils/geometry_generator.cpp"
 
  "src/ui/src/builder/ui_window_builder.cpp"
+
+
+
+
+ "src/animation/animation_system.cpp"
+
+ "src/animation/keyframe_animation_manager.cpp"
+  "src/animation/skeletal_animation_manager.cpp" 
+
+ "src/animation/keyframe_animation_interpolator.cpp" 
+ "src/animation/skeletal_animation_solver.cpp"
+
+
 
 )
 

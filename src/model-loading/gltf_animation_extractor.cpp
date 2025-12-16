@@ -8,7 +8,7 @@ namespace Engine
 {
 
 
-	AnimationPathType GltfAnimationExtractor::getAnimationType(std::string& animationPath)
+	AnimationPathType GltfAnimationExtractor::getAnimationType(const std::string& animationPath)
 	{
 
 		if (animationPath == "translation")
@@ -29,7 +29,7 @@ namespace Engine
 
 
 
-	AnimationInterpolationMode GltfAnimationExtractor::getAnimationInterpolationMode(std::string& tinygltfAnimationInterpolationMode)
+	AnimationInterpolationMode GltfAnimationExtractor::getAnimationInterpolationMode(const std::string& tinygltfAnimationInterpolationMode)
 	{
 
 		if (tinygltfAnimationInterpolationMode == "LINEAR")
@@ -51,11 +51,11 @@ namespace Engine
 
 
 
-	 ExtractedAnimationData GltfAnimationExtractor::extractAnimation(const tinygltf::Model& tinygltfModel)
+	 ExtractedAnimation GltfAnimationExtractor::extractAnimation(const tinygltf::Model& tinygltfModel)
 	{  //gltf Sampler accessor Index , Engine Sampler Index
 
 
-		ExtractedAnimationData extractedAnimationData;
+		ExtractedAnimation extractedAnimation;
 
 
 
@@ -68,11 +68,14 @@ namespace Engine
 		std::vector< AnimationTimeInput> inputList;
 		std::vector< AnimationOutputValue> outputList;
 
-
+		if (tinygltfModel.animations.size() != 0)
+		{
+			extractedAnimation.hasAnimations = true;
+		}
 
 		for (auto& animation : tinygltfModel.animations)
 		{
-			extractedAnimationData.animationsMap[animation.name] = Animation{}; //create empty animation entry
+			extractedAnimation.animationsMap[animation.name] = Animation{}; //create empty animation entry
 			float maxTime = 0.0f;
 
 			std::unordered_map<int, int> samplerIndexMap; /*PER ANIMATION MAP*/
@@ -116,9 +119,10 @@ namespace Engine
 					if (inputIndexMap.find(gltfInputIndex) == inputIndexMap.end())
 					{
 						//need to create new input
-						tinygltf::Accessor& inputAccessor = tinygltfModel.accessors[gltfInputIndex];
-						tinygltf::BufferView& inputBufferView = tinygltfModel.bufferViews[inputAccessor.bufferView];
-						tinygltf::Buffer& inputBuffer = tinygltfModel.buffers[inputBufferView.buffer];
+						const tinygltf::Accessor& inputAccessor = tinygltfModel.accessors[gltfInputIndex];
+						const tinygltf::BufferView& inputBufferView = tinygltfModel.bufferViews[inputAccessor.bufferView];
+						const tinygltf::Buffer& inputBuffer = tinygltfModel.buffers[inputBufferView.buffer];
+
 						size_t inputByteOffset = inputBufferView.byteOffset + inputAccessor.byteOffset;
 						size_t inputCount = inputAccessor.count;
 
@@ -165,9 +169,9 @@ namespace Engine
 					if (outputIndexMap.find(gltfOutputIndex) == outputIndexMap.end())
 					{
 						//need to create new output
-						tinygltf::Accessor& outputAccessor = tinygltfModel.accessors[gltfOutputIndex];
-						tinygltf::BufferView& outputBufferView = tinygltfModel.bufferViews[outputAccessor.bufferView];
-						tinygltf::Buffer& outputBuffer = tinygltfModel.buffers[outputBufferView.buffer];
+						const tinygltf::Accessor& outputAccessor = tinygltfModel.accessors[gltfOutputIndex];
+						const tinygltf::BufferView& outputBufferView = tinygltfModel.bufferViews[outputAccessor.bufferView];
+						const tinygltf::Buffer& outputBuffer = tinygltfModel.buffers[outputBufferView.buffer];
 						size_t outputByteOffset = outputBufferView.byteOffset + outputAccessor.byteOffset;
 						size_t outputCount = outputAccessor.count;
 						size_t typeCount = 0;
@@ -228,15 +232,15 @@ namespace Engine
 			engineAnimation.animationSamplers = animationSamplerList;
 			engineAnimation.maxTime = maxTime;
 
-			extractedAnimationData.animationsMap[animation.name] = engineAnimation;
+			extractedAnimation.animationsMap[animation.name] = engineAnimation;
 
 		}
 
 
-		extractedAnimationData.animationData.inputs= inputList;
-		extractedAnimationData.animationData.outputs = outputList;
+		extractedAnimation.animationData.inputs= inputList;
+		extractedAnimation.animationData.outputs = outputList;
 		
-		return extractedAnimationData;
+		return extractedAnimation;
 	}
 
 

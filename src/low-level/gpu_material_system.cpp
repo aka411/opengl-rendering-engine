@@ -27,6 +27,9 @@ MaterialId GPUMaterialSystem::uploadMaterial(MaterialType materialType, std::byt
 
 	assert(bufferBasePtr != nullptr);
 
+	
+	//I have read that this is ok
+	//                                std::byte* + size_t
 	std::byte* absoluteBufferPtr = bufferBasePtr + allocationInfo.offset;
 
 

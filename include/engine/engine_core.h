@@ -10,6 +10,7 @@
 #include "../ui/include/core/ui_system.h"
 #include "../ui/include/builder/ui_builder.h"
 #include "../transformation_system.h"
+#include "../animation/animation_system.h"
 
 
 
@@ -49,6 +50,7 @@ private:
 
 	RenderSystem m_renderSystem;// contains both world renderer and ui renderer
 
+	Engine::AnimationSystem m_animationSystem;
 
 	UI::UIBuilder m_uiBuilder;
 

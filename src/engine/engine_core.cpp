@@ -12,7 +12,7 @@ EngineCore::EngineCore() :
 	m_worldVertexBufferManagementSystem(m_gpuBufferManager),
 
 	m_engineLoader(m_ecsEngine, m_gpuTextureManager,
-		m_gpuMaterialSystem, m_worldVertexBufferManagementSystem),
+		m_gpuMaterialSystem, m_worldVertexBufferManagementSystem,m_animationSystem),
 	m_transformationSystem(m_ecsEngine),
 
 
@@ -20,13 +20,19 @@ EngineCore::EngineCore() :
 
 	m_renderSystem(m_ecsEngine, m_worldVertexBufferManagementSystem, m_gpuMaterialSystem, m_uiCoreSystem),
 	m_uiSystem(m_uiCoreSystem),
-	m_uiBuilder(m_uiCoreSystem)
+	m_uiBuilder(m_uiCoreSystem),
+	m_animationSystem(m_ecsEngine,m_gpuBufferManager)
 {
 
 	m_ecsEngine.registerComponent<EngineRenderComponent>();
 	m_ecsEngine.registerComponent<EngineFatRenderComponent>();
 	m_ecsEngine.registerComponent<EngineChildrenComponent>();
 	m_ecsEngine.registerComponent<EngineTransformationComponent>();
+
+	m_ecsEngine.registerComponent<AnimationComponent>();
+	m_ecsEngine.registerComponent<BoneAnimationComponent>();
+	m_ecsEngine.registerComponent<AnimationStateComponent>();
+
 	m_ecsEngine.registerComponent<RootEntityComponent>();
 	
 }
