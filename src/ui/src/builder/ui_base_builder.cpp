@@ -32,7 +32,7 @@ namespace UI
 	{
 		//these base methods are always retrival
 
-		TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
+		ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
 		EngineTransformationComponent* engineTransformationComponent = entityChunkView.getComponent<EngineTransformationComponent>();
 		
 		assert(engineTransformationComponent != nullptr);
@@ -48,7 +48,7 @@ namespace UI
 	UIBaseBuilder& UIBaseBuilder::withRectDimensions(const float width,const float height)
 	{
 
-		TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
+		ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
 		UIRectDimensionsComponent* uiRectDimensionsComponent = entityChunkView.getComponent<UIRectDimensionsComponent>();
 		
 		assert(uiRectDimensionsComponent != nullptr);

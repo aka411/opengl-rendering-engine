@@ -3,7 +3,7 @@
 #include "../components.h"
 #include "keyframe_animation_manager.h"
 #include "skeletal_animation_manager.h"
-#include "../../external/the-engine/the-engine/ecs/include/ecs_engine.h"
+#include "ecs.h"
 
 namespace Engine
 {
@@ -21,15 +21,15 @@ namespace Engine
 
 		//Uses KeyframeAnimationSolver and SkeletalAnimationSolver
 
-		TheEngine::ECS::ECSEngine& m_ecsEngine;
+		ECS::ECSEngine& m_ecsEngine;
 
 		// A ECSEngine Coupled method
-		std::vector<EngineTransformationComponent*> getTransfomrationsOfEntities(const std::vector<TheEngine::ECS::EntityId>& entityIds);
+		std::vector<EngineTransformationComponent*> getTransfomrationsOfEntities(const std::vector<ECS::EntityId>& entityIds);
 
 
 	public:
 
-		AnimationSystem(TheEngine::ECS::ECSEngine& ecsEngine, GPUBufferManager& gpuBufferManager);
+		AnimationSystem(ECS::ECSEngine& ecsEngine, GPUBufferManager& gpuBufferManager);
 
 		KeyframeAnimationManager& getKeyframeAnimationManager();
 		SkeletalAnimationManager& getSkeletalAnimationManager();

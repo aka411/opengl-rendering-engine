@@ -14,10 +14,10 @@ namespace UI
 
 		
 		glCreateVertexArrays(1, &m_dummyVAO);
-		//GODAMN BUG ,Need valid vao binded for vertx pulling to work
+		//Need valid vao binded for vertx pulling to work
 
 
-		m_uiCamera.setOrthographicProjection(0, 700, 700, 0, 10, -100);
+		m_uiCamera.setOrthographicProjection(0, 1000, 700, 0, 10, -100);
 
 	}
 
@@ -61,9 +61,9 @@ namespace UI
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &m_uiCamera.getProjectionMatrix()[0][0]);
 
 	
-		TheEngine::ECS::ECSEngine& ecsEngine = m_uiCoreSystem.getECSEngine();
+		ECS::ECSEngine& ecsEngine = m_uiCoreSystem.getECSEngine();
 
-		TheEngine::ECS::Query query = ecsEngine.getQuery<UIRenderMeshComponent,EngineTransformationComponent>();
+		ECS::Query query = ecsEngine.getQuery<UIRenderMeshComponent,EngineTransformationComponent>();
 
 
 		UIVertexBufferManagementSystem& uiVertexBufferManagementSystem = m_uiCoreSystem.getUIVertexBufferManagementSystem();

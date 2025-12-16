@@ -28,7 +28,7 @@ void PerformanceMonitorSystem::UpdateFPSMeter(const float deltaTime)
 
 	assert(m_fpsGraphElement != nullptr);
 
-	TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_fpsGraphElement->getEntityId());
+	ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_fpsGraphElement->getEntityId());
 
 	UI::UIGraphComponent* uiGraphComponentPtr = entityChunkView.getComponent<UI::UIGraphComponent>();
 	UI::UIRenderMeshComponent* uiRenderMeshComponent = entityChunkView.getComponent<UI::UIRenderMeshComponent>();
@@ -52,13 +52,15 @@ void PerformanceMonitorSystem::UpdateFPSMeter(const float deltaTime)
 	uiRenderMeshComponent->vertexCount = 0;
 	for (float dataPoint : data)
 	{
+		//100 px = 500 fps
 		//if (dataPoint < 0.0001) continue;
-		float scaledHeight = (dataPoint / (maxValue > 0 ? maxValue : 1.0f)) * 50.0f;
+		float scaledHeight = (dataPoint/500.0f ) * 100.0f;
+
 
 		//NOTE : The scaledHeight is negated cause the 
 		//geometry generates the rectangles with Y axis up but our UI coordinate system has Y axis down
-		GeometryGenerator::MeshData mesh = GeometryGenerator::getColouredRectangleWithOffset(5,-scaledHeight, { offset ,100,0}, uiGraphComponentPtr->color);
-		offset += 6;
+		GeometryGenerator::MeshData mesh = GeometryGenerator::getColouredRectangleWithOffset(6,-scaledHeight, { offset ,100,0}, uiGraphComponentPtr->color);
+		offset += 7;
 
 		if (uiRectDimensionsComponentPtr->width < offset) break;
 		uiRenderMeshComponent->vertexCount += mesh.numOfVertex;

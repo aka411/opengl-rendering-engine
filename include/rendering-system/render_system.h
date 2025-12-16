@@ -1,5 +1,5 @@
 #pragma once
-#include "../../external/the-engine/the-engine/ecs/include/ecs_engine.h"
+#include "ecs.h"
 #include "../low-level/gpu_material_system.h"
 #include "../low-level/shader_manager.h"
 #include "../low-level/vertex_format_manager.h"
@@ -7,38 +7,50 @@
 #include "../camera.h"
 #include "../components.h"
 #include "world_renderer.h"
-#include <map>
-#include "../ui/include/ui_renderer.h"
+
 #include "../ui/include/ui_renderer.h"
 
+#include "../animation/animation_system.h"
+#include "render_command_buffer_manager.h"
+#include "object_data_buffer_manager.h"
 
-//This class is the composer and conductor
-class RenderSystem
+namespace Engine
 {
+	//This class is the composer and conductor
+	class RenderSystem
+	{
 
-private:
+	private:
 
-	TheEngine::ECS::ECSEngine& m_ecsEngine; // world ecs
-
-
-	ShaderManager m_shaderManager;
-	VertexFormatManager m_vertexFormatManager;
-
-	WorldRenderer m_worldRenderer;//owner
-	UI::UIRenderer m_uiRenderer;//owner
+		ECS::ECSEngine& m_ecsEngine; // world ecs
 
 
-	WorldVertexBufferManagementSystem& m_worldVertexBufferManagementSystem;
+		ShaderManager m_shaderManager;
+		VertexFormatManager m_vertexFormatManager;
+
+		WorldRenderer m_worldRenderer;//owner
+		UI::UIRenderer m_uiRenderer;//owner
+
+
+		WorldVertexBufferManagementSystem& m_worldVertexBufferManagementSystem;
+
+		AnimationSystem& m_animationSystem;
+
+
+		GPUBufferManager& m_gpuBufferManager;
+
+		RenderCommandBufferManager m_renderCommandBufferManager;
+		ObjectDataBufferManager m_objectDataBufferManager;
 
 
 
+	public:
 
+		RenderSystem(ECS::ECSEngine& ecsEngine, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem, GPUMaterialSystem& gpuMaterialSystem, UI::UICoreSystem& uiCoreSystem, AnimationSystem& animationSystem, GPUBufferManager& gpuBufferManager);
 
-public:
+		void render(Engine::Camera& camera);
 
-	RenderSystem(TheEngine::ECS::ECSEngine& ecsEngine, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem, GPUMaterialSystem& gpuMaterialSystem,UI::UICoreSystem& uiCoreSystem);
+		void renderUI();
+	};
 
-	void render(Engine::Camera& camera); 
-
-	void renderUI();
-};
+}

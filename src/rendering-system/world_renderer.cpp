@@ -2,168 +2,175 @@
 #include "../../include/low-level/vertex_format_helper.h"
 #include "../../glad/glad.h"
 #include <unordered_map>
+#include <iostream>
 
-WorldRenderer::WorldRenderer(VertexFormatManager& vertexFormatManager, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem, GPUMaterialSystem& gpuMaterialSystem)
-	: m_worldVertexBufferManagementSystem(worldVertexBufferManagementSystem),
-	  m_vertexFormatManager(vertexFormatManager),
-	  m_shaderManager(),
-	  m_gpuMaterialSystem(gpuMaterialSystem)
+
+
+
+namespace Engine
 {
 
+	WorldRenderer::WorldRenderer(VertexFormatManager& vertexFormatManager, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem, GPUMaterialSystem& gpuMaterialSystem, AnimationSystem& animationSystem, RenderCommandBufferManager& renderCommandBufferManager,
+		ObjectDataBufferManager& objectDataBufferManager):
 
-
-	m_cameraBufferInfo = m_gpuBufferManager.createMappedUBOBuffer(1024 *10,nullptr);//10 KiB
-	m_objectBufferInfo = m_gpuBufferManager.createMappedUBOBuffer(1024 * 1024*3,nullptr);//10 KiB
-
-	
-}
-
-
-GLenum IndexTypeToGLType(IndexType type)
-{
-	switch (type)
+		m_worldVertexBufferManagementSystem(worldVertexBufferManagementSystem),
+		m_vertexFormatManager(vertexFormatManager),
+		m_shaderManager(),
+		m_gpuMaterialSystem(gpuMaterialSystem),
+		m_animationSystem(animationSystem),
+		m_renderCommandBufferManager(renderCommandBufferManager),
+		m_objectDataBufferManager(objectDataBufferManager)
 	{
-	case IndexType::UBYTE_8:
-		return GL_UNSIGNED_BYTE;
 
-	case IndexType::USHORT_16:
-		return GL_UNSIGNED_SHORT;
 
-	case IndexType::UINT_32:
-		return GL_UNSIGNED_INT;
 
-	case IndexType::UNKNOWN:
-	default:
-		// non-standard GLenum value to indicate failure.
-		return 0;
+		m_cameraBufferInfo = m_gpuBufferManager.createMappedUBOBuffer(1024 * 10, nullptr);//10 KiB
+	
+
+
 	}
-}
-
-void WorldRenderer::render(std::unordered_map<VertexFormat, std::vector<RenderCommand>>& vertexFormatToRenderCommands, Engine::Camera& camera)
-{
-	glFinish();//NOTE : PERFORMANCE KILLER
-	//We are using this cause of synchronisation issue 
-	//with the per object buffer we use to send modal matrix and material id,
-	// The issue is caused by us not using multiple buffers to avoid this kind of issue.
-	// But i am intentionally temporarily using this while i solidy the designs
-	
-	//set up 
-	glClearColor(0.2, 0.4, 0.5, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glEnable(GL_CULL_FACE);
-
-	glEnable(GL_DEPTH_TEST);
-	glClearDepth(1.0f);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	
-	glDisable(GL_BLEND);
-	//glEnable(GL_CULL_FACE);
-	//glFrontFace(GL_CCW);
-	//glCullFace(GL_BACK);
 
 
-	//material ssbo
-	GPUBufferInfo materialBufferIndo = m_gpuMaterialSystem.getGPUBufferInfo(MaterialType::PBR_METALLIC_ROUGHNESS);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER,0, materialBufferIndo.bufferHandle);
-	
-	//camera ubo 
-	struct CameraData
+	GLenum IndexTypeToGLType(IndexType type)
 	{
-		glm::mat4  projection;
-		glm::mat4  view;
-	};
+		switch (type)
+		{
+		case IndexType::UBYTE_8:
+			return GL_UNSIGNED_BYTE;
 
-	struct PerObjectDataUBOData
+		case IndexType::USHORT_16:
+			return GL_UNSIGNED_SHORT;
+
+		case IndexType::UINT_32:
+			return GL_UNSIGNED_INT;
+
+		case IndexType::UNKNOWN:
+		default:
+			// non-standard GLenum value to indicate failure.
+			return 0;
+		}
+	}
+
+
+
+	void WorldRenderer::startFrame(Engine::Camera& camera)
 	{
-		glm::mat4  model;
+
+
+		//glFlush();
+
+		glClearColor(0.2, 0.4, 0.5, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glEnable(GL_CULL_FACE);
+
+		glEnable(GL_DEPTH_TEST);
+		glClearDepth(1.0f);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		glDisable(GL_BLEND);
+		//glEnable(GL_CULL_FACE);
+		//glFrontFace(GL_CCW);
+		//glCullFace(GL_BACK);
+
+				//material ssbo
+
+
+
+
+
+		//camera ubo 
+		struct CameraData
+		{
+			glm::mat4  projection;
+			glm::mat4  view;
+		};
+
+
+
+
+		CameraData cameraData;
+		cameraData.projection = camera.getProjectionMatrix();
+		cameraData.view = camera.getViewMatrix();
+
+
+
+		memcpy(m_cameraBufferInfo.mappedPtr, &cameraData, sizeof(CameraData));
+
+		glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_cameraBufferInfo.bufferHandle, 0, sizeof(CameraData));
+
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_objectDataBufferManager.getGPUBufferForThisFrame().bufferHandle);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_animationSystem.getSkeletalAnimationManager().getJointMatrixSSBO().bufferHandle);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_gpuMaterialSystem.getGPUBufferInfo(MaterialType::PBR_METALLIC_ROUGHNESS).bufferHandle);
 		
-		uint32_t materialId; // no 64 bit int in shader opengl unless extension is used
-		float padding[3];
-	};
+	}
 
 
-	CameraData cameraData;
-	cameraData.projection = camera.getProjectionMatrix();
-	cameraData.view = camera.getViewMatrix();
-
-
-	
-	memcpy(m_cameraBufferInfo.mappedPtr, &cameraData, sizeof(CameraData));
-	
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_cameraBufferInfo.bufferHandle, 0, sizeof(CameraData));
-
-
-
-	for (const auto& vertexFormatToRenderCommand : vertexFormatToRenderCommands)
+	void WorldRenderer::IndirectDrawArray(const VertexFormat vertexFormat, const size_t byteOffset, const size_t count)
 	{
 
-		
+
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_renderCommandBufferManager.getArrayGPUBufferForThisFrame().bufferHandle);
+
+
+			//set up vao
+			
+			GLuint vao = m_vertexFormatManager.getVAO(vertexFormat);
+
+			glBindVertexArray(vao);
+
+			//set up shader 
+			GLuint shaderProgram = m_shaderManager.getShaderProgramForVertexFormat(vertexFormat);
+			glUseProgram(shaderProgram);
+
+
+			//set up vertex buffer
+
+			GPUBufferInfo vertexBufferInfo = m_worldVertexBufferManagementSystem.getBufferInfoForVertexFormat(vertexFormat);
+			glBindVertexBuffer(0, vertexBufferInfo.bufferHandle, 0, VertexFormatHelper::getSizeOfVertexForFormatInBytes(vertexFormat));
+
+
+			glMultiDrawArraysIndirect(GL_TRIANGLES, (void*)byteOffset, count, 0);
+
+	}
+
+
+
+	void WorldRenderer::IndirectDrawIndexed(const VertexFormat vertexFormat, const IndexType indexType, const size_t byteOffset, const size_t count)
+	{
+
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_renderCommandBufferManager.getIndexedGPUBufferForThisFrame().bufferHandle);
+
 		//set up vao
-		VertexFormat vertexFormat = vertexFormatToRenderCommand.first;
+	
 		GLuint vao = m_vertexFormatManager.getVAO(vertexFormat);
+
 		glBindVertexArray(vao);
 
 		//set up shader 
 		GLuint shaderProgram = m_shaderManager.getShaderProgramForVertexFormat(vertexFormat);
 		glUseProgram(shaderProgram);
-		
+
 
 		//set up vertex buffer
 
 		GPUBufferInfo vertexBufferInfo = m_worldVertexBufferManagementSystem.getBufferInfoForVertexFormat(vertexFormat);
-		glBindVertexBuffer(0, vertexBufferInfo.bufferHandle,0, VertexFormatHelper::getSizeOfVertexForFormatInBytes(vertexFormat));
-		
-		size_t objectSize = sizeof(PerObjectDataUBOData); // 80 bytes
-		size_t currentOffset = 0; // Initialize offset
+		glBindVertexBuffer(0, vertexBufferInfo.bufferHandle, 0, VertexFormatHelper::getSizeOfVertexForFormatInBytes(vertexFormat));
 
-		for (const auto& renderCommand : vertexFormatToRenderCommand.second)
-		{
+		GPUBufferInfo indexBufferInfo = m_worldVertexBufferManagementSystem.getBufferInfoForIndexType(indexType);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferInfo.bufferHandle);
 
+		glMultiDrawElementsIndirect(GL_TRIANGLES, IndexTypeToGLType(indexType), (void*)byteOffset, count, 0);
 
-
-			PerObjectDataUBOData perObjectDataUBOData;
-			perObjectDataUBOData.model = renderCommand.perObjectData.engineTransformationComponent.worldTransformMatrix;
-			perObjectDataUBOData.materialId = renderCommand.perObjectData.materialId;
-		
-			void* objectWritePtr = (char*)m_objectBufferInfo.mappedPtr + currentOffset;
-
-			memcpy(objectWritePtr, &perObjectDataUBOData, objectSize);
-
-			
-			glBindBufferRange(GL_UNIFORM_BUFFER, 1, m_objectBufferInfo.bufferHandle, currentOffset, sizeof(PerObjectDataUBOData));
-			currentOffset += objectSize;
-
-			
-
-			//  Upload the data per object 
-			
-
-			if (renderCommand.isIndexed)
-			{
-
-
-				GLenum glIndexFormat = IndexTypeToGLType(renderCommand.indexType);
-				GPUBufferInfo indexBufferInfo = m_worldVertexBufferManagementSystem.getBufferInfoForIndexType(renderCommand.indexType);
-
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferInfo.bufferHandle);
-				assert(renderCommand.indexType != IndexType::UNKNOWN);
-				assert(renderCommand.vertexOffset% VertexFormatHelper::getSizeOfVertexForFormatInBytes(vertexFormat) == 0);
-				assert(renderCommand.indexOffset % (renderCommand.indexType == IndexType::USHORT_16 ? 2 : (renderCommand.indexType == IndexType::UINT_32 ? 4 : 1)) == 0);
-				const size_t vertexOffset = ((renderCommand.vertexOffset) / VertexFormatHelper::getSizeOfVertexForFormatInBytes(vertexFormat));
-				glDrawElementsBaseVertex(GL_TRIANGLES, renderCommand.indexCount, glIndexFormat, (const void*)renderCommand.indexOffset,vertexOffset);
-				
-			}
-			else
-			{
-				glDrawArrays(GL_TRIANGLES,renderCommand.vertexOffset / VertexFormatHelper::getSizeOfVertexForFormatInBytes(vertexFormat), renderCommand.vertexCount);
-				
-			}
+	}
 
 
 
+	void WorldRenderer::endFrame()
+	{
 
-		}
-		
+		m_renderCommandBufferManager.nextFrame();
+		m_objectDataBufferManager.nextFrame();
+
 	}
 
 
@@ -173,10 +180,7 @@ void WorldRenderer::render(std::unordered_map<VertexFormat, std::vector<RenderCo
 
 
 
-
-
-
-
-
-
 }
+
+
+

@@ -23,8 +23,8 @@ AllocationInfo GPUBufferSubBumpAllocator::allocate(const size_t size)
 
 	if (size + m_currentPointer > m_gpuBufferInfo.size)
 	{
-		//std::cout << " RUN OUT OF MEMORY IN GPUBUFFER SUB ALLOCATOR " << std::endl;
-		//assert(0);
+		std::cout << " RUN OUT OF MEMORY IN GPU BUFFER SUB BUMP ALLOCATOR " << std::endl;
+		assert(0);
 		m_currentPointer = 0; //reset for now
 	}
 

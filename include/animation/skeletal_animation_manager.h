@@ -15,18 +15,16 @@ class SkeletalAnimationManager
 	*/
 private:
 
-	//std::vector<BoneAnimationCPUComponent> m_boneAnimationCPUComponents;
-	//std::vector<size_t> idToJointMatrixSetSize;// A book keeping to not allow overwrite beyond the alloacted area
-	
-	//owner of BoneAnimationCPUComponent , maybe i should use unique pointer
-	std::unordered_map<BoneAnimationId, BoneAnimationCPUComponent> m_boneIdToBoneAnimationCPUComponents;
-	
+
+	std::vector<BoneAnimationCPUComponent> m_boneAnimationCPUComponents;
+
 	GPUBufferInfo m_jointMatrixSSBO;
 
 	size_t m_currentByteOffset = 0;
 
 	//Actually this is not id but a offset
-	BoneAnimationId uploadToJointMatrixSSBO(const BoneAnimationCPUComponent& boneAnimationCPUComponent);
+
+	
 
 public:
 
@@ -37,9 +35,11 @@ public:
 
 	//The Id is actually a offset to a reserved area in ssbo
 	BoneAnimationId storeBoneAnimationCPUComponent(BoneAnimationCPUComponent&& boneAnimationCPUComponent);
+	BoneJointMatrixId uploadNewJointMatrixSetToSSBO(const std::vector<glm::mat4>& jointMatrixSet);
 
-	void updateJointMatrixSet(const BoneAnimationId boneAnimationId,const BoneAnimationCPUComponent& boneAnimationCPUComponent);
-	
+
+	void updateJointMatrixSetInSSBO(const BoneJointMatrixId boneJointMatrixId, const std::vector<glm::mat4>& jointMatrixSet);
+
 
 	//The SSBO with all joint matrices
 	GPUBufferInfo getJointMatrixSSBO();

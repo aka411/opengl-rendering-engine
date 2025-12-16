@@ -23,11 +23,11 @@ namespace UI
 
 		UITransformationSystem(UICoreSystem& uiCoreSystem);
 
-		EngineTransformationComponent& getTransformationComponent(TheEngine::ECS::EntityId& entityId);
+		EngineTransformationComponent& getTransformationComponent(ECS::EntityId& entityId);
 
 		void buildLocalMatrix(EngineTransformationComponent& transform);
 		
-		void updateTransformation(TheEngine::ECS::EntityId rootEntityId);
+		void updateTransformation(ECS::EntityId rootEntityId);
 		void updateTransformation(UIElement& rootUIElement);
 
 	};

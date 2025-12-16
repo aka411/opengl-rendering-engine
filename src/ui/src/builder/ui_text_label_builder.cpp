@@ -37,7 +37,7 @@ namespace UI
 	//Text specific methods
 	UITextLabelBuilder& UITextLabelBuilder::withColour(glm::vec4 color)
 	{
-		TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
+		ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
 		UITextComponent* uiTextComponent = entityChunkView.getComponent<UITextComponent>();
 
 		assert(uiTextComponent != nullptr && "UITextComponent not found in entity");
@@ -52,7 +52,7 @@ namespace UI
 
 	UITextLabelBuilder& UITextLabelBuilder::withText(const std::string& text)
 	{
-		TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
+		ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
 		UITextComponent* uiTextComponent = entityChunkView.getComponent<UITextComponent>();
 
 		assert(uiTextComponent != nullptr && "UITextComponent not found in entity");

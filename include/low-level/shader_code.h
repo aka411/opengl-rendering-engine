@@ -32,20 +32,38 @@ layout(std140,binding = 0 ) uniform Camera
 
 
 
-/***PER OBJECT DATA****/
-layout(std140,binding = 1 ) uniform PerObjectData
-{
 
+
+
+struct ObjectData
+{
  mat4 modelMatrix;
  uint materialId;
+ uint boneId;
+vec2 padding;
+};
 
-} perObjectData;
+// readonly SSBO containing the data
+layout(binding = 0, std430) readonly buffer objectDataSSBO 
+{
+
+ ObjectData objectData[];
+
+};
 
 
+#ifdef HAS_JOINTS
+
+// readonly SSBO containing the data
+layout(binding = 1, std430) readonly buffer jointSSBO 
+{
+
+ mat4 joints[];
+
+};
 
 
-
-
+#endif
 
 
 
@@ -86,17 +104,30 @@ flat out uint vs_materialId;
 void main()
 {
 
+ObjectData perObjectData = objectData[gl_BaseInstance];
 
 
 
+vec4 position = vec4(inPosition, 1.0);
+
+#ifdef HAS_JOINTS
+
+const uint boneOffset = perObjectData.boneId;
+
+    mat4 boneTransform = 
+        inWeights.x * joints[boneOffset+inJoints.x] +
+        inWeights.y * joints[boneOffset+inJoints.y] +
+        inWeights.z * joints[boneOffset+inJoints.z] +
+        inWeights.w * joints[boneOffset+inJoints.w];
 
 
-
+    position = boneTransform * position;
+#endif
 
 
  viewMatrix = camera.view;
  
- gl_Position = camera.projection * camera.view * perObjectData.modelMatrix * vec4( inPosition, 1.0);
+ gl_Position = camera.projection * camera.view * perObjectData.modelMatrix * position;
 
 
 
@@ -206,7 +237,7 @@ struct PBRMetallicRoughnessMaterial
 };
 
 
-layout(std430, binding = 0) readonly buffer MaterialData 
+layout(std430, binding = 2) readonly buffer MaterialData 
 {
     PBRMetallicRoughnessMaterial materials[];
 };
@@ -335,6 +366,7 @@ out vec4 FragColor;
 
 void main()
 {
+
 
 PBRMetallicRoughnessMaterial material = materials[vs_materialId];
 
@@ -513,7 +545,10 @@ vec3 ambient = vec3(0.1) * albedo * occlusion;
 vec3 finalColor = ambient + Lo + emissive;
 
 
-    FragColor = vec4(finalColor, baseColor.a);
+
+ FragColor = vec4(finalColor, baseColor.a);
+
+
 
 }
 

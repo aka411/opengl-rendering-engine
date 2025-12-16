@@ -12,7 +12,7 @@
 
 
 
-/*
+/*uint64_t materialBitMask       DEFINTION
 *
 * We need to support upto 5 texcoords so need 3 bits per texture
 * TexCoord indices map to : 000 -> 0 , 001 -> 1 , 010 -> 2 ...
@@ -101,8 +101,9 @@ struct PBRMetallicRoughnessMaterial
 
 	uint64_t materialBitMask = 0; //offset = 80
 
-	//Total: 88 bytes
+	//Total before padding2: 88 bytes
 	uint64_t padding2 = 0; // Padding to make the struct size a multiple of 16 bytes
+	//Total Size = 96 bytes
 };
 
 using MaterialId = uint64_t;

@@ -16,19 +16,19 @@ private:
 	std::unordered_map<VertexFormat, GPUBufferSubBumpAllocator> m_formatToVertexBufferSubAllocators;
 	std::unordered_map<IndexType, GPUBufferSubBumpAllocator> m_formatToIndexBufferSubAllocators;
 
-	void createNewVertexBufferForFormat(VertexFormat vertexFormat);
-	void createNewIndexBufferForIndexType(IndexType indexType);
+	void createNewVertexBufferForFormat(const VertexFormat vertexFormat);
+	void createNewIndexBufferForIndexType(const IndexType indexType);
 
 public:
 
 	WorldVertexBufferManagementSystem(GPUBufferManager& gpuBufferManager);
 
 	//get buffer for given vertex format
-	size_t uploadVertexData(VertexFormat vertexFormat, std::byte* data, size_t size);
-	size_t uploadIndexData(IndexType indexType, std::byte* data, size_t size);
+	size_t uploadVertexData(const VertexFormat vertexFormat, std::byte* data, const size_t size);
+	size_t uploadIndexData(const IndexType indexType, std::byte* data, const size_t size);
 
-	GPUBufferInfo getBufferInfoForVertexFormat(VertexFormat vertexFormat);
-	GPUBufferInfo getBufferInfoForIndexType(IndexType indextype);
+	GPUBufferInfo getBufferInfoForVertexFormat(const VertexFormat vertexFormat);
+	GPUBufferInfo getBufferInfoForIndexType(const IndexType indextype);
 
 
 };

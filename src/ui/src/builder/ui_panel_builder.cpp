@@ -26,7 +26,7 @@ namespace UI
     {
   
 
-        TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
+        ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
         UIMaterialComponent* uiMaterialComponentPtr = entityChunkView.getComponent<UIMaterialComponent>();
         
         assert(uiMaterialComponentPtr != nullptr && "UIMaterialComponent not found in entity");
@@ -40,7 +40,7 @@ namespace UI
 
     UIPanelBuilder& UIPanelBuilder::withRoundConerRadius(float radius)
     {
-        TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
+        ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
         UIMaterialComponent* uiMaterialComponentPtr = entityChunkView.getComponent<UIMaterialComponent>();
 
         assert(uiMaterialComponentPtr != nullptr && "UIMaterialComponent not found in entity");

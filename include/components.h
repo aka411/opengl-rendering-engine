@@ -7,9 +7,9 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include "../external/the-engine/the-engine/ecs/include/common_data_types.h"
+#include "ecs.h"
 #include "animation/animation_data_structures.h"
-#include "animation/animation_data_structures.h"
+
 
 
 
@@ -44,7 +44,7 @@ struct EngineFatRenderComponent
 
 struct EngineChildrenComponent
 {
-	std::vector<TheEngine::ECS::EntityId> childrenEntities;
+	std::vector<ECS::EntityId> childrenEntities;
 
 };
 
@@ -80,6 +80,17 @@ struct RootEntityComponent
 /***ANIMATION RELATED**/
 
 using BoneAnimationId = uint32_t;
+using BoneJointMatrixId = uint32_t;
+
+/*
+struct BoneJointMatrixId
+{
+	const uint32_t offset;
+	const size_t size;//for book keeping
+
+};
+*/
+
 using KeyframeAnimationId = uint32_t;
 
 
@@ -106,10 +117,20 @@ struct AnimationComponent
 //all entites with bone attributes get this
 struct BoneAnimationComponent
 {
-	BoneAnimationId id;//has cpu side and gpu side 
+	BoneAnimationId boneDataId;//has cpu side and gpu side 
+
+	//TODO : Future upgrade
+	BoneJointMatrixId JointIdInSSBO; // per root entity data , has state
+	std::vector<glm::mat4> jointMatrices;//pre-reserve
 };
 
-
+//The BoneJointMatrixId in BoneAnimationComponent and
+// BoneJointMatrixIdComponent may seem reduntant but it
+// there cause each individual entity is a node with mesh each mesh requires the JointIdInSSBO
+struct BoneJointMatrixIdComponent
+{
+	BoneJointMatrixId JointIdInSSBO;
+};
 
 
 
@@ -137,7 +158,7 @@ struct AnimationCPUComponent
 	BUT THERE IS A PROBLEM : When we create copies of same character model the mapping being in here is not gonna work
 	each copy needs its own mapping
 	*/
-	std::vector<TheEngine::ECS::EntityId> engineEntityIds;
+	std::vector<ECS::EntityId> engineEntityIds;
 
 
 	Engine::AnimationData animationData;
@@ -156,7 +177,10 @@ struct BoneAnimationCPUComponent
 	std::vector<int> jointIndices; //Indice into nodes, we need to map local index to entity id
 
 	//upload this per frame
-	std::vector<glm::mat4> jointMatrices;//WARNING : pre-reserve size
+
+	//size_t nmOfJointMatrices = 0; //this seems redundant casue size of jointIndices does convey same
+	//THIS SHOULD ACTUALLY BE PER ENTITY DATA, THIS IS MORE OF A STATE AND SHOULD BE IN ROOT
+	//std::vector<glm::mat4> jointMatrices;//WARNING : pre-reserve size 
 };
 
 
@@ -168,30 +192,5 @@ struct BoneAnimationCPUComponent
 
 
 
-/******NOT COMPONENTS****/
-struct PerObjectData
-{
-	uint64_t materialId;
-	EngineTransformationComponent engineTransformationComponent;
-
-};
 
 
-
-struct RenderCommand
-{
-
-	size_t	vertexOffset = 0;//in bytes
-	size_t	vertexCount = 0;
-
-	IndexType indexType;
-
-	bool isIndexed = false;
-	size_t	indexOffset = 0;
-	size_t	indexCount = 0;
-
-
-
-	PerObjectData perObjectData;
-
-};

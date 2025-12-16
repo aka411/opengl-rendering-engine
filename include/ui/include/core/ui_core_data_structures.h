@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../../external/the-engine/the-engine/ecs/include/common_data_types.h"
+#include "ecs.h"
 
 namespace UI
 {
@@ -39,7 +39,7 @@ namespace UI
 
 
 	//having material and rect bounds make it a renderable ui entity
-	using UIEntity = TheEngine::ECS::EntityId;
+	using UIEntity = ECS::EntityId;
 
 
 

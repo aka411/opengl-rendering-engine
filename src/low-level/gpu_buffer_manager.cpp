@@ -134,3 +134,31 @@ GPUBufferInfo GPUBufferManager::createMappedSSBO(const size_t size, void* data)
 	return gpuBufferInfo;
 }
 
+GPUBufferInfo GPUBufferManager::createMappedIBO(const size_t size)
+{
+	GLuint IBO;
+
+
+
+	glGenBuffers(1, &IBO);
+
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, IBO);
+
+	GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+
+	glBufferStorage(GL_DRAW_INDIRECT_BUFFER, size, nullptr, flags);
+
+	void* mappedVBOData = glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, size, flags);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
+
+	m_allocatedBuffers.push_back(IBO);
+
+	GPUBufferInfo gpuBufferInfo;
+
+	gpuBufferInfo.bufferHandle = IBO;
+	gpuBufferInfo.size = size;
+	gpuBufferInfo.mappedPtr = mappedVBOData;
+
+
+	return gpuBufferInfo;
+}

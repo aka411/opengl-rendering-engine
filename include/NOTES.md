@@ -121,3 +121,9 @@ We need to keep bone data in a cpu side manager
 which also manages a gpu buffer for all bone data with a id system the 
 root and all suscequent  meshs recieve this id.
 
+
+
+# Adding IndexType also to VertexFormat
+
+If we add IndexType To also vertexformat we can make the
+draw calls etc also easy and we wont need to store each index type drawcalls separately

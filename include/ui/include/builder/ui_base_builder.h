@@ -16,7 +16,7 @@ namespace UI
 
 		UICoreSystem& m_uiCoreSystem;// has ECSEngine and UIVertexBufferManagementSystem
 
-		TheEngine::ECS::ECSEngine& m_ecsEngine;
+		ECS::ECSEngine& m_ecsEngine;
 
 	
 		UIElement m_uiElement;
