@@ -1,6 +1,6 @@
 # Opengl-Rendering-Engine
 
-This is a simple opengl rendering system that is currently being developed.Currently I am working on a demo scene and UI system for this.
+This is a simple opengl rendering system that is currently being developed.
 The Renderer as of now can : 
 - Load simple gltf models and render them.
 - move camera with mouse and keyboard keys WASD.
