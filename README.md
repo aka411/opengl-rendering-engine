@@ -4,7 +4,7 @@ This is a simple opengl rendering system that is currently being developed.Curre
 The Renderer as of now can : 
 - Load simple gltf models and render them.
 - move camera with mouse and keyboard keys WASD.
-- Run skeletal animation and keyframe animation.(Temporarily disabled while integrating with ECS).
+- Run skeletal animation and keyframe animation.
   
 I have added the build instructions to build and run it below, the build and run instructions may seem a little verbose cause the project is **work in progress**, but if you follow it correctly it should work.
 
