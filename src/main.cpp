@@ -291,20 +291,6 @@ int main(int argc, char* args[])
 
 	 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	SDL_Delay(20);
 
 	//dont call renderer after this point, as the window will be destroyed
