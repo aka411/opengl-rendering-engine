@@ -26,6 +26,6 @@ public:
 
 	GPUBufferInfo createMappedSSBO(const size_t size, void* data);
 
-
+	GPUBufferInfo createMappedIBO(const size_t size);
 
 };

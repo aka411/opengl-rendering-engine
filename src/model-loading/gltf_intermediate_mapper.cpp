@@ -818,7 +818,7 @@ namespace Engine
 		engineIntermediateModel.indiceDatas = meshRelatedData.indexDatas;
 		engineIntermediateModel.vertexDatas = meshRelatedData.intermediateVertexDatas;
 		
-		engineIntermediateModel.rootNodeIndex = tinygltfModel.scenes[0].nodes[0];// very fragile
+		engineIntermediateModel.rootNodeIndex = rootNodeIndex;// tinygltfModel.scenes[0].nodes[0];// very fragile
 
 
 

@@ -1,21 +1,22 @@
 #include "../../include/animation/animation_system.h"
 #include "../../include/animation/keyframe_animation_interpolator.h"
+#include "../../include/animation/skeletal_animation_solver.h"
 
 
 
 namespace Engine
 {
 
-	std::vector<EngineTransformationComponent*> AnimationSystem::getTransfomrationsOfEntities(const std::vector<TheEngine::ECS::EntityId>& entityIds)
+	std::vector<EngineTransformationComponent*> AnimationSystem::getTransfomrationsOfEntities(const std::vector<ECS::EntityId>& entityIds)
 	{
 		std::vector<EngineTransformationComponent*> transformationComponents;
 
-		transformationComponents.reserve(entityIds.size());
+		transformationComponents.resize(entityIds.size());
 
 
 		for (size_t i = 0 ; i < transformationComponents.size(); ++i)
 		{
-			TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(entityIds[i]);
+			ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(entityIds[i]);
 
 			EngineTransformationComponent* engineTransformationComponent = entityChunkView.getComponent<EngineTransformationComponent>();
 
@@ -31,7 +32,7 @@ namespace Engine
 
 
 
-	AnimationSystem::AnimationSystem(TheEngine::ECS::ECSEngine& ecsEngine,GPUBufferManager& gpuBufferManager)
+	AnimationSystem::AnimationSystem(ECS::ECSEngine& ecsEngine,GPUBufferManager& gpuBufferManager)
 		:
 		m_keyframeAnimationManager(),
 		m_skeletalAnimationManager(gpuBufferManager),
@@ -60,15 +61,15 @@ namespace Engine
 
 		/***KEYFRAME ANIAMTION***/
 
-
-		TheEngine::ECS::Query query = m_ecsEngine.getQuery<RootEntityComponent, AnimationComponent, AnimationStateComponent>();
+		
+		ECS::Query query = m_ecsEngine.getQuery<RootEntityComponent, AnimationComponent, AnimationStateComponent>();
 
 		for (auto& chunkArrayView : query.getChunkArrayViews())
 		{
 			const size_t count = chunkArrayView.getCount();
 
 			const AnimationComponent* animationComponentArray = chunkArrayView.getComponentArray<AnimationComponent>();
-			//const TheEngine::ECS::EntityId* entityIds = chunkArrayView.getChunkRecordArray();
+			//const ECS::EntityId* entityIds = chunkArrayView.getChunkRecordArray();
 			AnimationStateComponent* animationStateComponentArray = chunkArrayView.getComponentArray<AnimationStateComponent>();
 			
 			
@@ -83,7 +84,7 @@ namespace Engine
 
 				
 
-				const std::vector<TheEngine::ECS::EntityId>& animationTargetToEntityIds = animationCPUComponent.engineEntityIds;
+				const std::vector<ECS::EntityId>& animationTargetToEntityIds = animationCPUComponent.engineEntityIds;
 
 				std::vector<EngineTransformationComponent*> animationTargetTransformationComponents = getTransfomrationsOfEntities(animationTargetToEntityIds);
 
@@ -104,7 +105,45 @@ namespace Engine
 
 		//we will have to query again this time to get BoneComponent Also
 
+		ECS::Query boneQuery = m_ecsEngine.getQuery<RootEntityComponent, AnimationComponent, AnimationStateComponent, BoneAnimationComponent>();
 
+		for (auto& chunkArrayViewWithBone : boneQuery.getChunkArrayViews())
+		{
+			const size_t count = chunkArrayViewWithBone.getCount();
+
+			BoneAnimationComponent* boneAnimationComponentArray = chunkArrayViewWithBone.getComponentArray<BoneAnimationComponent>();
+			const AnimationComponent* animationComponentArray = chunkArrayViewWithBone.getComponentArray<AnimationComponent>();
+
+			AnimationStateComponent* animationStateComponentArray = chunkArrayViewWithBone.getComponentArray<AnimationStateComponent>();
+
+
+			if (boneAnimationComponentArray == nullptr || animationStateComponentArray == nullptr) continue;
+
+			for (size_t i = 0; i < count; ++i)
+			{
+
+				const AnimationCPUComponent& animationCPUComponent = m_keyframeAnimationManager.getAnimationCPUComponentFromId(animationComponentArray[i].id);
+				const BoneAnimationCPUComponent& boneCPUBoneAnimationCPUComponent = m_skeletalAnimationManager.getBoneAnimationCPUComponentFromId(boneAnimationComponentArray[i].boneDataId);
+				
+
+
+
+				const std::vector<ECS::EntityId>& animationTargetToEntityIds = animationCPUComponent.engineEntityIds;
+
+				std::vector<EngineTransformationComponent*> animationTargetTransformationComponents = getTransfomrationsOfEntities(animationTargetToEntityIds);
+
+				if (!animationStateComponentArray[i].isPlayingAnimation)
+				{
+					continue;
+				}
+
+				SkeletalAnimationSolver::animate(boneCPUBoneAnimationCPUComponent, boneAnimationComponentArray[i].jointMatrices, animationTargetTransformationComponents);
+
+				m_skeletalAnimationManager.updateJointMatrixSetInSSBO(boneAnimationComponentArray[i].JointIdInSSBO, boneAnimationComponentArray[i].jointMatrices);
+			}
+
+
+		}
 
 
 

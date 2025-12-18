@@ -3,7 +3,7 @@
 
 
 
-EngineLoader::EngineLoader(TheEngine::ECS::ECSEngine& ecsEngine, GPUTextureManager& gpuTextureManager, GPUMaterialSystem& gpuMaterialSystem, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem, Engine::AnimationSystem& animationSystem)
+EngineLoader::EngineLoader(ECS::ECSEngine& ecsEngine, GPUTextureManager& gpuTextureManager, GPUMaterialSystem& gpuMaterialSystem, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem, Engine::AnimationSystem& animationSystem)
 	: m_ecsEngine(ecsEngine),
 	m_gpuTextureManager(gpuTextureManager),
 	m_gpuMaterialSystem(gpuMaterialSystem), 
@@ -16,7 +16,7 @@ EngineLoader::EngineLoader(TheEngine::ECS::ECSEngine& ecsEngine, GPUTextureManag
 
 }
 
-TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathToModel)
+ECS::EntityId EngineLoader::createRootEntity(const std::string& pathToModel)
 {
 	//get gltf model
 
@@ -170,8 +170,15 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 				engineRenderComponent.vertexCount = vertexCount;
 				engineRenderComponent.vertexFormat = vertexFormat;
 
-
-				engineRenderComponent.materialId = localToEnginePBRMaterial[primitive.materialId];
+				//TODO : NEED TO REVIEW THIS LATER
+				if (primitive.materialId >= 0)
+				{
+					engineRenderComponent.materialId = localToEnginePBRMaterial[primitive.materialId];
+				}
+				else
+				{
+					engineRenderComponent.materialId = -1;
+				}
 
 				if (primitive.isIndexed)
 				{
@@ -216,8 +223,16 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 			engineRenderComponent.vertexCount = vertexCount;
 			engineRenderComponent.vertexFormat = vertexFormat;
 
+			//TODO : NEED TO REVIEW THIS LATER
+			if (primitive.materialId >= 0)
+			{
+				engineRenderComponent.materialId = localToEnginePBRMaterial[primitive.materialId];
+			}
+			else
+			{
+				engineRenderComponent.materialId = -1;
+			}
 
-			engineRenderComponent.materialId = localToEnginePBRMaterial[primitive.materialId];
 
 			if (primitive.isIndexed)
 			{
@@ -251,7 +266,7 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 
 
 
-	std::vector<TheEngine::ECS::EntityId> engineEntityIds;
+	std::vector<ECS::EntityId> engineEntityIds;
 	engineEntityIds.reserve(engineIntermediateModel.engineIntermediateNode.size());
 
 	for (auto& node : engineIntermediateModel.engineIntermediateNode)
@@ -269,7 +284,7 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 	for (size_t i = 0 ; i <  engineIntermediateModel.engineIntermediateNode.size(); ++i)
 	{
 	    EngineIntermediateNode node = engineIntermediateModel.engineIntermediateNode[i];
-		const TheEngine::ECS::EntityId entityId = engineEntityIds[i];
+		const ECS::EntityId entityId = engineEntityIds[i];
 
 		m_ecsEngine.addComponentToEntity<EngineTransformationComponent>(entityId, node.transformation);//transformation
 
@@ -310,7 +325,7 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 
 
 
-	TheEngine::ECS::EntityId rootEntityId = engineEntityIds[engineIntermediateModel.rootNodeIndex];
+	ECS::EntityId rootEntityId = engineEntityIds[engineIntermediateModel.rootNodeIndex];
 	RootEntityComponent rootEntityComponent{};
 	m_ecsEngine.addComponentToEntity<RootEntityComponent>(rootEntityId, rootEntityComponent);
 
@@ -342,6 +357,10 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 
 		m_ecsEngine.addComponentToEntity<AnimationComponent>(rootEntityId, animationComponent);
 
+		AnimationStateComponent animationStateComponent;
+		m_ecsEngine.addComponentToEntity<AnimationStateComponent>(rootEntityId, animationStateComponent);
+
+		
 		if (engineIntermediateModel.boneAnimationData.isSkinned)
 		{
 			Engine::BoneAnimationData& boneAnimationData = engineIntermediateModel.boneAnimationData;
@@ -349,15 +368,26 @@ TheEngine::ECS::EntityId EngineLoader::createRootEntity(const std::string& pathT
 			BoneAnimationCPUComponent boneAnimationCPUComponent;
 			boneAnimationCPUComponent.inverseBindMatrices = boneAnimationData.inverseBindMatrices;
 			boneAnimationCPUComponent.jointIndices = boneAnimationData.jointIndices;//indice into engineEntityIds
-			boneAnimationCPUComponent.jointMatrices = boneAnimationData.jointMatrices;
+			
+			
 
 			BoneAnimationComponent boneAnimationComponent;
 
-			boneAnimationComponent.id = m_animationSystem.getSkeletalAnimationManager().storeBoneAnimationCPUComponent(std::move(boneAnimationCPUComponent));
+			boneAnimationComponent.jointMatrices = boneAnimationData.jointMatrices;
+
+			boneAnimationComponent.boneDataId = m_animationSystem.getSkeletalAnimationManager().storeBoneAnimationCPUComponent(std::move(boneAnimationCPUComponent));
+			boneAnimationComponent.JointIdInSSBO = m_animationSystem.getSkeletalAnimationManager().uploadNewJointMatrixSetToSSBO(boneAnimationComponent.jointMatrices);
 
 			m_ecsEngine.addComponentToEntity<BoneAnimationComponent>(rootEntityId, boneAnimationComponent);
 
 
+			for (auto& entityId : engineEntityIds)
+			{
+				BoneJointMatrixIdComponent boneJointMatrixIdComponent;
+				boneJointMatrixIdComponent.JointIdInSSBO = boneAnimationComponent.JointIdInSSBO;
+
+				m_ecsEngine.addComponentToEntity<BoneJointMatrixIdComponent>(entityId, boneJointMatrixIdComponent);
+			}
 
 		}
 

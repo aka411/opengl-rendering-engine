@@ -16,11 +16,11 @@ namespace UI
 
 	}
 
-	EngineTransformationComponent& UITransformationSystem::getTransformationComponent(TheEngine::ECS::EntityId& entityId)
+	EngineTransformationComponent& UITransformationSystem::getTransformationComponent(ECS::EntityId& entityId)
 	{
-		TheEngine::ECS::ECSEngine& ecsEngine = m_uiCoreSystem.getECSEngine();
+		ECS::ECSEngine& ecsEngine = m_uiCoreSystem.getECSEngine();
 
-		TheEngine::ECS::EntityChunkView entityChunkView = ecsEngine.getEntityChunkView(entityId);
+		ECS::EntityChunkView entityChunkView = ecsEngine.getEntityChunkView(entityId);
 		EngineTransformationComponent* engineTransformationComponentPtr = entityChunkView.getComponent<EngineTransformationComponent>();
 
 
@@ -49,11 +49,11 @@ namespace UI
 
 
 
-	void UITransformationSystem::updateTransformation(TheEngine::ECS::EntityId rootEntityId)
+	void UITransformationSystem::updateTransformation(ECS::EntityId rootEntityId)
 	{
 
 
-		TheEngine::ECS::ECSEngine& ecsEngine = m_uiCoreSystem.getECSEngine();
+		ECS::ECSEngine& ecsEngine = m_uiCoreSystem.getECSEngine();
 
 		ECSHierarchyTraverser ecsHierarchyTraverser(ecsEngine);
 
@@ -78,8 +78,8 @@ namespace UI
 			//get parent world transform and get current local transfrom
 			// Wc = Wp * Lc;
 
-			TheEngine::ECS::EntityId parentEntityId = ecsHierarchyTraverser.getParentEntityId();
-			TheEngine::ECS::EntityId childEntityId = ecsHierarchyTraverser.getCurrentEntityId();
+			ECS::EntityId parentEntityId = ecsHierarchyTraverser.getParentEntityId();
+			ECS::EntityId childEntityId = ecsHierarchyTraverser.getCurrentEntityId();
 
 
 

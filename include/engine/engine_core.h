@@ -2,7 +2,7 @@
 #include "../low-level/gpu_texture_manager.h"
 #include "../low-level/gpu_material_system.h"
 #include "../low-level/world_vertex_buffer_management_system.h"
-#include "../../external/the-engine/the-engine/ecs/include/ecs_engine.h"
+#include "ecs.h"
 #include "engine_loader.h"
 #include "../rendering-system/render_system.h"
 #include <string>
@@ -13,66 +13,73 @@
 #include "../animation/animation_system.h"
 
 
-
-class EngineCore
+namespace Engine
 {
-private:
+	class EngineCore
+	{
+	private:
 
-	TheEngine::ECS::ECSEngine m_ecsEngine;//owner
-	
-
-	GPUBufferManager m_gpuBufferManager;
-
-	GPUTextureManager m_gpuTextureManager;//owner
-
-	GPUMaterialSystem m_gpuMaterialSystem;// ---> needs GPUBufferManager
-
-	WorldVertexBufferManagementSystem m_worldVertexBufferManagementSystem;//-->needs GPUBufferManager
+		ECS::ECSEngine m_ecsEngine;//owner
 
 
-	EngineLoader m_engineLoader;
+		GPUBufferManager m_gpuBufferManager;
+
+		GPUTextureManager m_gpuTextureManager;//owner
+
+		GPUMaterialSystem m_gpuMaterialSystem;// ---> needs GPUBufferManager
+
+		WorldVertexBufferManagementSystem m_worldVertexBufferManagementSystem;//-->needs GPUBufferManager
 
 
-
-	/***MODEL RENDERING SYSTEMS***/
-
-
-	TransformationSystem m_transformationSystem;
+		EngineLoader m_engineLoader;
 
 
 
-
-	/**UI SYSTEM**/
-
-	UI::UICoreSystem m_uiCoreSystem; // needs ECSEngine, GPUBufferManager
-	UI::UISystem m_uiSystem;//owner
+		/***MODEL RENDERING SYSTEMS***/
 
 
-	RenderSystem m_renderSystem;// contains both world renderer and ui renderer
-
-	Engine::AnimationSystem m_animationSystem;
-
-	UI::UIBuilder m_uiBuilder;
-
-
-public:
+		TransformationSystem m_transformationSystem;
 
 
 
-	EngineCore();
 
-	void loadModel(std::string pathToFile);
-	void render(Engine::Camera camera);
+		/**UI SYSTEM**/
 
-	void update();
-
-	void renderUI();
-
-	/***** UI SYSTEM *****/
-	UI::UIBuilder& getUIBuilder();
-
-	UI::UICoreSystem& getUICoreSystem();
-	
+		UI::UICoreSystem m_uiCoreSystem; // needs ECSEngine, GPUBufferManager
+		UI::UISystem m_uiSystem;//owner
 
 
-};
+		RenderSystem m_renderSystem;// contains both world renderer and ui renderer
+
+		Engine::AnimationSystem m_animationSystem;
+
+		UI::UIBuilder m_uiBuilder;
+
+		ECS::NullFatalErrorHandler m_nullFatalErrorHandler;
+	public:
+
+
+
+		EngineCore();
+
+
+		ECS::ECSEngine& getECSEngine();
+
+
+		ECS::EntityId loadModel(std::string pathToFile);
+
+		void update(const float deltaTime);
+
+		void render(Engine::Camera camera);
+
+		void renderUI();
+
+		/***** UI SYSTEM *****/
+		UI::UIBuilder& getUIBuilder();
+
+		UI::UICoreSystem& getUICoreSystem();
+
+
+	};
+
+}

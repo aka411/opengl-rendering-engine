@@ -160,7 +160,7 @@ public:
     static std::vector<VertexAttributeInfo> getVertexAttributeInfosForVertexFormat(const VertexFormat vertexFormat);
 
    
-  
+    static size_t getSizeOfIndexTypeInBytes(const IndexType indexType);
     static size_t getSizeOfVertexForFormatInBytes(const VertexFormat vertexFormat);
  
    

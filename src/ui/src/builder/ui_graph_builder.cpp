@@ -42,7 +42,7 @@ namespace UI
     UIGraphBuilder& UIGraphBuilder::withColour(glm::vec4 color)
     {
    
-        TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
+        ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_uiElement.getEntityId());
         UIGraphComponent* uiGraphComponent = entityChunkView.getComponent<UIGraphComponent>();
 
         assert(uiGraphComponent != nullptr && "UIMaterialComponent not found in entity");

@@ -1,7 +1,7 @@
 #pragma once
 #include "../core/ui_component.h"
 #include "../core/ui_core_system.h"
-#include "../../../../external/the-engine/the-engine/ecs/include/ecs_engine.h"
+#include "ecs.h"
 #include "../builder/ui_element.h"
 
 class PerformanceMonitorSystem
@@ -10,7 +10,7 @@ class PerformanceMonitorSystem
 private:
 
 	UI::UICoreSystem& m_uiCoreSystem;
-	TheEngine::ECS::ECSEngine& m_ecsEngine;
+	ECS::ECSEngine& m_ecsEngine;
 
 	
 	UI::UIElement* m_fpsGraphElement = nullptr;

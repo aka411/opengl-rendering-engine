@@ -54,7 +54,7 @@ void ECSHierarchyTraverser::reverse()
 
 	//assert(m_model->nodes.size() > m_parentIndex);
 	//assert(m_model->nodes[m_parentIndex].children.size() > m_visitInfoStack.top().visitedChildIndex);
-	TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_parentEntityId);
+	ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_parentEntityId);
 
 	m_currentEntityId = entityChunkView.getComponent<EngineChildrenComponent>()->childrenEntities[m_visitInfoStack.top().visitedChildIndex];
 	m_visitInfoStack.top().visitedChildIndex++;
@@ -62,7 +62,7 @@ void ECSHierarchyTraverser::reverse()
 	return;
 }
 
-ECSHierarchyTraverser::ECSHierarchyTraverser(TheEngine::ECS::ECSEngine& ecsEngine) : m_ecsEngine(ecsEngine)
+ECSHierarchyTraverser::ECSHierarchyTraverser(ECS::ECSEngine& ecsEngine) : m_ecsEngine(ecsEngine)
 {
 
 }
@@ -70,20 +70,20 @@ ECSHierarchyTraverser::ECSHierarchyTraverser(TheEngine::ECS::ECSEngine& ecsEngin
 
 
 
-void ECSHierarchyTraverser::setRootEntity(TheEngine::ECS::EntityId rootEntityId)
+void ECSHierarchyTraverser::setRootEntity(ECS::EntityId rootEntityId)
 {
 	m_currentEntityId = rootEntityId;
 	m_traversalComplete = false;
 }
 
-TheEngine::ECS::EntityId ECSHierarchyTraverser::getCurrentEntityId()
+ECS::EntityId ECSHierarchyTraverser::getCurrentEntityId()
 {
 
 
 	return m_currentEntityId;
 }
 
-TheEngine::ECS::EntityId ECSHierarchyTraverser::getParentEntityId()
+ECS::EntityId ECSHierarchyTraverser::getParentEntityId()
 {
 	return m_parentEntityId;
 }
@@ -97,17 +97,17 @@ void ECSHierarchyTraverser::traverse()
 
 
 	//std::vector<int> childrenList = m_model->nodes[m_currentIndex].children;
-	TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_currentEntityId);
+	ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_currentEntityId);
 	EngineChildrenComponent* engineChildrenComponent = entityChunkView.getComponent<EngineChildrenComponent>();
 
 	if (engineChildrenComponent == nullptr)
 	{
-		//feels hacky though
+	
 		reverse();
 		return;
 	}
 
-	std::vector<TheEngine::ECS::EntityId>& childrenList = engineChildrenComponent->childrenEntities;
+	std::vector<ECS::EntityId>& childrenList = engineChildrenComponent->childrenEntities;
 
 
 

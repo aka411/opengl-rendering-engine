@@ -1,7 +1,6 @@
 #pragma once
 #include <stack>
-#include "../external/the-engine/the-engine/ecs/include/common_data_types.h"
-#include "../external/the-engine/the-engine/ecs/include/ecs_engine.h"
+#include "ecs.h"
 
 
 class ECSHierarchyTraverser
@@ -11,7 +10,7 @@ class ECSHierarchyTraverser
 private:
 
 
-	TheEngine::ECS::ECSEngine& m_ecsEngine;
+	ECS::ECSEngine& m_ecsEngine;
 
 
 
@@ -21,15 +20,15 @@ private:
 		size_t totalChildCount = 0;
 	};
 
-	TheEngine::ECS::EntityId m_currentEntityId;
-	TheEngine::ECS::EntityId m_parentEntityId;
+	ECS::EntityId m_currentEntityId;
+	ECS::EntityId m_parentEntityId;
 
 
 	bool m_traversalComplete = false;
 
 	//using vector would be more better casue it has easier reset
 	std::stack <VisitInfo> m_visitInfoStack;
-	std::stack<TheEngine::ECS::EntityId> m_visitedEntityStack;
+	std::stack<ECS::EntityId> m_visitedEntityStack;
 
 	void reset();
 	void reverse();
@@ -37,11 +36,11 @@ private:
 
 public:
 
-	ECSHierarchyTraverser(TheEngine::ECS::ECSEngine& ecsEngine);
-	void setRootEntity(TheEngine::ECS::EntityId rootEntityId);
+	ECSHierarchyTraverser(ECS::ECSEngine& ecsEngine);
+	void setRootEntity(ECS::EntityId rootEntityId);
 
-	TheEngine::ECS::EntityId getCurrentEntityId();
-	TheEngine::ECS::EntityId getParentEntityId();
+	ECS::EntityId getCurrentEntityId();
+	ECS::EntityId getParentEntityId();
 
 
 	void traverse();

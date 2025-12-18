@@ -337,6 +337,26 @@ std::vector<VertexAttributeInfo> VertexFormatHelper::getVertexAttributeInfosForV
 
 
 
+size_t VertexFormatHelper::getSizeOfIndexTypeInBytes(const IndexType indexType)
+{
+
+	switch (indexType)
+	{
+	case IndexType::UBYTE_8: return 1;
+	case IndexType::USHORT_16: return 2;
+	case IndexType::UINT_32: return 4;
+	
+	default: return 0;
+
+
+
+	}
+
+
+}
+
+
+
 
 size_t VertexFormatHelper::getSizeOfVertexForFormatInBytes(const VertexFormat vertexFormat)
 {

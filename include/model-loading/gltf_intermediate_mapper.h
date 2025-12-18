@@ -49,7 +49,7 @@ namespace Engine
 
 
 
-		//BoneAnimationData getBoneAnimationData(const tinygltf::Model& tinygltfModel);
+	
 
 
 

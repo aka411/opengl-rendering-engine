@@ -6,7 +6,7 @@ namespace UI
 {
 
 
-	UIElement::UIElement(const TheEngine::ECS::EntityId& entityId, TheEngine::ECS::ECSEngine& ecsEngine) : m_entityId(entityId), m_ecsEngine(ecsEngine)
+	UIElement::UIElement(const ECS::EntityId& entityId, ECS::ECSEngine& ecsEngine) : m_entityId(entityId), m_ecsEngine(ecsEngine)
 	{
 
 
@@ -14,7 +14,7 @@ namespace UI
 	}
 
 
-	TheEngine::ECS::EntityId UIElement::getEntityId()
+	ECS::EntityId UIElement::getEntityId()
 	{
 		return m_entityId;
 	}

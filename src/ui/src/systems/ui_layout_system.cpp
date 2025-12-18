@@ -12,9 +12,9 @@ namespace UI
 
     void UILayoutSystem::updateLayout()
     {
-        TheEngine::ECS::ECSEngine& ecsEngine = m_uiCoreSystem.getECSEngine();
+        ECS::ECSEngine& ecsEngine = m_uiCoreSystem.getECSEngine();
 
-        TheEngine::ECS::Query query = ecsEngine.getQuery<UIRootComponent>();
+        ECS::Query query = ecsEngine.getQuery<UIRootComponent>();
 
         //Consider a active component to tag active ui tree
 
@@ -24,7 +24,7 @@ namespace UI
             const size_t count = chunkArrayView.getCount();
          
 
-            const TheEngine::ECS::EntityId* chunkRecordArray = chunkArrayView.getChunkRecordArray();
+            const ECS::EntityId* chunkRecordArray = chunkArrayView.getChunkRecordArray();
 
             for (size_t i = 0; i < count; ++i)
             {

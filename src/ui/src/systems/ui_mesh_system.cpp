@@ -18,7 +18,7 @@ namespace UI
    //TODO : Need to change this
 	void UIMeshSystem::generateUIMeshesForDirty()
 	{
-		TheEngine::ECS::Query uiMeshQuery = m_ecsEngine.getQuery<UIRenderMeshComponent,UIRectDimensionsComponent,UIMaterialComponent>();
+		ECS::Query uiMeshQuery = m_ecsEngine.getQuery<UIRenderMeshComponent,UIRectDimensionsComponent,UIMaterialComponent>();
 
 
 

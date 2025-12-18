@@ -8,7 +8,7 @@
 AnimationCPUComponent& KeyframeAnimationManager::getAnimationCPUComponentFromId(KeyframeAnimationId keyframeAnimationId)
 {
 
-	assert(m_animationCPUComponents.size() < keyframeAnimationId);
+	assert(m_animationCPUComponents.size() > keyframeAnimationId);
 
 	return m_animationCPUComponents[keyframeAnimationId];
 

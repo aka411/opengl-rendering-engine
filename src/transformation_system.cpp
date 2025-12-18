@@ -3,7 +3,7 @@
 
 
 
-TransformationSystem::TransformationSystem(TheEngine::ECS::ECSEngine& ecsEngine) : m_ecsEngine(ecsEngine)
+TransformationSystem::TransformationSystem(ECS::ECSEngine& ecsEngine) : m_ecsEngine(ecsEngine)
 {
 
 
@@ -18,11 +18,11 @@ TransformationSystem::TransformationSystem(TheEngine::ECS::ECSEngine& ecsEngine)
 
 
 
-EngineTransformationComponent& TransformationSystem::getTransformationComponent(TheEngine::ECS::EntityId& entityId)
+EngineTransformationComponent& TransformationSystem::getTransformationComponent(ECS::EntityId& entityId)
 {
-	TheEngine::ECS::ECSEngine& ecsEngine = m_ecsEngine;
+	ECS::ECSEngine& ecsEngine = m_ecsEngine;
 
-	TheEngine::ECS::EntityChunkView entityChunkView = ecsEngine.getEntityChunkView(entityId);
+	ECS::EntityChunkView entityChunkView = ecsEngine.getEntityChunkView(entityId);
 	EngineTransformationComponent* engineTransformationComponentPtr = entityChunkView.getComponent<EngineTransformationComponent>();
 
 
@@ -51,11 +51,11 @@ void TransformationSystem::buildLocalMatrix(EngineTransformationComponent& trans
 
 
 
-void TransformationSystem::updateTransformation(TheEngine::ECS::EntityId rootEntityId)
+void TransformationSystem::updateTransformation(ECS::EntityId rootEntityId)
 {
 
 
-	TheEngine::ECS::ECSEngine& ecsEngine = m_ecsEngine;
+	ECS::ECSEngine& ecsEngine = m_ecsEngine;
 
 	ECSHierarchyTraverser ecsHierarchyTraverser(ecsEngine);
 
@@ -80,8 +80,8 @@ void TransformationSystem::updateTransformation(TheEngine::ECS::EntityId rootEnt
 		//get parent world transform and get current local transfrom
 		// Wc = Wp * Lc;
 
-		TheEngine::ECS::EntityId parentEntityId = ecsHierarchyTraverser.getParentEntityId();
-		TheEngine::ECS::EntityId childEntityId = ecsHierarchyTraverser.getCurrentEntityId();
+		ECS::EntityId parentEntityId = ecsHierarchyTraverser.getParentEntityId();
+		ECS::EntityId childEntityId = ecsHierarchyTraverser.getCurrentEntityId();
 
 
 
@@ -104,7 +104,7 @@ void TransformationSystem::updateTransformation(TheEngine::ECS::EntityId rootEnt
 void TransformationSystem::updateTransformationsForAllEntities()
 {
 	//gets all entities with root and updates
-	TheEngine::ECS::Query query = m_ecsEngine.getQuery<RootEntityComponent, EngineTransformationComponent>();
+	ECS::Query query = m_ecsEngine.getQuery<RootEntityComponent, EngineTransformationComponent>();
 
 
 
@@ -114,11 +114,11 @@ void TransformationSystem::updateTransformationsForAllEntities()
 
 
 		RootEntityComponent* rootEntityComponentPtr = chunkArrayView.getComponentArray<RootEntityComponent>();
-		const TheEngine::ECS::EntityId* rootEntityIdPtr = chunkArrayView.getChunkRecordArray();
+		const ECS::EntityId* rootEntityIdPtr = chunkArrayView.getChunkRecordArray();
 
 
 
-		//use the geometry generator to create a quad mesh based on rect bounds
+	
 
 		if (rootEntityComponentPtr == nullptr || rootEntityIdPtr == nullptr)
 		{

@@ -5,29 +5,55 @@
 #include "../low-level/vertex_format_manager.h"
 #include "../components.h"
 #include "../camera.h"
+#include "../animation/animation_system.h"
 
-class WorldRenderer
+#include "world_renderer_data_structures.h"
+#include "render_command_buffer_manager.h"
+#include "object_data_buffer_manager.h"
+
+namespace Engine
 {
 
-private:
+	class WorldRenderer
+	{
 
-	WorldVertexBufferManagementSystem& m_worldVertexBufferManagementSystem;
-	VertexFormatManager& m_vertexFormatManager;
-	ShaderManager m_shaderManager;
+	private:
 
-	GPUMaterialSystem& m_gpuMaterialSystem;
+		WorldVertexBufferManagementSystem& m_worldVertexBufferManagementSystem;
+		VertexFormatManager& m_vertexFormatManager;
+		ShaderManager m_shaderManager;
 
-	GPUBufferManager m_gpuBufferManager;
+		GPUMaterialSystem& m_gpuMaterialSystem;
 
-	GPUBufferInfo m_cameraBufferInfo;
-	GPUBufferInfo m_objectBufferInfo;
+		GPUBufferManager m_gpuBufferManager;
 
-
-public:
-
-	WorldRenderer(VertexFormatManager& m_vertexFormatManager,WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem, GPUMaterialSystem& gpuMaterialSystem);
-
-	void render(std::unordered_map<VertexFormat, std::vector<RenderCommand>>& vertexFormatToRenderCommands, Engine::Camera& camera);
+		GPUBufferInfo m_cameraBufferInfo;
 
 
-};
+		AnimationSystem& m_animationSystem;
+
+
+		RenderCommandBufferManager& m_renderCommandBufferManager;
+		ObjectDataBufferManager& m_objectDataBufferManager;
+
+	public:
+
+		WorldRenderer(VertexFormatManager& vertexFormatManager, WorldVertexBufferManagementSystem& worldVertexBufferManagementSystem, GPUMaterialSystem& gpuMaterialSystem, AnimationSystem& animationSystem, RenderCommandBufferManager& m_renderCommandBufferManager,
+		ObjectDataBufferManager& m_objectDataBufferManager);
+
+
+		void startFrame(Engine::Camera& camera);
+
+		//void render(std::unordered_map<VertexFormat, std::vector<RenderCommand>>& vertexFormatToRenderCommands);
+		
+		void IndirectDrawArray(const VertexFormat vertexFormat, const size_t byteOffset, const size_t count);
+		void IndirectDrawIndexed(const VertexFormat vertexFormat, const IndexType indexType, const size_t byteOffset, const size_t count);
+		
+
+		void endFrame();
+
+
+
+	};
+
+}

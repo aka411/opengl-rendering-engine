@@ -1,6 +1,6 @@
 #pragma once
-#include "../../../../external/the-engine/the-engine/ecs/include/common_data_types.h"
-#include "../../../../external/the-engine/the-engine/ecs/include/ecs_engine.h"
+#include "ecs.h"
+
 
 
 namespace UI
@@ -13,16 +13,16 @@ namespace UI
 
 	private:
 
-		TheEngine::ECS::ECSEngine& m_ecsEngine;
+		ECS::ECSEngine& m_ecsEngine;
 
-		const TheEngine::ECS::EntityId m_entityId;
+		const ECS::EntityId m_entityId;
 
 
 	public:
 
-		UIElement(const TheEngine::ECS::EntityId& entityId, TheEngine::ECS::ECSEngine& ecsEngine);
+		UIElement(const ECS::EntityId& entityId, ECS::ECSEngine& ecsEngine);
 
-		TheEngine::ECS::EntityId getEntityId();
+		ECS::EntityId getEntityId();
 
 
 		//component access method
@@ -40,7 +40,7 @@ namespace UI
 	template <typename ComponentType>
 	ComponentType* UIElement::getComponent()
 	{
-		TheEngine::ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_entityId);
+		ECS::EntityChunkView entityChunkView = m_ecsEngine.getEntityChunkView(m_entityId);
 
 		ComponentType* componentPtr = entityChunkView.getComponent<ComponentType>();
 

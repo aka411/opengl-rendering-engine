@@ -8,7 +8,7 @@ namespace UI
 {
 
     
-    UICoreSystem::UICoreSystem(TheEngine::ECS::ECSEngine& ecsEngine, GPUBufferManager& gpuBufferManager) : m_uiShaderManager(), m_ecsEngine(ecsEngine), m_uiVertexBufferManagementSystem(gpuBufferManager)
+    UICoreSystem::UICoreSystem(ECS::ECSEngine& ecsEngine, GPUBufferManager& gpuBufferManager) : m_uiShaderManager(), m_ecsEngine(ecsEngine), m_uiVertexBufferManagementSystem(gpuBufferManager)
     {
 
         m_ecsEngine.registerComponent<UIRenderMeshComponent>();
@@ -36,7 +36,7 @@ namespace UI
     }
 
    
-    TheEngine::ECS::ECSEngine& UICoreSystem::getECSEngine()
+    ECS::ECSEngine& UICoreSystem::getECSEngine()
     {
       
         return m_ecsEngine;

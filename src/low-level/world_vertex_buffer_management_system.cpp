@@ -9,10 +9,10 @@ WorldVertexBufferManagementSystem::WorldVertexBufferManagementSystem(GPUBufferMa
 	
 }
 
-void WorldVertexBufferManagementSystem::createNewVertexBufferForFormat(VertexFormat vertexFormat)
+void WorldVertexBufferManagementSystem::createNewVertexBufferForFormat(const VertexFormat vertexFormat)
 {
 
-	GPUBufferInfo gpuBufferInfo = m_gpuBuffermanager.createMappedVertexBuffer(50 * 1024 * 1024,nullptr);//50MiB
+	GPUBufferInfo gpuBufferInfo = m_gpuBuffermanager.createMappedVertexBuffer(250 * 1024 * 1024,nullptr);//250MiB
 
 	GPUBufferSubBumpAllocator gpuBufferSubBumpAllocator(gpuBufferInfo);
 
@@ -24,10 +24,10 @@ void WorldVertexBufferManagementSystem::createNewVertexBufferForFormat(VertexFor
 }
 
 
-void WorldVertexBufferManagementSystem::createNewIndexBufferForIndexType(IndexType indexType)
+void WorldVertexBufferManagementSystem::createNewIndexBufferForIndexType(const IndexType indexType)
 {
 
-	GPUBufferInfo gpuBufferInfo = m_gpuBuffermanager.createMappedIndexBuffer(50 * 1024 * 1024, nullptr);//50MiB
+	GPUBufferInfo gpuBufferInfo = m_gpuBuffermanager.createMappedIndexBuffer(200 * 1024 * 1024, nullptr);//200MiB
 
 	GPUBufferSubBumpAllocator gpuBufferSubBumpAllocator(gpuBufferInfo);
 
@@ -39,7 +39,7 @@ void WorldVertexBufferManagementSystem::createNewIndexBufferForIndexType(IndexTy
 
 }
 
-size_t WorldVertexBufferManagementSystem::uploadVertexData(VertexFormat vertexFormat, std::byte* data, size_t size)
+size_t WorldVertexBufferManagementSystem::uploadVertexData(const VertexFormat vertexFormat, std::byte* data, const size_t size)
 {
 
 
@@ -66,7 +66,7 @@ size_t WorldVertexBufferManagementSystem::uploadVertexData(VertexFormat vertexFo
 }
 
 
-size_t WorldVertexBufferManagementSystem::uploadIndexData(IndexType indexType, std::byte* data, size_t size)
+size_t WorldVertexBufferManagementSystem::uploadIndexData(const IndexType indexType, std::byte* data, const size_t size)
 {
 
 	const auto& it = m_formatToIndexBufferSubAllocators.find(indexType);
@@ -93,14 +93,14 @@ size_t WorldVertexBufferManagementSystem::uploadIndexData(IndexType indexType, s
 
 
 
-GPUBufferInfo WorldVertexBufferManagementSystem::getBufferInfoForVertexFormat(VertexFormat vertexFormat)
+GPUBufferInfo WorldVertexBufferManagementSystem::getBufferInfoForVertexFormat(const VertexFormat vertexFormat)
 {
 
 	return m_formatToVertexBufferSubAllocators.at(vertexFormat).getGPUBufferInfo();
 
 }
 
-GPUBufferInfo WorldVertexBufferManagementSystem::getBufferInfoForIndexType(IndexType indextype)
+GPUBufferInfo WorldVertexBufferManagementSystem::getBufferInfoForIndexType(const IndexType indextype)
 {
 
 	return m_formatToIndexBufferSubAllocators.at(indextype).getGPUBufferInfo();

@@ -17,6 +17,38 @@
 #include "../include/ui/include/systems/performance_monitor_system.h"
 
 
+
+
+void GLAPIENTRY DebugMessageCallback(
+	GLenum source,
+	GLenum type,
+	GLuint id,
+	GLenum severity,
+	GLsizei length,
+	const GLchar* message,
+	const void* userParam)
+{
+	
+	if (type == GL_DEBUG_TYPE_OTHER || type == GL_DEBUG_TYPE_PERFORMANCE)
+		return;
+
+	
+	fprintf(stderr, "GL Debug Message:\n");
+	fprintf(stderr, "  Source: 0x%x\n", source);
+	fprintf(stderr, "  Type: 0x%x\n", type);
+	fprintf(stderr, "  ID: %d\n", id);
+	fprintf(stderr, "  Severity: 0x%x\n", severity);
+	fprintf(stderr, "  Message: %s\n", message);
+	fprintf(stderr, "------------------------------------------------\n");
+
+	// Crash the program if it's a high-severity error
+	if (severity == GL_DEBUG_SEVERITY_HIGH)
+	{
+		
+		// __debugbreak(); // Windows-specific
+	}
+}
+
 SDL_Window* init()
 {
 	SDL_Init(SDL_INIT_VIDEO);
@@ -29,7 +61,9 @@ SDL_Window* init()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_Window* window = SDL_CreateWindow("Opengl Rendering Engine(openGL 4.6)",700, 700, SDL_WINDOW_OPENGL);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+
+	SDL_Window* window = SDL_CreateWindow("Opengl Rendering Engine(openGL 4.6)",1000, 700, SDL_WINDOW_OPENGL);
 	assert(window != nullptr);
 	SDL_GLContext  gl_context = SDL_GL_CreateContext(window);
 	assert(gl_context != nullptr);
@@ -67,7 +101,7 @@ SDL_Window* init()
 int main(int argc, char* args[])
 {
 
-
+	using namespace Engine;
 
 
 	SDL_Window* window = init();
@@ -77,12 +111,33 @@ int main(int argc, char* args[])
 
 	 bool running = true;
 
-	
+	 GLint flags;
+	 glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+
+	 if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+	 {
+		 
+		 glEnable(GL_DEBUG_OUTPUT);
+
+
+		 glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+
+		 glDebugMessageCallback(DebugMessageCallback, NULL);
+
+
+		 glDebugMessageControl(
+			 GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION,
+			 0, NULL, GL_FALSE
+		 );
+
+		 fprintf(stdout, "OpenGL Debug Output successfully enabled.\n");
+	 }
 	
 
 	 Engine::Camera camera;
 	
-	 camera.setPerspectiveProjection(60.0f, static_cast<float>(700) / static_cast<float>(700), 0.1f, 1000.0f);
+	 camera.setPerspectiveProjection(60.0f, static_cast<float>(1000) / static_cast<float>(700), 0.01f, 2000.0f);
 	 EngineCore engineCore;
 
 	 
@@ -92,7 +147,7 @@ int main(int argc, char* args[])
 		 .withRectDimensions(700, 700)
 		 .build();
 
-	 UI::UIElement panel1 = engineCore.getUIBuilder()//RED
+	 UI::UIElement panel1 = engineCore.getUIBuilder()
 		 .createUIPanel()
 		 .withColour({ 23.0 / 255.0, 23.0 / 255.0, 23.0 / 255.0,0.6 })
 		 .withPosition({ 0,0,0 })
@@ -106,19 +161,34 @@ int main(int argc, char* args[])
 		 .withPosition({ 0,0,1 })
 		 .withRectDimensions(200,100)
 		 .build();
+	 
 
-	engineCore.loadModel("PATH TO GLTF FILE");
+
+
+	 // Base path to the model
+	 const char* modelPath = "Path TO GLTF File";
+	 ECS::ECSEngine& ecsEngine = engineCore.getECSEngine();
+
+
+	 ECS::EntityId rootEntity = engineCore.loadModel(modelPath);
+
+
+
+
 
 	 uiWindow.addChild(panel1);
 	 panel1.addChild(fpsGraph);
 	
+
 	 
+
 
 	 PerformanceMonitorSystem performanceMonitorSystem(engineCore.getUICoreSystem());
 
 	 performanceMonitorSystem.setUp(fpsGraph);
 
 
+	
 
 	 float deltaTime = 0.0f;
 	 float lastFrameTime = SDL_GetTicks() / 1000.0f;
@@ -126,6 +196,9 @@ int main(int argc, char* args[])
 	 float accumulator = 0;
 	 float frameNumber = 1;
 	 performanceMonitorSystem.UpdateFPSMeter(0);
+
+
+
 	 while (running)
 	 {
 		 currentFrameTime = SDL_GetTicks() / (1000.0f); // retuns time in milliseconds converted to seconds
@@ -193,7 +266,7 @@ int main(int argc, char* args[])
 		 accumulator += deltaTime;
 		 if (accumulator > 1/30.0)
 		 {
-			 
+			
 			 performanceMonitorSystem.UpdateFPSMeter(accumulator/ frameNumber);
 			 accumulator = 0;
 			 frameNumber =1;
@@ -204,34 +277,19 @@ int main(int argc, char* args[])
 
 
 
-		 engineCore.update();
+		 engineCore.update(deltaTime);
 		 engineCore.render(camera);
 		 engineCore.renderUI();
-	
+
 
 		 //buffer swap
 		 SDL_GL_SwapWindow(window);
-
-		
+	
 	 }
 
 
 
 	 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	SDL_Delay(20);
 

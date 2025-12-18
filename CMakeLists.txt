@@ -12,7 +12,7 @@ include(FetchContent)
 
 
 
-add_subdirectory(external/the-engine/the-engine/ecs)
+add_subdirectory(external/ecs-engine)
 
 
 
@@ -105,6 +105,11 @@ add_executable(opengl-rendering-engine
  "src/animation/skeletal_animation_solver.cpp"
 
 
+ "src/low-level/gpu_buffer_per_frame_allocator.cpp"
+
+
+ "src/rendering-system/object_data_buffer_manager.cpp"
+ "src/rendering-system/render_command_buffer_manager.cpp"
 
 )
 
@@ -118,7 +123,7 @@ target_include_directories(opengl-rendering-engine PRIVATE
 ${CMAKE_SOURCE_CURRENT_DIR}/include
 
 ${CMAKE_SOURCE_CURRENT_DIR}/glad
-${CMAKE_SOURCE_CURRENT_DIR}/external/the-engine/the-engine/ecs/include
+${CMAKE_SOURCE_CURRENT_DIR}/external/ecs-engine/include
 
 ${CMAKE_SOURCE_CURRENT_DIR}/ui/include
 

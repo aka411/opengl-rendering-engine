@@ -156,7 +156,7 @@ struct GPUBufferInfo
 {
 	BufferType bufferType = BufferType::UNKNOWN;
 
-	GLuint bufferHandle;
+	GLuint bufferHandle ;
 
 	//size in bytes
 	size_t size = 0;

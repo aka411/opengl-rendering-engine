@@ -11,7 +11,7 @@ namespace UI
     {
     private:
         
-        TheEngine::ECS::ECSEngine& m_ecsEngine;
+        ECS::ECSEngine& m_ecsEngine;
 
         UICoreSystem& m_uiCoreSystem;
   

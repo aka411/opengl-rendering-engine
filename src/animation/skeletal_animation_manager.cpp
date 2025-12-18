@@ -3,11 +3,11 @@
 
 
 
-BoneAnimationId SkeletalAnimationManager::uploadToJointMatrixSSBO(const BoneAnimationCPUComponent& boneAnimationCPUComponent)
+BoneJointMatrixId SkeletalAnimationManager::uploadNewJointMatrixSetToSSBO(const std::vector<glm::mat4>& jointMatrixSet)
 {
 
 
-    const size_t bytesToCopy = boneAnimationCPUComponent.jointMatrices.size() * sizeof(boneAnimationCPUComponent.jointMatrices[0]);
+    const size_t bytesToCopy = jointMatrixSet.size() * sizeof(jointMatrixSet[0]);
 
 
     assert(m_jointMatrixSSBO.size > (bytesToCopy + m_currentByteOffset));
@@ -18,15 +18,16 @@ BoneAnimationId SkeletalAnimationManager::uploadToJointMatrixSSBO(const BoneAnim
     
     std::byte* absoluteByteOffset = reinterpret_cast<std::byte*>(m_jointMatrixSSBO.mappedPtr) + m_currentByteOffset ;
 
-    memcpy(absoluteByteOffset, boneAnimationCPUComponent.jointMatrices.data(), bytesToCopy);
+    memcpy(absoluteByteOffset, jointMatrixSet.data(), bytesToCopy);
 
 
     const size_t lastByteOffset = m_currentByteOffset;
 
     m_currentByteOffset += bytesToCopy;
 
+    assert(lastByteOffset % sizeof(jointMatrixSet[0]) == 0);
 
-    return (lastByteOffset / sizeof(boneAnimationCPUComponent.jointMatrices[0]));
+    return (lastByteOffset / sizeof(jointMatrixSet[0]));
 }
 
 
@@ -47,9 +48,9 @@ BoneAnimationCPUComponent& SkeletalAnimationManager::getBoneAnimationCPUComponen
     //my belief is that map does not move old data when adding new 
     // ones like vector does when it needs more space to add 
     //new elements
-
+    assert(m_boneAnimationCPUComponents.size() > boneAnimationId);
     
-    return  m_boneIdToBoneAnimationCPUComponents.at(boneAnimationId);
+    return m_boneAnimationCPUComponents[boneAnimationId];
 
 }
 
@@ -58,25 +59,27 @@ BoneAnimationCPUComponent& SkeletalAnimationManager::getBoneAnimationCPUComponen
 BoneAnimationId SkeletalAnimationManager::storeBoneAnimationCPUComponent(BoneAnimationCPUComponent&& boneAnimationCPUComponent)
 {
 
-    assert(boneAnimationCPUComponent.jointMatrices.size() == boneAnimationCPUComponent.jointIndices.size());
+    assert(boneAnimationCPUComponent.inverseBindMatrices.size() == boneAnimationCPUComponent.jointIndices.size());
 
-    const BoneAnimationId boneAnimationId = uploadToJointMatrixSSBO(boneAnimationCPUComponent);
+    const BoneAnimationId boneAnimationId = m_boneAnimationCPUComponents.size();
 
-    m_boneIdToBoneAnimationCPUComponents[boneAnimationId] = std::move(boneAnimationCPUComponent);//creating copy is ok 
+    m_boneAnimationCPUComponents.push_back(std::move(boneAnimationCPUComponent));//creating copy is ok 
 
 
     return boneAnimationId;
 }
 
 
-void SkeletalAnimationManager::updateJointMatrixSet(const BoneAnimationId boneAnimationId, const BoneAnimationCPUComponent& boneAnimationCPUComponent)
+void SkeletalAnimationManager::updateJointMatrixSetInSSBO(const BoneJointMatrixId boneJointMatrixId, const std::vector<glm::mat4>& jointMatrixSet)
 {
 
-    
+    //May need book keeping to track and validate its writing to correct size 
 
-    const size_t bytesToCopy = boneAnimationCPUComponent.jointMatrices.size() * sizeof(boneAnimationCPUComponent.jointMatrices[0]);
+    const size_t bytesToCopy = jointMatrixSet.size() * sizeof(jointMatrixSet[0]);
 
-    memcpy(m_jointMatrixSSBO.mappedPtr, boneAnimationCPUComponent.jointMatrices.data(), bytesToCopy);
+    std::byte* absoluteOffsetAddressPtr = reinterpret_cast<std::byte*>(m_jointMatrixSSBO.mappedPtr) + (boneJointMatrixId * sizeof(jointMatrixSet[0]));
+
+    memcpy(absoluteOffsetAddressPtr, jointMatrixSet.data(), bytesToCopy);
 
 }
 
