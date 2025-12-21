@@ -23,8 +23,8 @@ add_executable(opengl-rendering-engine
 
  src/main.cpp
  "glad/glad.c"
- 
- 
+
+
  "src/common_header_imp.cpp"
  "src/camera.cpp"
 
@@ -43,7 +43,7 @@ add_executable(opengl-rendering-engine
  "src/low-level/gpu_material_system.cpp"
  "src/low-level/shader_code_generator.cpp"
  "src/low-level/shader_manager.cpp"
- "src/low-level/vertex_format_helper.cpp" 
+ "src/low-level/vertex_format_helper.cpp"
  "src/low-level/world_vertex_buffer_management_system.cpp"
 
  "src/model-loading/vertex_attributes_repacker.cpp"
@@ -58,7 +58,7 @@ add_executable(opengl-rendering-engine
  "src/model-loading/gltf_attribute_extractor.cpp"
  "src/model-loading/gltf_animation_extractor.cpp"
 
- "src/ecs_hierarchy_traverser.cpp" 
+ "src/ecs_hierarchy_traverser.cpp"
  "src/transformation_system.cpp"
 
  # UI SOURCE FILES
@@ -70,12 +70,12 @@ add_executable(opengl-rendering-engine
  "src/ui/src/builder/ui_text_label_builder.cpp"
  "src/ui/src/builder/ui_graph_builder.cpp"
  "src/ui/src/builder/ui_builder.cpp"
- "src/ui/src/builder/ui_base_builder.cpp" 
+ "src/ui/src/builder/ui_base_builder.cpp"
  "src/ui/src/builder/ui_panel_builder.cpp"
 
 
  "src/ui/src/systems/ui_vertex_buffer_management_system.cpp"
- "src/ui/src/systems/ui_mesh_system.cpp" 
+ "src/ui/src/systems/ui_mesh_system.cpp"
  "src/ui/src/systems/ui_transformation_system.cpp"
  "src/ui/src/systems/performance_monitor_system.cpp"
  "src/ui/src/systems/ui_layout_system.cpp"
@@ -99,9 +99,9 @@ add_executable(opengl-rendering-engine
  "src/animation/animation_system.cpp"
 
  "src/animation/keyframe_animation_manager.cpp"
-  "src/animation/skeletal_animation_manager.cpp" 
+  "src/animation/skeletal_animation_manager.cpp"
 
- "src/animation/keyframe_animation_interpolator.cpp" 
+ "src/animation/keyframe_animation_interpolator.cpp"
  "src/animation/skeletal_animation_solver.cpp"
 
 
@@ -120,12 +120,12 @@ add_executable(opengl-rendering-engine
 
 target_include_directories(opengl-rendering-engine PRIVATE
 
-${CMAKE_SOURCE_CURRENT_DIR}/include
+${CMAKE_CURRENT_SOURCE_DIR}/include
 
-${CMAKE_SOURCE_CURRENT_DIR}/glad
-${CMAKE_SOURCE_CURRENT_DIR}/external/ecs-engine/include
+${CMAKE_CURRENT_SOURCE_DIR}/glad
+${CMAKE_CURRENT_SOURCE_DIR}/external/ecs-engine/include
 
-${CMAKE_SOURCE_CURRENT_DIR}/ui/include
+${CMAKE_CURRENT_SOURCE_DIR}/ui/include
 
 )
 
